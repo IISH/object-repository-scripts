@@ -10,7 +10,7 @@
             <directory>${project.basedir}</directory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
-                <exclude>scripts.iml</exclude>
+                <exclude>object-repository-scripts.iml</exclude>
                 <exclude>package.xml</exclude>
                 <exclude>pom.xml</exclude>
                 <exclude>target</exclude>
