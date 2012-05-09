@@ -1,21 +1,37 @@
+#!/bin/bash
 #
 # Runs ImageMagick to convert an image into a ( smaller ) image. 
 # Then ingests the derivative into the correct bucket.
 #
-source $scripts/shared/parameters.sh $@
+sa_path=$sa_path
+scripts=$scripts
+db=$db
+pid=$pid
+md5=$md5
+sourceBuckets=$sourceBuckets
+targetBucket=$targetBucket
+targetFile=/$sa_path/tmp/$md5.$targetBucket
+sourceFileExtension=$sourceFileExtension
 
-sourceFile=/tmp/$md5.$sourceBuckets.$sourceFileExtension
-targetFile=/tmp/$md5.$targetBucket
-if [ -f $sourceFile ]; then
-	echo "Using existing cached file on $sourceFile"
-else
-	source $scripts/shared/get.sh $@ -bucket $sourceBuckets -l $sourceFile
-fi
+for bucket in $sourceBuckets
+do
+    sourceFile=/tmp/$md5.$bucket.$sourceFileExtension
+    if [ -f $sourceFile ]; then
+	    echo "Using existing cached file on $sourceFile"
+	    break
+    else
+	    source $scripts/shared/get.sh
+	    if [ -f $sourceFile ] ; then
+	        echo "Using existing cached file on $sourceFile"
+	        break
+	    fi
+    fi
+done
 
 # Run the convert script to create derivative.
 if [ -f $sourceFile ]; then
 	echo "Creating derivative from $sourceFile"
-	cmd=`php $scripts/shared/image.derivative.php -i $sourceFile -l $targetBucket -d $database -p $pid -s $scripts/shared/content.js -o $targetFile `
+	cmd=`php $scripts/shared/image.derivative.php -i $sourceFile -l $targetBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile `
 	echo "cmd=$cmd"
 	convert $cmd
 else

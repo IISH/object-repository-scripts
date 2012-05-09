@@ -5,12 +5,11 @@
 scripts=$scripts
 orfiles=$orfiles
 host=$host
-source $scripts/shared/parameters.sh
 bucket=$bucket
 db=$db
-l=$l
+l="$l"
 pid=$pid
-sourceBuckets=$sourceBuckets
+sourceBucket=$sourceBucket
 
 #checking params
 if [ -z "$pid" ] ; then
@@ -19,7 +18,7 @@ if [ -z "$pid" ] ; then
 fi
 
 echo "Getting $bucket/$pid to $l"
-java -jar $orfiles -M Get -l $l -h $host -d "$db" -b $sourceBuckets -a $pid
+java -jar $orfiles -M Get -l "$l" -h $host -d "$db" -b $sourceBucket -a $pid
 
 rc=$?
 if [[ $rc != 0 ]] ; then

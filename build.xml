@@ -1,0 +1,52 @@
+<project name="object-repository" default="deploy" basedir=".">
+    <description>
+        Deployment of artifacts from our bamboo CI environment.
+    </description>
+    <!-- set global properties for this build -->
+    <property name="build" value="latestSuccessful"/>
+    <property name="bamboo"
+              value="https://bamboo.socialhistoryservices.org/browse"/>
+    <property name="version" value="1.0"/>
+    <property name="dest.bin" value="/usr/bin/${ant.project.name}"/>
+    <property name="dest.opt" value="/opt/${ant.project.name}"/>
+    <property name="dest.conf" value="/etc/${ant.project.name}"/>
+    <property name="dest.log" value="/var/log/${ant.project.name}"/>
+    <property name="tmp" value="/tmp/${ant.project.name}"/>
+
+    <target name="deploy"
+            description="download and installs all required files">
+
+        <mkdir dir="${dest.bin}"/>
+        <mkdir dir="${dest.conf}"/>
+        <mkdir dir="${dest.log}"/>
+        <mkdir dir="${dest.opt}/pmq-agents-enabled"/>
+        <delete dir="${tmp}"/>
+        <mkdir dir="${tmp}"/>
+        <get src="${bamboo}/OR-ADMIN/${build}/artifact/JOB1/admin.war/object-repository-admin-${version}.war" dest="${tmp}/object-repository-admin-${version}.war"/>
+        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/pmg-agent/object-repository-pmg-agent-${version}.jar" dest="${tmp}/object-repository-pmg-agent-${version}.jar"/>
+        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/orfiles/object-repository-orfiles-${version}.jar" dest="${tmp}/object-repository-orfiles-${version}.jar"/>
+        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/instruction-manager/object-repository-instruction-manager-${version}.jar" dest="${tmp}/object-repository-instruction-manager-${version}.jar"/>
+        <get src="${bamboo}/OR-SCRIPTS/${build}/artifact/JOB1/scripts/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-${version}-src.tar.gz"/>
+
+        <gunzip src="${tmp}/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-${version}-src.tar"/>
+        <delete file="${tmp}/scripts-${version}-src.tar.gz"/>
+        <untar src="${tmp}/scripts-${version}-src.tar" dest="${tmp}/_scripts"/>
+        <delete file="${tmp}/scripts-${version}-src.tar"/>
+        <move file="${tmp}/_scripts/scripts-${version}-src" tofile="${tmp}/scripts-${version}-src"/>
+        <delete dir="${tmp}/_scripts"/>
+
+        <chmod perm="744">
+            <fileset dir="${tmp}/scripts-${version}-src" includes="**/*.sh"/>
+        </chmod>
+
+        <delete dir="${dest.bin}"/>
+        <move file="${tmp}" tofile="${dest.bin}"/>
+        <delete dir="${tmp}"/>
+
+        <symlink link="${dest.opt}/conf" resource="${dest.conf}" overwrite="yes"/>
+        <symlink link="${dest.opt}/log" resource="${dest.log}" overwrite="yes"/>
+        <symlink link="${dest.opt}/pmq-agents-available" resource="${dest.bin}/scripts/pmq-agents-available" overwrite="yes"/>
+        <symlink link="${dest.opt}/start.sh" resource="${dest.bin}/scripts-${version}-src/start.sh" overwrite="yes"/>
+
+    </target>
+</project>
