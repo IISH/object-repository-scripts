@@ -23,6 +23,7 @@ fi
 
 aptitude install ant1.8
 cd /opt
+rm build.xml
 wget https://raw.github.com/IISH/object-repository-scripts/master/build.xml
 ant
 
