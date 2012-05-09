@@ -47,6 +47,7 @@ profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resol
                   'start' : ISODate('2012-01-01T00:00:00.000Z'), \
                   'statusCode' : 0, \
                   'total' : 0, \
+		  'exitValue' : 123, \
                   'version' : 0 } \
                   , \
           	  { \
@@ -59,6 +60,7 @@ profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resol
                   'processed' : 0, \
                   'start' : ISODate('2012-01-01T00:00:00.000Z'), \
                   'statusCode' : 0, \
+                  'exitValue' : 123, \
                   'total' : 0, \
                   'version' : 0 } \
                   ] }"

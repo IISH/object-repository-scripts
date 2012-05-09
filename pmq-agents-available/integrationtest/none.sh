@@ -22,7 +22,7 @@ testTotal=15
 testCounter=0
 action="upsert"
 autoGeneratePIDs="none"
-source $scripts/pmq-agents-available/StagingfileBindPIDs/test/setup.sh
+source $scripts/pmq-agents-available/integrationtest/setup.sh
 db=$db
 key=$key
 endpoint=$endpoint

@@ -152,9 +152,8 @@ function removeDocuments(master) {
             var document = (ns == namespace) ? master : collection.findOne({'metadata.pid':pid});
             if (document) {
                 var files_id = document._id;
-		print((ns == namespace));
                 print("Removing from " + namespace + '.' + pid);
-                collection.remove(files_id);
+                collection.remove({_id:files_id});
                 db.getCollection(namespace + '.chunks').remove({files_id:files_id});
             }
         }
