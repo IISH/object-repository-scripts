@@ -13,8 +13,7 @@
     <property name="dest.log" value="/var/log/${ant.project.name}"/>
     <property name="tmp" value="/tmp/${ant.project.name}"/>
 
-    <target name="deploy"
-            description="download and installs all required files">
+    <target name="deploy" description="download and installs all required files">
 
         <mkdir dir="${dest.bin}"/>
         <mkdir dir="${dest.conf}"/>
@@ -22,21 +21,21 @@
         <mkdir dir="${dest.opt}/pmq-agents-enabled"/>
         <delete dir="${tmp}"/>
         <mkdir dir="${tmp}"/>
-        <get src="${bamboo}/OR-ADMIN/${build}/artifact/JOB1/admin.war/object-repository-admin-${version}.war" dest="${tmp}/object-repository-admin-${version}.war"/>
-        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/pmg-agent/object-repository-pmg-agent-${version}.jar" dest="${tmp}/object-repository-pmg-agent-${version}.jar"/>
-        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/orfiles/object-repository-orfiles-${version}.jar" dest="${tmp}/object-repository-orfiles-${version}.jar"/>
-        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/instruction-manager/object-repository-instruction-manager-${version}.jar" dest="${tmp}/object-repository-instruction-manager-${version}.jar"/>
-        <get src="${bamboo}/OR-SCRIPTS/${build}/artifact/JOB1/scripts/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-${version}-src.tar.gz"/>
+        <get src="${bamboo}/OR-ADMIN/${build}/artifact/JOB1/admin.war/object-repository-admin-${version}.war" dest="${tmp}/object-repository-admin.war"/>
+        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/pmq-agent/pmq-agent-${version}.jar" dest="${tmp}/pmq-agent.jar"/>
+        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/orfiles/orfiles-${version}.jar" dest="${tmp}/orfiles.jar"/>
+        <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/instruction-manager/instruction-manager-${version}.jar" dest="${tmp}/instruction-manager.jar"/>
+        <get src="${bamboo}/OR-SCRIPTS/${build}/artifact/JOB1/scripts/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-src.tar.gz"/>
 
-        <gunzip src="${tmp}/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-${version}-src.tar"/>
-        <delete file="${tmp}/scripts-${version}-src.tar.gz"/>
-        <untar src="${tmp}/scripts-${version}-src.tar" dest="${tmp}/_scripts"/>
-        <delete file="${tmp}/scripts-${version}-src.tar"/>
-        <move file="${tmp}/_scripts/scripts-${version}-src" tofile="${tmp}/scripts-${version}-src"/>
+        <gunzip src="${tmp}/scripts-src.tar.gz" dest="${tmp}/scripts-src.tar"/>
+        <delete file="${tmp}/scripts-src.tar.gz"/>
+        <untar src="${tmp}/scripts-src.tar" dest="${tmp}/_scripts"/>
+        <delete file="${tmp}/scripts-src.tar"/>
+        <move file="${tmp}/_scripts/scripts-${version}" tofile="${tmp}/scripts"/>
         <delete dir="${tmp}/_scripts"/>
 
         <chmod perm="744">
-            <fileset dir="${tmp}/scripts-${version}-src" includes="**/*.sh"/>
+            <fileset dir="${tmp}/scripts" includes="**/*.sh"/>
         </chmod>
 
         <delete dir="${dest.bin}"/>
@@ -46,7 +45,7 @@
         <symlink link="${dest.opt}/conf" resource="${dest.conf}" overwrite="yes"/>
         <symlink link="${dest.opt}/log" resource="${dest.log}" overwrite="yes"/>
         <symlink link="${dest.opt}/pmq-agents-available" resource="${dest.bin}/scripts/pmq-agents-available" overwrite="yes"/>
-        <symlink link="${dest.opt}/start.sh" resource="${dest.bin}/scripts-${version}-src/start.sh" overwrite="yes"/>
+        <symlink link="${dest.opt}/start.sh" resource="${dest.bin}/scripts/start.sh" overwrite="yes"/>
 
     </target>
 </project>
