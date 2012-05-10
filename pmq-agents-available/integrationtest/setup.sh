@@ -69,7 +69,7 @@ mongo sa --eval "db.getCollection('profile').save($profile)"
 
 #  Get some 25 test files with the instruction. Remove any PIDs in the pid webservice
 instruction="$fileSet/instruction.xml"
-echo "<instruction xmlns='http://objectrepository.org/instruction/1.0/' autoIngestValidInstruction='true' action='$action'>" > $instruction
+echo "<instruction xmlns='http://objectrepository.org/instruction/1.0/' autoIngestValidInstruction='true' autoGeneratePIDs='$autoGeneratePIDs' action='$action'>" > $instruction
 for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5
@@ -80,7 +80,7 @@ do
         location=/$folder/$filename
         md5=$(md5sum $file | cut -d ' ' -f 1)
         pid=$na/$i.$j
-
+	lid="lid.$pid"
             echo "<stagingfile>" >> $instruction
             echo "<location>$location</location>" >> $instruction
             if [ "$autoGeneratePIDs" == "none" ]; then
@@ -88,7 +88,7 @@ do
             fi
 		
             if [ "$autoGeneratePIDs" == "lid" ]; then
-                echo "<lid>lid.$pid</lid>" >> $instruction
+                echo "<lid>$lid</lid>" >> $instruction
             fi
             echo "<md5>$md5</md5>" >> $instruction
             echo "</stagingfile>" >> $instruction

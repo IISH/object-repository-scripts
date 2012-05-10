@@ -18,7 +18,7 @@ folder="unittest"
 fileSet=$sa_path/$na/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
-testTotal=15
+testTotal=101
 testCounter=0
 action="upsert"
 autoGeneratePIDs="none"
@@ -49,8 +49,10 @@ do
 	    break
     fi
 
+	echo "Files in stagingfile collection: $count"
+
     if [ $remember != $count ] ; then
-        failSafe = 0
+        failSafe=0
         remember=$count
     fi
 done
@@ -71,10 +73,11 @@ do
 
         pid=$na/$i.$j
         count=$(mongo $db --quiet --eval "db.getCollection('files').find({pid:'$pid'}).count()")
-        if [ $count == 0 ] ; then
+        if [ $count != 1 ] ; then
             echo "The expected pid $pid is not in the database"
             exit -1
         fi
+
         let testCounter++
 
 	    soapenv="<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' \
@@ -86,21 +89,26 @@ do
                 </soapenv:Body> \
             </soapenv:Envelope>"
 
-	    log=/tmp/$filename
-	    rm -f $log
-        wget -O $log --header="Content-Type: text/xml" --header="Authorization: oauth $key" --post-data "$soapenv" \
+	    file=/tmp/$filename
+	    rm -f $file
+        wget -O $file --header="Content-Type: text/xml" --header="Authorization: oauth $key" --post-data "$soapenv" \
             --no-check-certificate $endpoint
-        if [ ! -f $log ] ; then
+        if [ ! -f $file ] ; then
             echo "The PID webservice did not gave a valid response."
             exit -1
         fi
+	let testCounter++
 
-        l=$fileSet/$filename
-        pidCheck=$(php $scripts/pmg-agents-available/StagingfileBindPIDs/test/pid.php -l $l)
+        pidCheck=$(php $scripts/pmq-agents-available/integrationtest/pid.php -l $file)
         if [ "$pidCheck" != "$pid" ] ; then
             echo "Pid not returned by webservice"
             exit -1
         fi
+	let testCounter++
 
     done
-done	
+done
+
+source $scripts/shared/testreport.sh
+
+echo $testCounter

@@ -1,9 +1,8 @@
 <?php
 
 // l = file location; p=pid
-$options = getopt("l:p:");
+$options = getopt("l:");
 $l = $options['l'];
-$p = $options['p'];
 
 $xml = new DOMDocument();
 $xml->load($l);

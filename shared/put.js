@@ -174,6 +174,7 @@ function metadata(document) {
     var m = document.metadata;
     m.na = na;
     m.pid = pid;
+    m.lid = lid;
     m.access = access;
     m.label = label;
     m.resolverBaseUrl = resolverBaseUrl;

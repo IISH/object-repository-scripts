@@ -29,6 +29,10 @@ else
 
     remove=true
     source $scripts/shared/put.sh
+    count=$(ls -1 | wc -l)
+    if [$count == 0] ; then
+	rm -f $fileSet
+    fi
 
 fi
 

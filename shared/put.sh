@@ -46,6 +46,7 @@ resolverBaseUrl="$resolverBaseUrl"
     var md5='$md5'; \
     var ns='$bucket'; \
     var pid='$pid'; \
+    var lid='$lid'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     ''" $scripts/shared/put.js
 
