@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# integrationtest/lid.sh
+# integrationtest/filename2lid.sh
 #
 # Integration test
 #
@@ -21,7 +21,7 @@ cpendpoint=$cpendpoint
 testTotal=101
 testCounter=0
 action="upsert"
-autoGeneratePIDs="lid"
+autoGeneratePIDs="filename2lid"
 source $scripts/pmq-agents-available/integrationtest/setup.sh
 db=$db
 key=$key
@@ -59,12 +59,12 @@ done
 
 # What we expect is to find our files in the database
 # And each PID we expect to see in the PID webservice with the resolve URLs.i
-# However, now we do not know what that pid is.
 for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5
     do
         filename="master.$i.$j.txt"
+	    pid=$na/$filename
         file=$fileSet/$filename
         if [ -f $file ] ; then
             echo "The file $file ought to have been removed."
@@ -72,9 +72,8 @@ do
         fi
         let testCounter++
 
-	pid=$na/$i.$j
         lid="lid.$pid"
-	query="{'metadata.lid':'$lid'}"
+	    query="{'metadata.lid':'$lid'}"
         count=$(mongo $db --quiet --eval "db.getCollection('files').find($query).count()")
         if [ $count != 1 ] ; then
             echo "The expected lid $lid; but it is not in the database"
@@ -82,9 +81,9 @@ do
         fi
 	let testCounter++
 
-	pid=$(mongo $db --quiet --eval "db.getCollection('files').findOne($query).metadata.pid")
-	if [ ${#pid} != 42 ] ; then
-	    echo "We ought to get an UUID shaped PID value."
+	checkPid=$(mongo $db --quiet --eval "db.getCollection('files').findOne($query).metadata.pid")
+	if [ "$checkPid" != "$pid" ] ; then
+	    echo "We expected $pid but actually got $checkPid"
 	    exit -1
 	fi
     done

@@ -67,7 +67,8 @@ profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resol
 echo "profile=$profile"
 mongo sa --eval "db.getCollection('profile').save($profile)"
 
-#  Get some 25 test files with the instruction. Remove any PIDs in the pid webservice
+#  Get some 25 test files with the instruction. Remove any PIDs in the pid webservice.
+# We alway use a custom pid that we know.
 instruction="$fileSet/instruction.xml"
 echo "<instruction xmlns='http://objectrepository.org/instruction/1.0/' autoIngestValidInstruction='true' autoGeneratePIDs='$autoGeneratePIDs' action='$action'>" > $instruction
 for i in 1 2 3 4 5
@@ -75,12 +76,12 @@ do
     for j in 1 2 3 4 5
     do
         filename="master.$i.$j.txt"
+        pid=$na/$filename
         file="$fileSet/$filename"
         echo $file > $file
         location=/$folder/$filename
         md5=$(md5sum $file | cut -d ' ' -f 1)
-        pid=$na/$i.$j
-	lid="lid.$pid"
+	    lid="lid.$pid"
             echo "<stagingfile>" >> $instruction
             echo "<location>$location</location>" >> $instruction
             if [ "$autoGeneratePIDs" == "none" ]; then
