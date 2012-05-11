@@ -34,7 +34,7 @@ query="{fileSet:'$fileSet'}"
 mongo sa --quiet --eval "db.getCollection('stagingfile').remove($query)"
 # Add a profile with a default workflow that only processes the StagingfileBindPIDs
 profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resolverBaseUrl:'http://hdl.handle.net/', 
-    autoGeneratePIDs:'none',autoIngestValidInstruction:'true',pidwebserviceEndpoint:null,pidwebserviceKey:null, \
+    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null, \
     workflow:[ \
 	{ \
                   'attempts' : 1, \
