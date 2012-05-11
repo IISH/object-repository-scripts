@@ -75,7 +75,7 @@ for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5
     do
-        filename="master.$i.$j.txt"
+        filename="$i.$j.txt"
         pid=$na/$filename
         file="$fileSet/$filename"
         echo $file > $file
@@ -110,7 +110,7 @@ do
 	if [ -f $log ] ; then
             echo "DeletePidRequest(pid:'$pid')"
         else
-            echo "Error: could not remove PID from webservice. Error response from web service."
+            echo "Error: could not call webservice."
             echo $soapenv
 	    echo "with key $key and endpoint $endpoint"
 	    exit -1

@@ -22,13 +22,12 @@ testTotal=101
 testCounter=0
 action="upsert"
 autoGeneratePIDs="none"
-source $scripts/pmq-agents-available/integrationtest/setup.sh
+source $scripts/integrationtest/setup.sh
 db=$db
 key=$key
 endpoint=$endpoint
 
 echo "====================================================================="
-
 # as the files are being processed, we just have to wait a bit and see...
 failSafe=0
 remember=0
@@ -63,7 +62,7 @@ for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5
     do
-        filename="master.$i.$j.txt"
+        filename="$i.$j.txt"
         file=$fileSet/$filename
         if [ -f $file ] ; then
             echo "The file $file ought to have been removed."
@@ -71,7 +70,7 @@ do
         fi
         let testCounter++
 
-        pid=$na/$i.$j
+        pid=$na/$filename
         count=$(mongo $db --quiet --eval "db.getCollection('files').find({pid:'$pid'}).count()")
         if [ $count != 1 ] ; then
             echo "The expected pid $pid is not in the database"
@@ -99,8 +98,8 @@ do
         fi
 	let testCounter++
 
-        pidCheck=$(php $scripts/pmq-agents-available/integrationtest/pid.php -l $file)
-        if [ "$pidCheck" != "$pid" ] ; then
+        pidCheck=$(php $scripts/integrationtest/pid.php -l $file)
+        if [ "${pidCheck}" != "${pid^^}" ] ; then
             echo "Pid not returned by webservice"
             exit -1
         fi

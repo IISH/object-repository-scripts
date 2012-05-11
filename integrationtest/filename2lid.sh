@@ -18,11 +18,11 @@ folder="unittest"
 fileSet=$sa_path/$na/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
-testTotal=101
+testTotal=51
 testCounter=0
 action="upsert"
 autoGeneratePIDs="filename2lid"
-source $scripts/pmq-agents-available/integrationtest/setup.sh
+source $scripts/integrationtest/setup.sh
 db=$db
 key=$key
 endpoint=$endpoint
@@ -63,8 +63,8 @@ for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5
     do
-        filename="master.$i.$j.txt"
-	    pid=$na/$filename
+        lid="$i.$j"
+	pid=$na/$filename
         file=$fileSet/$filename
         if [ -f $file ] ; then
             echo "The file $file ought to have been removed."
@@ -72,20 +72,14 @@ do
         fi
         let testCounter++
 
-        lid="lid.$pid"
 	    query="{'metadata.lid':'$lid'}"
-        count=$(mongo $db --quiet --eval "db.getCollection('files').find($query).count()")
+        count=$(mongo $db --quiet --eval "db.getCollection('master.files').find($query).count()")
         if [ $count != 1 ] ; then
-            echo "The expected lid $lid; but it is not in the database"
+            echo "The expected lid $lid not in the database"
             exit -1
         fi
 	let testCounter++
 
-	checkPid=$(mongo $db --quiet --eval "db.getCollection('files').findOne($query).metadata.pid")
-	if [ "$checkPid" != "$pid" ] ; then
-	    echo "We expected $pid but actually got $checkPid"
-	    exit -1
-	fi
     done
 done
 

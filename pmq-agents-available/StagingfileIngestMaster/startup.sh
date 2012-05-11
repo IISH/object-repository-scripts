@@ -29,9 +29,9 @@ else
 
     remove=true
     source $scripts/shared/put.sh
-    count=$(ls -1 | wc -l)
+    count=$(ls $fileSet -1 | wc -l)
     if [$count == 0] ; then
-	rm -f $fileSet
+	rm -r $fileSet
     fi
 
 fi
