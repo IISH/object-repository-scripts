@@ -13,7 +13,7 @@ useCustom=$useCustom
 derivative=$derivative
 md5=$md5
 
-$scripts/shared/generic.derivative.sh
+source $scripts/shared/generic.derivative.sh
 
 # If we are here in this script, it is because there was no custom derivative provided.
 file="$scripts/shared/$derivative.derivative.sh"

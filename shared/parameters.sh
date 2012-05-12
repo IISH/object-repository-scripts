@@ -17,6 +17,7 @@ while [ "${1+isset}" ]; do
     echo "v=$v"
 done
 
+sa_path=$sa_path
 content=$content
 contentType=$contentType
 database=$database
@@ -27,6 +28,7 @@ fileSet=$fileSet
 key=$key
 l=$l
 location=$location
+tmp=/$sa_path/tmp
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 sourceFileExtension=$sourceFileExtension
 

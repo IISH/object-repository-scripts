@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# StagingfileBindPIDs/test/setup.sh
+# StagingfileBindPIDs/test/stagingfilePut.instructionSetup.sh
 #
 # Unit test using startup.sh
 #

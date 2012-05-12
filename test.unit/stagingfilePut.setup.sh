@@ -1,10 +1,10 @@
 #
-# /StagingfileIngestMaster/test/setup.sh
+# /StagingfileIngestMaster/test/stagingfilePut.instructionSetup.sh
 #
 # Purpose is to make sure the add and update procedures work well as described
 # in /shared/put.js
 #
-# Use case2.sh make to reconstruct the database and testfiles
+# Use stagingfilePut.case2.sh make to reconstruct the database and testfiles
 
 sa_path=$sa_path
 scripts=$scripts

@@ -18,5 +18,5 @@ if [ -f $sourceFile ]; then
     contentType=(php $scripts/shared/contenttype.php -l $sourceFile)
     content=$(identify -format "{height:'%h',width:'%w',x-resolution:'%x',y-resolution:'%y'}" $sourceFile)
     remove=true
-    $scripts/shared/put.sh
+    source $scripts/shared/put.sh
 fi

@@ -20,6 +20,7 @@ md5=$md5
 na=$na
 orfiles=$orfiles
 pid="$pid"
+lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
 
     if [ ! -f "$l" ] ; then

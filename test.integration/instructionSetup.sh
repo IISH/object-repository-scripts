@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# StagingfileBindPIDs/test/setup.sh
+# StagingfileBindPIDs/test/stagingfilePut.instructionSetup.sh
 #
 # Integration test
 #
@@ -19,9 +19,7 @@ autocreateInstruction=$autocreateInstruction
 action="upsert"
 
 mkdir -p $fileSet
-rm $fileSet/*.txt
-rm $fileSet/*.md5
-mkdir -p /tmp/$na
+rm $fileSet/*
 
 # empty our profile, instruction and stagingfile collections
 query="{na:'$na'}"

@@ -100,8 +100,8 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     $targetHeight = $original['px']['height'];
     # Update our database
     $mongosh = "mongo $db --quiet --eval=\"var ns='$bucket';pid='$pid';var content={"
-                . "dpix:'" . (int)$original['dpis']['x'] . "',"
-                . "dpiy:'" . (int)$original['dpis']['y'] . "',"
+                . "x-resolution:'" . (int)$original['dpis']['x'] . "',"
+                . "y-resolution:'" . (int)$original['dpis']['y'] . "',"
                 . "width:'" . $targetWidth . "',"
                 . "height:'" . $targetHeight . "'};"
                 . "''\" " . $script;

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# /StagingfileIngestMaster/test/case4.sh
+# /StagingfileIngestMaster/test/stagingfilePut.case4.sh
 #
 # Purpose is to make sure the add and update procedures work well as described
 # in /shared/put.js
@@ -14,7 +14,7 @@
 
 
 scripts=$scripts
-source $scripts/pmq-agents-available/StagingfileIngestMaster/test/setup.sh
+source $scripts/pmq-agents-available/test.unit/setup.sh
 na=$na
 sa_path=$sa_path
 fileSet=$fileSet

@@ -5,6 +5,7 @@
 # Insert a Master file into the database
 
 scripts=$scripts
+fileSet=$fileSet
 bucket="master"
 source $scripts/shared/parameters.sh
 db=$db

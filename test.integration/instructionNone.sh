@@ -22,7 +22,7 @@ testTotal=101
 testCounter=0
 action="upsert"
 autoGeneratePIDs="none"
-source $scripts/integrationtest/setup.sh
+source $scripts/test.integration/setup.sh
 db=$db
 key=$key
 endpoint=$endpoint

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# integrationtest/filename2lid.sh
+# integrationtest/instructionFilename2lid.sh
 #
 # Integration test
 #
@@ -18,48 +18,38 @@ folder="unittest"
 fileSet=$sa_path/$na/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
-testTotal=27
+testTotal=51
 testCounter=0
 action="upsert"
-autoGeneratePIDs="filename2pid"
-autocreateInstruction=true
-source $scripts/integrationtest/setup.sh
+autoGeneratePIDs="filename2lid"
+source $scripts/test.integration/setup.sh
 db=$db
 key=$key
 endpoint=$endpoint
 
 echo "====================================================================="
 
-ls $fileSet -al
-
+# as the files are being processed, we just have to wait a bit and see...
 failSafe=0
 remember=0
-
-sleep 30
-count=$(ls $fileSet -1 | wc -l)
-if [ $count != 25 ] ; then
-	echo "No files ought ot have been processed."
-	exit -1
-fi
-let failSafe++
-
-# Now run the workflow
-mongo sa --quiet --eval "db.getCollection('instruction').update({fileSet:'$fileSet'}, \
-	{\$set:{autoGeneratePIDs:'filename2pid',autoIngestValidInstruction:false,'task.name':'InstructionAutocreate', \
-	'task.statusCode':100}}, false, false)"
 
 while [ $failSafe -lt 100 ]
 do
     sleep 5
     let failSafe++
+    f=$(mongo sa --quiet --eval "db.getCollection('stagingfile').find( {failure:{\$size:0}} ).count()")
+    if [ $f != 0 ] ; then
+        echo "There are $f failures..."
+        exit -1
+    fi
     count=$(mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet'}).count()")
-    if [ $count == 25 ] ; then
-            echo "Instruction completed."
+    if [ $count == 0 ] ; then
+	    echo "Instruction completed."
         let testCounter++
-            break
+	    break
     fi
 
-        echo "Files in stagingfile collection: $count"
+	echo "Files in stagingfile collection: $count"
 
     if [ $remember != $count ] ; then
         failSafe=0
@@ -67,22 +57,30 @@ do
     fi
 done
 
-# Nothing will happen now... pids are there, but no automatic ingest: autoIngestValidInstruction:'false'
 # What we expect is to find our files in the database
-echo "Wait for some time... ingest ought not to happen."
-sleep 60
-
+# And each PID we expect to see in the PID webservice with the resolve URLs.i
 for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5
     do
-	pid=$na/$i.$j
+        lid="$i.$j"
+        filename="$i.$j.txt"
+	    pid=$na/$filename
         file=$fileSet/$filename
-        if [ ! -f $file ] ; then
-            echo "The file $file ought not to have been removed."
+        if [ -f $file ] ; then
+            echo "The file $file ought to have been removed."
             exit -1
         fi
         let testCounter++
+
+	    query="{'metadata.lid':'$lid'}"
+        count=$(mongo $db --quiet --eval "db.getCollection('master.files').find($query).count()")
+        if [ $count != 1 ] ; then
+            echo "The expected lid $lid not in the database"
+            exit -1
+        fi
+	let testCounter++
+
     done
 done
 

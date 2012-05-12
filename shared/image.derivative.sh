@@ -10,12 +10,13 @@ pid=$pid
 md5=$md5
 sourceBuckets=$sourceBuckets
 targetBucket=$targetBucket
-targetFile=/$sa_path/tmp/$md5.$targetBucket
+tmp=$tmp
+targetFile=$tmp/$md5.$targetBucket
 sourceFileExtension=$sourceFileExtension
 
 for bucket in $sourceBuckets
 do
-    sourceFile=/tmp/$md5.$bucket.$sourceFileExtension
+    sourceFile=$tmp/$md5.$bucket.$sourceFileExtension
     if [ -f $sourceFile ]; then
 	    echo "Using existing cached file on $sourceFile"
 	    break
