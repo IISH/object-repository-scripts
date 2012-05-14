@@ -17,8 +17,8 @@ if [ -z "$pid" ] ; then
     exit -1
 fi
 
-echo "Getting $bucket/$pid to $l"
-java -jar $orfiles -M Get -l "$l" -h $host -d "$db" -b $sourceBucket -a $pid
+echo "Get from db=$db bucket=$sourceBucket pid=$pid to $l"
+java -jar $orfiles -M Get -l "$l" -h $host -d "$db" -b $sourceBucket -a $pid -m ""
 
 rc=$?
 if [[ $rc != 0 ]] ; then

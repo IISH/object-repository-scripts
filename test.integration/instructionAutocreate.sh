@@ -18,12 +18,12 @@ folder="unittest"
 fileSet=$sa_path/$na/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
-testTotal=27
+testTotal=26
 testCounter=0
 action="upsert"
 autoGeneratePIDs="filename2pid"
 autocreateInstruction=true
-source $scripts/test.integration/setup.sh
+source $scripts/test.integration/instructionSetup.sh
 db=$db
 key=$key
 endpoint=$endpoint

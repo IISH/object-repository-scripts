@@ -18,6 +18,7 @@ source $scripts/shared/generic.derivative.sh
 # If we are here in this script, it is because there was no custom derivative provided.
 file="$scripts/shared/$derivative.derivative.sh"
 if [ -f $file ] ; then
+    echo "Loading $file"
     source $file
 else
     echo "We cannot make a derivative of type $derivative"

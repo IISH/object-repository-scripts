@@ -23,7 +23,6 @@ mongo or_$na --quiet --eval "db.getCollection('files').remove({na:'$na'})"
 
 
 # What we expect is to find our files in teh database
-# And each PID we expect to see in the PID webservice with the resolve URLs.
 rm $fileSet/*
 for i in 1 2 3 4 5
 do

@@ -173,8 +173,9 @@ function metadata(document) {
     var now = new Date();
     var m = document.metadata;
     m.na = na;
+    m.fileSet = fileSet;
     m.pid = pid;
-    m.lid = lid;
+    if ( lid ) m.lid = lid;
     m.access = access;
     m.label = label;
     m.resolverBaseUrl = resolverBaseUrl;

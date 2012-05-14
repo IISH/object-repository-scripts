@@ -28,7 +28,8 @@ fileSet=$fileSet
 key=$key
 l=$l
 location=$location
-tmp=/$sa_path/tmp
+tmp=/tmp
+mkdir -p $tmp
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 sourceFileExtension=$sourceFileExtension
 

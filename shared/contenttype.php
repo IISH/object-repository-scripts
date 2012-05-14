@@ -10,7 +10,7 @@
  * No matches results in returning the last item in the content list
  */
 
-// l = file with extension and t = file of content types
+// l = file with extension and t = file that contains extensions and content types
 $options = getopt("l:t:");
 $l = $options['l'];
 $t = $options['t'];
@@ -18,11 +18,11 @@ $contentType = "application/octet-stream";
 
 $extension = "." . pathinfo($l, PATHINFO_EXTENSION);
 if ($extension == ".") {
-    echo $contentType;
+    print($contentType);
     exit(0);
 }
 
-$file = fopen($t, "r") or exit("Unable to open file!");
+$file = fopen($t, "r") or exit("Unable to open file $t!");
 while (!feof($file)) {
     $line = fgets($file);
     if ($line[0] == "#") continue;

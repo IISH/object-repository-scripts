@@ -11,7 +11,7 @@
 
 
 scripts=$scripts
-source $scripts/pmq-agents-available/test.unit/setup.sh
+source $scripts/test.unit/stagingfilePut.setup.sh
 na=$na
 sa_path=$sa_path
 fileSet=$fileSet

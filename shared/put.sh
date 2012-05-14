@@ -30,7 +30,9 @@ resolverBaseUrl="$resolverBaseUrl"
 
     # Upload our file.
     # The PUT will fail when md5 and length compound key is unique.
-    java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put
+    echo "-c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put"
+	java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put
+
 
     rc=$?
     if [[ $rc != 0 ]] ; then
@@ -42,6 +44,7 @@ resolverBaseUrl="$resolverBaseUrl"
     var content=$content; \
     var filesDB='$db'; \
     var na='$na'; \
+    var fileSet='$fileSet'; \
     var label='$label'; \
     var length=$length; \
     var md5='$md5'; \

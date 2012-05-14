@@ -22,7 +22,7 @@ testTotal=101
 testCounter=0
 action="upsert"
 autoGeneratePIDs="none"
-source $scripts/test.integration/setup.sh
+source $scripts/test.integration/instructionSetup.sh
 db=$db
 key=$key
 endpoint=$endpoint
@@ -98,7 +98,7 @@ do
         fi
 	let testCounter++
 
-        pidCheck=$(php $scripts/integrationtest/pid.php -l $file)
+        pidCheck=$(php $scripts/test.integration/pid.php -l $file)
         if [ "${pidCheck}" != "${pid^^}" ] ; then
             echo "Pid not returned by webservice"
             exit -1

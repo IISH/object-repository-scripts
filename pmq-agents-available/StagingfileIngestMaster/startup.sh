@@ -19,7 +19,7 @@ l="$l"
 
 # If we have no file to upload, we basically are talking about an update of metadata
 if [ -z "$l" ] ; then
-    echo "No file found... updating metadata for the $db.$bucket collection"
+    echo "No location '$l' found... updating metadata for the $db.$bucket collection"
 
     e="db.getCollection('$bucket.files').update({'metadata.pid':'$pid'},{\$set:{'metadata.access':'$access', \
     contentType:'$contentType','metadata.label':'$label'}}, false, false); \

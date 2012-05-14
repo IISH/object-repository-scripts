@@ -20,6 +20,7 @@ action="upsert"
 
 mkdir -p $fileSet
 rm $fileSet/*
+mkdir /tmp/$na
 
 # empty our profile, instruction and stagingfile collections
 query="{na:'$na'}"
@@ -62,13 +63,16 @@ profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resol
                   'total' : 0, \
                   'version' : 0 } \
                   ] }"
-echo "profile=$profile"
+
+profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resolverBaseUrl:'http://hdl.handle.net/',
+    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null,workflow:null}"
 mongo sa --eval "db.getCollection('profile').save($profile)"
 
 #  Get some 25 test files with the instruction. Remove any PIDs in the pid webservice.
 # We alway use a custom pid that we know.
 instruction="$fileSet/instruction.xml"
-echo "<instruction xmlns='http://objectrepository.org/instruction/1.0/' autoIngestValidInstruction='true' autoGeneratePIDs='$autoGeneratePIDs' action='$action'>" > $instruction
+echo "<instruction xmlns='http://objectrepository.org/instruction/1.0/' autoIngestValidInstruction='true' autoGeneratePIDs='$autoGeneratePIDs' \
+	action='$action' workflow='StagingfileIngestMaster,StagingfileBindPIDs' >" > $instruction
 for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5

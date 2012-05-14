@@ -2,6 +2,11 @@
 
 source $scripts/test.unit/stagingfileDerivatives.setup.sh
 
+echo "A test level 1 derivative" > "$folder1/1_0001.txt"
+echo "A test level 2 derivative" > "$folder2/1_0001.txt"
+echo "A test level 3 derivative" > "$folder3/1_0001.txt"
+
+
 for bucket in "master" "level1" "level2" "level3"
 do
 	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"

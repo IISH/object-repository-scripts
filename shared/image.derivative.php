@@ -100,14 +100,16 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     $targetHeight = $original['px']['height'];
     # Update our database
     $mongosh = "mongo $db --quiet --eval=\"var ns='$bucket';pid='$pid';var content={"
-                . "x-resolution:'" . (int)$original['dpis']['x'] . "',"
-                . "y-resolution:'" . (int)$original['dpis']['y'] . "',"
-                . "width:'" . $targetWidth . "',"
-                . "height:'" . $targetHeight . "'};"
+                . "'x-resolution':" . (int)$original['dpis']['x'] . ","
+                . "'y-resolution':" . (int)$original['dpis']['y'] . ","
+                . "width:" . $targetWidth . ","
+                . "height:" . $targetHeight . "};"
                 . "''\" " . $script;
     exec($mongosh);
 
-    if (!isset($options[$output])) {
+	echo "mongosh=$mongosh";
+
+    if (!$output) {
         echo "Output not set so will not produce a derivative.";
         return;
     }
