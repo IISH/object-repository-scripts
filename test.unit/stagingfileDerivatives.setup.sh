@@ -24,10 +24,10 @@ cp $f $testfile
 md5=$(md5sum $testfile | cut -d ' ' -f 1)
 
 
-# For the derivatives we use a text/plain
+# Clear earlier derivative material
 folder1="$fileSet/.level1/"
 folder2="$sa_path/$na/$cpuser/unittest/.level2/"
-folder2="$sa_path/$na/$cpuser/unittest/.level3/"
+folder3="$sa_path/$na/$cpuser/unittest/.level3/"
 mkdir -p $folder1
 mkdir -p $folder2
 mkdir -p $folder3

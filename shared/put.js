@@ -172,6 +172,7 @@ function metadata(document) {
 
     var now = new Date();
     var m = document.metadata;
+    m.bucket = ns;
     m.na = na;
     m.fileSet = fileSet;
     m.pid = pid;
@@ -190,33 +191,34 @@ function metadata(document) {
     printjson(document);
 }
 
-function cache(oldPid) {
+/**
+ * cache
+ *
+ * Copy all metadata elements of non-master related files into the master.files array
+ *
+ * @param oldPid
+ */
+function cache() {
 
     print("caching");
-    var collection = db.getMongo().getDB(filesDB).getCollection('files');
-    if (oldPid) {
-        collection.remove({'pid':oldPid});
-    }
 
     var master = db.getCollection('master.files').findOne({'metadata.pid':pid});
-    documentA = master.metadata;
-    documentA.files = [];
+    metadata = master.metadata;
+    metadata.cache = [];
 
     var collectionNames = db.getCollectionNames();
     var length = collectionNames.length;
     for (var i = 0; i < length; i++) {
         var collectionName = collectionNames[i];
-        if (collectionName.lastIndexOf(".files") != -1) {
+        if (collectionName.lastIndexOf(".files") != -1 && master.getName() != collectionName) {
             var bucket = db.getCollection(collectionName).findOne({'metadata.pid':pid});
             if (bucket) {
-                bucket.bucket = collectionName;
-                documentA.files.push(
+                metadata.cache.push(
                     bucket
                 )
             }
         }
     }
-
     collection.update({pid:pid}, documentA, true, false);
 }
 
@@ -237,7 +239,7 @@ switch (list.count()) {
         print("Case 1");
         var documentA = files.findOne({md5:md5, length:length});
         updateCollections(documentA.metadata.pid);
-        cache(documentA.metadata.pid);
+        cache();
         break;
     case 1:
         // CASE 2: new document with new Pid. Found by md5,length,pid match
@@ -248,7 +250,7 @@ switch (list.count()) {
         if (isCase2) {
             print("Case 2");
             metadata(list[0]);
-            cache(null);
+            cache();
             break;
         }
 
@@ -266,7 +268,7 @@ switch (list.count()) {
         documentA.metadata = documentB.metadata;
         metadata(documentA);
         updateCollections(dropPid);
-        cache(dropPid);
+        cache();
 
         break;
     case 2:
@@ -284,7 +286,7 @@ switch (list.count()) {
         removeDocuments(documentA);
         documentB.metadata = documentA.metadata;
         metadata(documentB);
-        cache(null);
+        cache();
         break;
     default:
         print("Query resulted in too many documents.");

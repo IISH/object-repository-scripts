@@ -33,6 +33,11 @@ mkdir -p $tmp
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 sourceFileExtension=$sourceFileExtension
 
+if [ -z "$sa_path" ] ; then
+    echo "Path sa_path not set as environment variable."
+    exit -1
+fi
+
 # Some normalizations
 # As the location in the supplied stagingfile is not absolute, but taken from the point of view of a ftp
 # home directory, we need to make it absolute.

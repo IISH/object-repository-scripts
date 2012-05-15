@@ -1,10 +1,19 @@
 #!/bin/bash
 
+scripts=$scripts
 source $scripts/test.unit/stagingfileDerivatives.setup.sh
+db=$db
+na=$na
+fileSet=$fileSet
+location=$location
+md5=$md5
+contentType=$contentType
+pid=$pid
+folder1=$folder1
+folder2=$folder2
+folder3=$folder3
 
-echo "A test level 1 derivative" > "$folder1/1_0001.txt"
-echo "A test level 2 derivative" > "$folder2/1_0001.txt"
-echo "A test level 3 derivative" > "$folder3/1_0001.txt"
+# todo: copy an image as a substitute custom derivative
 
 
 for bucket in "master" "level1" "level2" "level3"

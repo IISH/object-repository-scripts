@@ -9,7 +9,7 @@
 sa_path=$sa_path
 scripts=$scripts
 orfiles=$orfiles
-na=12345
+na="12345"
 testuser="testuser"
 folder="unittest"
 fileSet=$sa_path/$na/$testuser/$folder
