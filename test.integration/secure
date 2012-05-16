@@ -1,1 +1,0 @@
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Header/><SOAP-ENV:Body><ns2:DeletePidResponse xmlns:ns2="http://pid.socialhistoryservices.org/"><ns2:deleted>false</ns2:deleted></ns2:DeletePidResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>

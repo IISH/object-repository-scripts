@@ -100,8 +100,7 @@
  * Systemic change of master and all derivatives by replacing the old metadata.pid with a new metadata.pid.
  * This method should be called when an identical master is offered with a new metadata.pid.
  *
- * This method cannot possibly be called from a derivative update ( as derivatives are preceded by this very master
- * update that calls this method). Nonetheless, as a fallback we allow it.
+ * This method cannot possibly be trickered by a derivative update.
  *
  * @param oldPid
  */
@@ -131,7 +130,7 @@ function updateCollections(oldPid) {
 }
 
 /**
- * removeDocument
+ * removeDocuments
  *
  * Remove the document and all other documents associated with the pid value
  */
@@ -202,24 +201,21 @@ function cache() {
 
     print("caching");
 
-    var master = db.getCollection('master.files').findOne({'metadata.pid':pid});
-    metadata = master.metadata;
-    metadata.cache = [];
-
+    var cache = [];
     var collectionNames = db.getCollectionNames();
     var length = collectionNames.length;
     for (var i = 0; i < length; i++) {
         var collectionName = collectionNames[i];
-        if (collectionName.lastIndexOf(".files") != -1 && master.getName() != collectionName) {
+        if (collectionName.lastIndexOf(".files") != -1 && 'master.files' != collectionName) {
             var bucket = db.getCollection(collectionName).findOne({'metadata.pid':pid});
             if (bucket) {
-                metadata.cache.push(
+                cache.push(
                     bucket
                 )
             }
         }
     }
-    collection.update({pid:pid}, documentA, true, false);
+    db.getCollection('master.files').update( { 'metadata.pid': pid }, {$set:{'metadata.cache':cache}}, true, false );
 }
 
 var files = db.getCollection(ns + '.files');
@@ -239,7 +235,6 @@ switch (list.count()) {
         print("Case 1");
         var documentA = files.findOne({md5:md5, length:length});
         updateCollections(documentA.metadata.pid);
-        cache();
         break;
     case 1:
         // CASE 2: new document with new Pid. Found by md5,length,pid match
@@ -250,7 +245,6 @@ switch (list.count()) {
         if (isCase2) {
             print("Case 2");
             metadata(list[0]);
-            cache();
             break;
         }
 
@@ -268,7 +262,6 @@ switch (list.count()) {
         documentA.metadata = documentB.metadata;
         metadata(documentA);
         updateCollections(dropPid);
-        cache();
 
         break;
     case 2:
@@ -281,15 +274,14 @@ switch (list.count()) {
         var match = list[0].md5 == md5 && list[0].length == length;
         var documentA = ( match ) ? list[1] : list[0];
         var documentB = ( match ) ? list[0] : list[1];
-        assert(!match && documentB.md5 == md5 && documentB.length == length,
-            "The new document does not have a md5,length match.");
         removeDocuments(documentA);
         documentB.metadata = documentA.metadata;
         metadata(documentB);
-        cache();
         break;
     default:
         print("Query resulted in too many documents.");
         printjson(query);
         throw "We found more than two documents !";
 }
+
+cache()

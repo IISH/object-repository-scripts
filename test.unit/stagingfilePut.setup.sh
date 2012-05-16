@@ -30,16 +30,16 @@ if [ "$make" == "database" ]; then
 
     echo "Reconsructing files and database."
 
-    # Begin with an empty database... we call them buckets, but they are really namespaces
-    mongo $db --eval "printjson(db.dropDatabase())"
-
     mkdir -p $fileSet
-    rm -f $fileSet/*.txt
-    rm -f $fileSet/*.md5
+    rm $fileSet/*.txt
+    rm $fileSet/*.md5
 
     counter=0
     for bucket in "master" "level1" "level2" "level3"
     do
+	
+	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
+        mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
         mongo $db --quiet --eval "db.getCollection('$bucket.files').ensureIndex({md5:1,length:1}, {unique:true})"
         for i in 0 1 2 3
         do
@@ -54,7 +54,7 @@ if [ "$make" == "database" ]; then
                     pid=$na/$i.$j
                     $scripts/shared/put.sh -na $na -bucket $bucket -contentType "image/jpeg" -pid $pid \
                         -md5 $md5 -location $location -access "open" -label "test label $md5" -fileSet $fileSet
-                    let "counter++"
+                    let counter++
                 fi
             done
         done
@@ -62,20 +62,36 @@ if [ "$make" == "database" ]; then
     echo "Added $counter files in four collections"
 
     # We now ought to have buckets * i * j files
-    checkCounter=0
+    checkFilesCounter=0
+    checkChunksCounter=0
     for bucket in "master" "level1" "level2" "level3"
     do
-        c=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').count()")
-        let "checkCounter+=$c"
+        cFiles=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').count()")
+	cChunks=$(mongo $db --quiet --eval "db.getCollection('$bucket.chunks').count()")
+        let checkFilesCounter+=$cFiles
+	let checkChunksCounter+=$cChunks
     done
-    if [ "$checkCounter" != "$counter" ]; then
-        echo "Expected a count of $counter but actually found $checkCounter"
+    if [ $checkFilesCounter != $counter ]; then
+        echo "Expected a count of $counter but actually found $checkFilesCounter"
+	exit -1
     fi
 
+    if [ $checkChunksCounter != $counter ]; then
+        echo "Expected a count of $counter but actually found $checkChunksCounter"
+	exit -1
+    fi
+
+echo "=================================================================================================================="
+exit 0
     #  File count is as expected
     mongo test --eval "printjson(db.dropDatabase())"
-    mongo $db --quiet --eval "printjson(db.copyDatabase('$db', 'test'))"
+    #mongo $db --quiet --eval "printjson(db.copyDatabase('$db', 'test'))"
+else
+	for bucket in "master" "level1" "level2" "level3"
+    	do
+        	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
+        	mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
+    	done
+	mongo $db --quiet --eval "printjson(db.copyDatabase('test', '$db'))"
 fi
-
-mongo $db --quiet --eval "db.dropDatabase();printjson(db.copyDatabase('test', '$db'))"
 
