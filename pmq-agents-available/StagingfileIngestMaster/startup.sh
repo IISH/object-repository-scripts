@@ -18,7 +18,15 @@ label="$label"
 l="$l"
 
 # If we have no file to upload, we basically are talking about an update of metadata
-if [ -z "$l" ] ; then
+if [ -f "$l" ] ; then
+
+    remove=true
+    source $scripts/shared/put.sh
+    count=$(ls $fileSet -1 | wc -l)
+    if [$count == 0] ; then
+        rm -r $fileSet
+    fi
+else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
 
     e="db.getCollection('$bucket.files').update({'metadata.pid':'$pid'},{\$set:{'metadata.access':'$access', \
@@ -26,15 +34,7 @@ if [ -z "$l" ] ; then
     db.getCollection('files').update({'pid':'$pid'}, {\$set:{'access':'$access',label:'$label'}}, false, false);''"
     mongo $db --quiet --eval "$e"
     exit $?
-else
-
-    remove=true
-    source $scripts/shared/put.sh
-    count=$(ls $fileSet -1 | wc -l)
-    if [$count == 0] ; then
-	rm -r $fileSet
-    fi
-
 fi
 
 exit $?
+
