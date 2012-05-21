@@ -22,10 +22,10 @@ if [ -f "$l" ] ; then
 
     remove=true
     source $scripts/shared/put.sh
-    count=$(ls $fileSet -1 | wc -l)
-    if [$count == 0] ; then
-        rm -r $fileSet
-    fi
+    #count=$(ls $fileSet -1 | wc -l)
+    #if [$count == 0] ; then
+    #    rm -r $fileSet
+    #fi
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
 
