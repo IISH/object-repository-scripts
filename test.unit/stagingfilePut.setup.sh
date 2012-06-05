@@ -54,7 +54,7 @@ if [ "$make" == "database" ]; then
                     pid=$na/$i.$j
                     $scripts/shared/put.sh -na $na -bucket $bucket -contentType "image/jpeg" -pid $pid \
                         -md5 $md5 -location $location -access "open" -label "test label $md5" -fileSet $fileSet
-                    let counter++
+                    counter++
                 fi
             done
         done
@@ -67,9 +67,9 @@ if [ "$make" == "database" ]; then
     for bucket in "master" "level1" "level2" "level3"
     do
         cFiles=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').count()")
-	cChunks=$(mongo $db --quiet --eval "db.getCollection('$bucket.chunks').count()")
-        let checkFilesCounter+=$cFiles
-	let checkChunksCounter+=$cChunks
+	    cChunks=$(mongo $db --quiet --eval "db.getCollection('$bucket.chunks').count()")
+        checkFilesCounter+=$cFiles
+	    checkChunksCounter+=$cChunks
     done
     if [ $checkFilesCounter != $counter ]; then
         echo "Expected a count of $counter but actually found $checkFilesCounter"
@@ -83,6 +83,7 @@ if [ "$make" == "database" ]; then
 
 echo "=================================================================================================================="
 exit 0
+
     #  File count is as expected
     mongo test --eval "printjson(db.dropDatabase())"
     #mongo $db --quiet --eval "printjson(db.copyDatabase('$db', 'test'))"

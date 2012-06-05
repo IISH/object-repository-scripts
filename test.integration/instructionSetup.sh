@@ -32,47 +32,15 @@ mongo or_$na  --quiet --eval "db.getCollection('files').remove({na:'$na'})"
 query="{fileSet:'$fileSet'}"
 mongo sa --quiet --eval "db.getCollection('stagingfile').remove($query)"
 # Add a profile with a default workflow that only processes the StagingfileBindPIDs
-profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resolverBaseUrl:'http://hdl.handle.net/', 
-    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null, \
-    workflow:[ \
-	{ \
-                  'attempts' : 1, \
-                  'end' : ISODate('2012-01-01T00:00:00.000Z'), \
-                  'failure' : false, \
-                  'info' : 'Default workflow unittest', \
-                  'limit' : 3, \
-                  'name' : 'StagingfileIngestMaster', \
-                  'processed' : 0, \
-                  'start' : ISODate('2012-01-01T00:00:00.000Z'), \
-                  'statusCode' : 0, \
-                  'total' : 0, \
-		  'exitValue' : 123, \
-                  'version' : 0 } \
-                  , \
-          	  { \
-                  'attempts' : 1, \
-                  'end' : ISODate('2012-01-01T00:00:00.000Z'), \
-                  'failure' : false, \
-                  'info' : 'Default workflow unittest', \
-                  'limit' : 3, \
-                  'name' : 'StagingfileBindPIDs', \
-                  'processed' : 0, \
-                  'start' : ISODate('2012-01-01T00:00:00.000Z'), \
-                  'statusCode' : 0, \
-                  'exitValue' : 123, \
-                  'total' : 0, \
-                  'version' : 0 } \
-                  ] }"
-
 profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resolverBaseUrl:'http://hdl.handle.net/',
-    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null,workflow:null}"
+    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null,plan:[]}"
 mongo sa --eval "db.getCollection('profile').save($profile)"
 
 #  Get some 25 test files with the instruction. Remove any PIDs in the pid webservice.
 # We alway use a custom pid that we know.
 instruction="$fileSet/instruction.xml"
 echo "<instruction xmlns='http://objectrepository.org/instruction/1.0/' autoIngestValidInstruction='true' autoGeneratePIDs='$autoGeneratePIDs' \
-	action='$action' workflow='StagingfileIngestMaster,StagingfileBindPIDs' >" > $instruction
+	action='$action' plan='StagingfileIngestMaster,StagingfileBindPIDs' >" > $instruction
 for i in 1 2 3 4 5
 do
     for j in 1 2 3 4 5

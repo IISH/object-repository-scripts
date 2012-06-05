@@ -22,7 +22,7 @@ mongo or_$na --quiet --eval "db.getCollection('master.chunks').remove()"
 mongo or_$na --quiet --eval "db.getCollection('files').remove({na:'$na'})"
 
 
-# What we expect is to find our files in teh database
+# What we expect is to find our files in the database
 rm $fileSet/*
 for i in 1 2 3 4 5
 do
