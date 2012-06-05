@@ -7,7 +7,7 @@
  * - prevent unnecessary file PUTs when the file's md5 and length are identical to a GridFS file.
  * - update metadata.pid during PID replacements
  * - removed documents when new filecontent is offered
- * - Upserts the 'files' collection to hold a cached version of our FSGrid storage.
+ * - Upserts the 'master.metadata.cache' array to hold a cached version of our FSGrid storage.
  *
  * PUT actions will be the responsibility for mongofiles and cannot be performed by this script.
  **/
