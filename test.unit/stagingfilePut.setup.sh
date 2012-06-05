@@ -54,7 +54,7 @@ if [ "$make" == "database" ]; then
                     pid=$na/$i.$j
                     $scripts/shared/put.sh -na $na -bucket $bucket -contentType "image/jpeg" -pid $pid \
                         -md5 $md5 -location $location -access "open" -label "test label $md5" -fileSet $fileSet
-                    counter++
+                    let counter++
                 fi
             done
         done
@@ -68,8 +68,8 @@ if [ "$make" == "database" ]; then
     do
         cFiles=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').count()")
 	    cChunks=$(mongo $db --quiet --eval "db.getCollection('$bucket.chunks').count()")
-        checkFilesCounter+=$cFiles
-	    checkChunksCounter+=$cChunks
+        let checkFilesCounter+=$cFiles
+	    let checkChunksCounter+=$cChunks
     done
     if [ $checkFilesCounter != $counter ]; then
         echo "Expected a count of $counter but actually found $checkFilesCounter"
