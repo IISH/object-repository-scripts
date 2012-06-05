@@ -15,7 +15,6 @@ pid=$pid
 
 echo "Check for existing derivative on fs for master $location"
 sourceFile=$(php $scripts/shared/generic.derivative.php -f "$fileSet" -l "$location" -b $targetBucket)
-if [ ! -z "$sourceFile" ] ; then 
 	if [ -f $sourceFile ]; then
     		echo "Found custom file: $sourceFile"
     		contentType=$(php $scripts/shared/contenttype.php -t $scripts/shared/contenttype.txt -l $sourceFile)
@@ -32,5 +31,4 @@ if [ ! -z "$sourceFile" ] ; then
 		bucket=$targetBucket
     		source $scripts/shared/put.sh
 	fi
-fi
 echo "No custom derivative found."

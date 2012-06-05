@@ -25,7 +25,7 @@ do
 	l=$sourceFile
 	    source $scripts/shared/get.sh
 	    if [ -f $sourceFile ] ; then
-	        echo "Using existing cached file on $sourceFile"
+	        echo "Using db file on $sourceFile"
 	        break
 	    fi
     fi
@@ -43,7 +43,7 @@ fi
 
 
 if [ -f $sourceFile ]; then
-echo        rm $sourceFile
+    rm $sourceFile
 fi
 
 

@@ -93,6 +93,6 @@ id=$id
 resolverBaseUrl=$resolverBaseUrl
 taskId=$taskId
 identifier=$identifier
-instruction="{instruction:{task:{name:'$name',statusCode:$statusCode, identifier:'$identifier'},'fileSet':'$fileSet', \
+instruction="{instruction:{workflow:{workflow:{name:'$name',statusCode:$statusCode, identifier:'$identifier'}},'fileSet':'$fileSet', \
     autoGeneratePIDs:'$autoGeneratePIDs',resolverBaseUrl:'$resolverBaseUrl',na:'$na',contentType:'$contentType', \
     access:'$access',action:'$action',id:'$id'}}"
