@@ -13,8 +13,11 @@ while [ "${1+isset}" ]; do
  v=$1
     shift
   eval ${k}=$(echo -ne \""${v}"\")
-    echo "key=$k"
-    echo "v=$v"
+    echo "$k=$v"
+	if [ ${v:0:1} == "-" ]; then
+	    echo "Value cannot start with a hyphen."
+	    exit -1
+	fi
 done
 
 sa_path=$sa_path
@@ -50,7 +53,11 @@ if [ ! -z "$location" ]; then
 	if [ -z "$l" ]; then
         	l=$location
 	fi
-	length=$(stat -c%s "$l")
+	if [ -f "$l" ] ; then
+		length=$(stat -c%s "$l")
+	else
+		length=0
+	fi
 fi
 
 # Split the contentType [family/type] into two separate variables. Example:

@@ -13,13 +13,14 @@ folder1=$folder1
 folder2=$folder2
 custom=$custom
 testCounter=0
-testTotal=4
+testTotal=7
 
 # remove the custom derivative material
 if [ -z "$custom" ]; then
-    echo "We are to test derivative creation"
-    rm $fileSet/.level1/*
-    rm $fileSet/TIFF/.level2/*
+    echo "We are to test derivative creation. One substitute ( level1 ) and two inserts (level 2 and level 2)"
+    rm $fileSet/.level1/files/*
+    rm $fileSet/TIFF/.level2/files/*
+    rm $fileSet/TIFF/files/.level3/*
 else
     echo "We are to test custom derivative ingestation"
 fi
@@ -45,6 +46,17 @@ do
     fi
     let testCounter++
 
+done
+
+for bucket in "level1" "level2" "level3"
+do
+	query="db.master.files.find( {'metadata.cache.metadata.bucket':'$bucket'}).count()"
+	count=$(mongo $db --quiet --eval "$query")
+	if [ $count == 0 ] ; then
+        	echo "Query $query should have shown a document in the cache"
+        	exit -1
+	fi
+    	let testCounter++
 done
 
 source $scripts/shared/testreport.sh
