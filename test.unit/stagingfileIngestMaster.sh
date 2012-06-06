@@ -19,7 +19,6 @@ testCounter=0
 
 mongo or_$na --quiet --eval "db.getCollection('master.files').remove()"
 mongo or_$na --quiet --eval "db.getCollection('master.chunks').remove()"
-mongo or_$na --quiet --eval "db.getCollection('files').remove({na:'$na'})"
 
 
 # What we expect is to find our files in the database
@@ -41,14 +40,7 @@ do
             -name $name -bucket $bucket -contentType "text/plain" -md5 $md5 -access "open" -location $loc \
             -label "hello $pid"
         db=or_$na
-        count=$(mongo $db --quiet --eval "db.getCollection('master.files').find({'pid.metadata':$pid}).count()")
-        if [ $count != 0 ] ; then
-            echo "Did not find a master with pid $pid"
-            exit -1
-        fi
-        let testCounter++
-
-	count=$(mongo $db --quiet --eval "db.getCollection('files').find({'pid':$pid}).count()")
+	count=$(mongo $db --quiet --eval "db.getCollection('master.files').find({'metadata.pid':$pid}).count()")
         if [ $count != 0 ] ; then
             echo "Did not find a metadata file with pid $pid"
             exit -1

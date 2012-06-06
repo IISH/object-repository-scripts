@@ -71,7 +71,7 @@ do
         let testCounter++
 
         pid=$na/$filename
-        count=$(mongo $db --quiet --eval "db.getCollection('files').find({pid:'$pid'}).count()")
+        count=$(mongo $db --quiet --eval "db.getCollection('master.files').find({'metadata.pid':'$pid'}).count()")
         if [ $count != 1 ] ; then
             echo "The expected pid $pid is not in the database"
             exit -1

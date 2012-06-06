@@ -28,7 +28,6 @@ mongo sa --quiet --eval "db.getCollection('profile').remove($query)"
 mongo sa --quiet --eval "db.getCollection('instruction').remove($query)"
 mongo or_$na --quiet --eval "db.getCollection('master.files').remove()"
 mongo or_$na --quiet --eval "db.getCollection('master.chunks').remove()"
-mongo or_$na  --quiet --eval "db.getCollection('files').remove({na:'$na'})"
 query="{fileSet:'$fileSet'}"
 mongo sa --quiet --eval "db.getCollection('stagingfile').remove($query)"
 # Add a profile with a default workflow that only processes the StagingfileBindPIDs

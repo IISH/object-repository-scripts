@@ -21,7 +21,6 @@ do
 	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
 	mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
 done
-mongo $db --quiet --eval "db.getCollection('files').remove({na:'$na'})"
 
 for bucket in "master" "level1" "level2" "level3"
 do

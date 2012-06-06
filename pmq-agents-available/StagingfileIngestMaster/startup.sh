@@ -17,22 +17,19 @@ contentType=$contentType
 label="$label"
 l="$l"
 
-# If we have no file to upload, we basically are talking about an update of metadata
+# If we find a file we upload it
 if [ -f "$l" ] ; then
 
     remove=true
     source $scripts/shared/put.sh
     #count=$(ls $fileSet -1 | wc -l)
     #if [$count == 0] ; then
-    #    rm -r $fileSet
+    #    echo "The folder $fileSet can be deleted. We leave this up to the end user."
     #fi
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
-
-    e="db.getCollection('$bucket.files').update({'metadata.pid':'$pid'},{\$set:{'metadata.access':'$access', \
-    contentType:'$contentType','metadata.label':'$label'}}, false, false); \
-    db.getCollection('files').update({'pid':'$pid'}, {\$set:{'access':'$access',label:'$label'}}, false, false);''"
-    mongo $db --quiet --eval "$e"
+    mongo $db --quiet --eval "db.getCollection('$bucket.files').update({'metadata.pid':'$pid'}, \
+        {\$set:{'metadata.access':'$access',contentType:'$contentType','metadata.label':'$label'}}, false, false);''"
     exit $?
 fi
 

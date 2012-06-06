@@ -10,10 +10,11 @@ if [[ $rc != 0 ]] ; then
     exit $rc
 fi
 
-# Lets see if all stagingfiles have a default task 'Start'
+# Lets see if all stagingfiles have a default task 'Start'. In fact we look for alternative tasks who really should not
+# be there at all.
 fileSet=$fileSet
 count=$(mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet', \
-    \$or:[{'task':{\$exists:false}},{'task.name':{\$ne:'Start'}}]}}).count()")
+    \$or:[{'workflow.n':{\$exists:false}},{'workflow.n':0,'workflow.name':{\$ne:'Start'}}]}).count()")
 
 if [ $count != 0 ] ; then
     echo "$count declared files do not have the expected 'Start' task: $fileSet"

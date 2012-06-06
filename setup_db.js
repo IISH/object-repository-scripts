@@ -52,7 +52,4 @@ for (var i = 0; i < buckets.length; i++) {
     }
 }
 
-// Ensure an index on the non sharded files collection also
-db.getCollection('files').ensureIndex({pid:1}, { unique:true });
-
 print(db.printShardingStatus());
