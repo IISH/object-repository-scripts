@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Here we have a simple tiff which we will pull from a reserved area
+
 scripts=$scripts
 sa_path=$sa_path
 na="12345"
@@ -8,37 +10,28 @@ folder=unittest/TIFF
 fileName="1_0001.tif"
 fileSet=$sa_path/$na/$cpuser/unittest
 
-# Our "master" file is here
-testfile=$fileSet/TIFF/$fileName
+# Our "master" file is here as it should be in the instruction:
 pid="$na/1"
 location="/$folder/$fileName"
 contentType="image/tiff"
 db=or_$na
 
-mkdir -p $fileSet
-rm $fileSet/*
+if [ ! -d $fileSet ]; then
+    mkdir -p $fileSet
+fi
 
-# We keep the test master here in $f
-f="$sa_path/$na/.$cpuser/$folder/$fileName"
-if [ ! -f $f ]; then
-    echo "Error: cannot find test master file $f"
+# We keep the test master and custom derivatives here:
+d="$sa_path/$na/.$cpuser/TIFF"
+if [ ! -d $d ]; then
+    echo "Error: cannot find test master directory $d"
     exit 0
 fi
 
-mkdir -p $fileSet/TIFF/
-cp $f $testfile
-md5=$(md5sum $testfile | cut -d ' ' -f 1)
-
-
-# Clear earlier test derivative material
-folder1="$fileSet/.level1/"
-folder2="$sa_path/$na/$cpuser/unittest/.level2/"
-folder3="$sa_path/$na/$cpuser/unittest/.level3/"
-mkdir -p $folder1
-mkdir -p $folder2
-mkdir -p $folder3
-rm $folder1/*
-rm $folder2/*
-rm $folder3/*
-
-
+# copy the test file to the ftp directory. We dare a rm -r here, because we know fileSet is not empty and the command
+# has a /TIFF attached to it.
+rm -r $fileSet/TIFF
+cp -r $d $fileSet
+testfile=$fileSet/TIFF/1_0001.tif
+if [ ! -f $testfile ]; then
+    echo "No testfile found: $testfile"
+fi

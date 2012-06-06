@@ -43,10 +43,10 @@ if [ $count != 25 ] ; then
 fi
 let failSafe++
 
-# Now run the workflow
-mongo sa --quiet --eval "db.getCollection('instruction').update({fileSet:'$fileSet'}, \
-	{\$set:{autoGeneratePIDs:'filename2pid',autoIngestValidInstruction:false,'task.name':'InstructionAutocreate', \
-	'task.statusCode':100}}, false, false)"
+# Now run the workflow: autoIngestValidInstruction:false
+mongo sa --quiet --eval "db.getCollection('instruction').update({fileSet:'$fileSet','workflow.n':0}, \
+	{\$set:{autoGeneratePIDs:'filename2pid',autoIngestValidInstruction:false,'workflow.$.name':'InstructionAutocreate', \
+	'workflow.$.statusCode':100, plan:['StagingfileIngestMaster,StagingfileBindPIDs']}}, false, false)"
 
 while [ $failSafe -lt 100 ]
 do
@@ -77,6 +77,7 @@ do
     for j in 1 2 3 4 5
     do
 	pid=$na/$i.$j
+	 filename="$i.$j.txt"
         file=$fileSet/$filename
         if [ ! -f $file ] ; then
             echo "The file $file ought not to have been removed."

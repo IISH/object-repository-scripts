@@ -11,9 +11,15 @@ contentType=$contentType
 pid=$pid
 folder1=$folder1
 folder2=$folder2
-folder3=$folder3
+custom=$custom
 let testCounter=0
-let testTotal=4
+let testTotal=3
+
+# remove the custom derivative material
+if [ -z $custom ]; then
+    rm $fileSet/.level1/*
+    rm $fileSet/TIFF/.level2/*
+fi
 
 for bucket in "master" "level1" "level2" "level3"
 do
