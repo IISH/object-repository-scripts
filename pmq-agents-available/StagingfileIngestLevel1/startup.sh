@@ -11,6 +11,6 @@ source $scripts/shared/derivative.sh
 derivative=$derivative
 
 file="$scripts/shared/$derivative".derivative.sh
-if [ -f $file ] ; then
+if [ -f "$file" ] ; then
     source $file
 fi

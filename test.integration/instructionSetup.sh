@@ -76,7 +76,7 @@ do
         log=/tmp/$pid
         wget -O $log --header="Content-Type: text/xml" --header="Authorization: oauth $key" --post-data "$soapenv" --no-check-certificate $endpoint
 
-	if [ -f $log ] ; then
+	if [ -f "$log" ] ; then
             echo "DeletePidRequest(pid:'$pid')"
         else
             echo "Error: could not call webservice."
@@ -94,11 +94,11 @@ for i in {1..60}
 do
 	sleep 1
 	echo "$i. Check for removal of $instruction"
-	if [ ! -f $instruction ] ; then
+	if [ ! -f "$instruction" ] ; then
 	    break
 	fi
 done
-	if [ -f $instruction ] ; then
+	if [ -f "$instruction" ] ; then
 		echo "The instruction was not removed within in the expected time."
 		exit -1
 	fi

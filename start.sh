@@ -49,7 +49,7 @@ do
 
      maxTasks=2
      setenv=$f/setenv.sh
-     if [ -f $setenv ] ; then
+     if [ -f "$setenv" ] ; then
          source $setenv
      fi
      echo "Starting agent for $messageQueue"

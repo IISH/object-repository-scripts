@@ -16,13 +16,13 @@ location="/$folder/$fileName"
 contentType="image/tiff"
 db=or_$na
 
-if [ ! -d $fileSet ]; then
-    mkdir -p $fileSet
+if [ ! -d "$fileSet" ]; then
+    mkdir -p "$fileSet"
 fi
 
 # We keep the test master and custom derivatives here:
 d="$sa_path/$na/.$cpuser/unittest"
-if [ ! -d $d ]; then
+if [ ! -d "$d" ]; then
     echo "Error: cannot find test master directory $d"
     exit 0
 fi
@@ -32,7 +32,7 @@ echo "Using test directory $d"
 # has a /TIFF attached to it.
 rm -r /mnt/sa/12345/testuser/unittest
 cp -r -v $d $fileSet
-testfile=$fileSet/TIFF/files/$fileName
+testfile=$fileSet/TIFF/files/1_0001.tif
 if [ ! -f "$testfile" ]; then
     echo "No testfile found: $testfile"
 fi

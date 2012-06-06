@@ -67,7 +67,7 @@ do
         filename="$i.$j.txt"
 	    pid=$na/$filename
         file=$fileSet/$filename
-        if [ -f $file ] ; then
+        if [ -f "$file" ] ; then
             echo "The file $file ought to have been removed."
             exit -1
         fi
