@@ -16,6 +16,10 @@ sourceFileExtension=$sourceFileExtension
 
 for sourceBucket in $sourceBuckets
 do
+	echo "sourceBucket='$sourceBucket'"
+    if [ ! "$sourceBucket" == "master" ]; then
+        sourceFileExtension="jpg"
+    fi
     sourceFile=$tmp/$md5.$sourceBucket.$sourceFileExtension
     echo "sourceFile=$sourceFile"
     if [ -f $sourceFile ]; then

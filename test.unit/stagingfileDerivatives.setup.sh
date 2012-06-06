@@ -21,7 +21,7 @@ if [ ! -d $fileSet ]; then
 fi
 
 # We keep the test master and custom derivatives here:
-d="$sa_path/$na/.$cpuser/$folder"
+d="$sa_path/$na/.$cpuser/unittest"
 if [ ! -d $d ]; then
     echo "Error: cannot find test master directory $d"
     exit 0
@@ -30,11 +30,12 @@ echo "Using test directory $d"
 
 # copy the test file to the ftp directory. We dare a rm -r here, because we know fileSet is not empty and the command
 # has a /TIFF attached to it.
-rm -r $fileSet/TIFF
-cp -r $d $fileSet
+rm -r /mnt/sa/12345/testuser/unittest
+cp -r -v $d $fileSet
 testfile=$fileSet/TIFF/1_0001.tif
 if [ ! -f $testfile ]; then
     echo "No testfile found: $testfile"
 fi
 
+md5=$(md5sum $testfile | cut -d ' ' -f 1)
 

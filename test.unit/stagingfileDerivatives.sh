@@ -16,7 +16,7 @@ testCounter=0
 testTotal=4
 
 # remove the custom derivative material
-if [ ! -z "$custom" ]; then
+if [ -z "$custom" ]; then
     echo "We are to test derivative creation"
     rm $fileSet/.level1/*
     rm $fileSet/TIFF/.level2/*
