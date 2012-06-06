@@ -41,3 +41,9 @@ md5=$(md5sum $testfile | cut -d ' ' -f 1)
 md5level1=$(md5sum $d/.level1/files/1_0001.jpg | cut -d ' ' -f 1)
 md5level2=$(md5sum $d/TIFF/.level2/files/1_0001.jpg | cut -d ' ' -f 1)
 md5level3=$(md5sum $d/TIFF/files/.level3/1_0001.jpg | cut -d ' ' -f 1)
+
+echo "md5=$md5"
+echo "md5level1=$md5level1"
+echo "md5level2=$md5level2"
+echo "md5level3=$md5level3"
+

@@ -12,6 +12,7 @@ bucket=$bucket
 content=$content
 contentType=$contentType
 db=$db
+fileSet=$fileSet
 host=$host
 l="$l"
 label="$label"

@@ -59,6 +59,7 @@ if [ -f "$targetFile" ]; then
 	l=$targetFile
 	remove=true
 	md5=$(md5sum $targetFile | cut -d ' ' -f 1)
+	echo "$md5  $targetFile" > "$targetFile.md5"
 	source $scripts/shared/put.sh
 else
 	echo "Unable to create derivative."

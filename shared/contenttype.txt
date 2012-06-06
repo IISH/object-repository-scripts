@@ -416,9 +416,9 @@
 .pic,image/pict
 .pict,image/pict
 .jfif,image/pjpeg
-.jpe,image/pjpeg
-.jpeg,image/pjpeg
-.jpg,image/pjpeg
+.jpe,image/jpe
+.jpeg,image/jpeg
+.jpg,image/jpg
 .png,image/png
 .x-png,image/png
 .tif,image/tiff

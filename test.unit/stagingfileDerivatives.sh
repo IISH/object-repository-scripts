@@ -11,18 +11,19 @@ contentType=$contentType
 pid=$pid
 folder1=$folder1
 folder2=$folder2
-custom=$custom
+custom="$1"
 testCounter=0
 testTotal=7
 
 # remove the custom derivative material
-if [ -z "$custom" ]; then
-    echo "We are to test derivative creation. One substitute ( level1 ) and two inserts (level 2 and level 2)"
+if [ "$custom" == "true" ]; then
+    echo "We are to test custom derivative ingestation. One substitute ( level1 ) and two inserts (level 2 and level 2)"
+    testTotal=10
+else
+    echo "We are to test derivative creation."
     rm $fileSet/.level1/files/*
     rm $fileSet/TIFF/.level2/files/*
     rm $fileSet/TIFF/files/.level3/*
-else
-    echo "We are to test custom derivative ingestation"
 fi
 
 for bucket in "master" "level1" "level2" "level3"
@@ -58,5 +59,31 @@ do
 	fi
     	let testCounter++
 done
+
+if [ "$custom" == "true" ] ; then
+	query="db.level1.files.find( {'md5':'$md5level1'}).count()"
+	count=$(mongo $db --quiet --eval "$query")
+	if [ $count == 0 ] ; then
+        	echo "Query $query should have shown a document in the cache"
+        	exit -1
+	fi
+	let testCounter++
+
+	query="db.level2.files.find( {'md5':'$md5level2'}).count()"
+	count=$(mongo $db --quiet --eval "$query")
+	if [ $count == 0 ] ; then
+        	echo "Query $query should have shown a document in the cache"
+        	exit -1
+	fi
+	let testCounter++
+
+	query="db.level3.files.find( {'md5':'$md5level3'}).count()"
+	count=$(mongo $db --quiet --eval "$query")
+	if [ $count == 0 ] ; then
+        	echo "Query $query should have shown a document in the cache"
+        	exit -1
+	fi
+	let testCounter++
+fi
 
 source $scripts/shared/testreport.sh

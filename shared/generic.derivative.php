@@ -42,21 +42,37 @@
 $options = getopt("l:b:f:");
 $l = $options['l'];
 $b = $options['b'];
-$f = dirname($options['f']);
+$f = $options['f'];
+print(findLevel($f, $l, $b, pathinfo($l, PATHINFO_FILENAME)));
 
-print( findLevel($f, 10, dirname($l), pathinfo($l, PATHINFO_FILENAME), $b) );
-
-function findLevel($f, $failSave, $folder, $filename, $bucket)
+function findLevel($fileSet, $location, $bucket, $filename)
 {
-    if ($f == $folder || $failSave < 1) return null;
+    $pieces = explode("/", $location);
+    $start = sizeof(explode("/", $fileSet));
+    $length = sizeof($pieces);
+    for ($i = $start; $i < $length; $i++) {
 
-    $files = rglob($folder . "/." . $bucket, $filename . ".*");
-    if (sizeof($files) == 0) {
-        return findLevel($f, $failSave - 1, dirname($folder), $filename, $bucket);
+        $insert = "";
+        for ($j = $start; $j < $i; $j++) {
+            if (!empty($pieces[$j])) $insert .= "/" . $pieces[$j];
+        }
+        $insert .= "/" . $bucket;
+        $substitute = $insert;
+        for ($j = $i; $j < $length - 1; $j++) {
+            if (!empty($pieces[$j])) {
+                $insert .= "/" . $pieces[$j];
+                if ($j != $i) $substitute .= "/" . $pieces[$j];
+            }
+        }
+
+        $files = rglob($fileSet . $insert, $filename . ".*");
+        if (sizeof($files) != 0) return $files[0];
+        $files = rglob($fileSet . $substitute, $filename . ".*");
+        if (sizeof($files) != 0) return $files[0];
     }
-    if (sizeof($files) == 1) return $files[0];
-    return null;
+    return NULL;
 }
+
 
 /*
 * @return array containing all pattern - matched files .
@@ -70,7 +86,6 @@ function rglob($sDir, $sPattern, $nFlags = NULL)
     // Get the list of all matching files currently in the
     // directory.
     $filter = "$sDir/$sPattern";
-    //echo "filter:" . $filter . "\n";
     return glob($filter, $nFlags);
 }
 
