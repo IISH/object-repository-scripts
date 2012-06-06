@@ -12,13 +12,16 @@ pid=$pid
 folder1=$folder1
 folder2=$folder2
 custom=$custom
-let testCounter=0
-let testTotal=3
+testCounter=0
+testTotal=4
 
 # remove the custom derivative material
-if [ -z $custom ]; then
+if [ ! -z "$custom" ]; then
+    echo "We are to test derivative creation"
     rm $fileSet/.level1/*
     rm $fileSet/TIFF/.level2/*
+else
+    echo "We are to test custom derivative ingestation"
 fi
 
 for bucket in "master" "level1" "level2" "level3"
@@ -40,7 +43,7 @@ do
         echo "Query $query should have shown a document in the collection"
         exit -1
     fi
-    testCounter++
+    let testCounter++
 
 done
 

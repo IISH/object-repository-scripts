@@ -21,11 +21,12 @@ if [ ! -d $fileSet ]; then
 fi
 
 # We keep the test master and custom derivatives here:
-d="$sa_path/$na/.$cpuser/TIFF"
+d="$sa_path/$na/.$cpuser/$folder"
 if [ ! -d $d ]; then
     echo "Error: cannot find test master directory $d"
     exit 0
 fi
+echo "Using test directory $d"
 
 # copy the test file to the ftp directory. We dare a rm -r here, because we know fileSet is not empty and the command
 # has a /TIFF attached to it.
@@ -35,3 +36,5 @@ testfile=$fileSet/TIFF/1_0001.tif
 if [ ! -f $testfile ]; then
     echo "No testfile found: $testfile"
 fi
+
+
