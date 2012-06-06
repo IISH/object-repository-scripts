@@ -22,13 +22,13 @@ do
     fi
     sourceFile=$tmp/$md5.$sourceBucket.$sourceFileExtension
     echo "sourceFile=$sourceFile"
-    if [ -f $sourceFile ]; then
+    if [ -f "$sourceFile" ]; then
 	    echo "Using existing cached file on $sourceFile"
 	    break
     else
 	l=$sourceFile
 	    source $scripts/shared/get.sh
-	    if [ -f $sourceFile ] ; then
+	    if [ -f "$sourceFile" ] ; then
 	        echo "Using db file on $sourceFile"
 	        break
 	    fi
@@ -36,7 +36,7 @@ do
 done
 
 # Run the convert script to create derivative.
-if [ -f $sourceFile ]; then
+if [ -f "$sourceFile" ]; then
 	echo "Creating derivative from $sourceFile"
 	php $scripts/shared/image.derivative.php -i $sourceFile -l $targetBucket -b $sourceBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile
 else
@@ -46,14 +46,14 @@ else
 fi
 
 
-if [ -f $sourceFile ]; then
+if [ -f "$sourceFile" ]; then
     rm $sourceFile
 fi
 
 
 # The derivative script has added a jpg extension to the targetFile, which we take over here.
 targetFile="$targetFile.jpg"
-if [ -f $targetFile ]; then
+if [ -f "$targetFile" ]; then
 	contentType="image/jpeg"
 	bucket=$targetBucket
 	l=$targetFile

@@ -64,7 +64,7 @@ do
     do
         filename="$i.$j.txt"
         file=$fileSet/$filename
-        if [ -f $file ] ; then
+        if [ -f "$file" ] ; then
             echo "The file $file ought to have been removed."
             exit -1
         fi
@@ -89,10 +89,10 @@ do
             </soapenv:Envelope>"
 
 	    file=/tmp/$filename
-	    rm -f $file
+	    rm $file
         wget -O $file --header="Content-Type: text/xml" --header="Authorization: oauth $key" --post-data "$soapenv" \
             --no-check-certificate $endpoint
-        if [ ! -f $file ] ; then
+        if [ ! -f "$file" ] ; then
             echo "The PID webservice did not gave a valid response."
             exit -1
         fi

@@ -79,7 +79,7 @@ do
 	pid=$na/$i.$j
 	 filename="$i.$j.txt"
         file=$fileSet/$filename
-        if [ ! -f $file ] ; then
+        if [ ! -f "$file" ] ; then
             echo "The file $file ought not to have been removed."
             exit -1
         fi

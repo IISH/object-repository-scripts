@@ -65,8 +65,8 @@ resolverBaseUrl="$resolverBaseUrl"
         query="{md5:'$md5',length:$length}"
         mustHave=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').findOne($query).metadata.pid")
         if [ "$mustHave" == "$pid" ] ; then
-            rm -f $l
-            rm -f $l.md5
+            rm $l
+            rm $l.md5
             exit 0
         else
             echo "Error. No file found with $query"
