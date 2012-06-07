@@ -17,7 +17,6 @@ source $scripts/shared/parameters.sh
 db=$db
 make=$make
 manual=$manual
-echo "Add '-make database' to reconstruct a template with test material."
 echo "fileSet=$fileSet"
 echo "db=$db"
 
@@ -25,8 +24,6 @@ if [ ! "or_12345" == "$db" ]; then
  echo "Error... running a test with na=$na the test na MUST be 12345"
  exit -1
 fi
-
-if [ "$make" == "database" ]; then
 
     echo "Reconsructing files and database."
 
@@ -82,17 +79,3 @@ if [ "$make" == "database" ]; then
     fi
 
 echo "=================================================================================================================="
-exit 0
-
-    #  File count is as expected
-    mongo test --eval "printjson(db.dropDatabase())"
-    #mongo $db --quiet --eval "printjson(db.copyDatabase('$db', 'test'))"
-else
-	for bucket in "master" "level1" "level2" "level3"
-    	do
-        	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
-        	mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
-    	done
-	mongo $db --quiet --eval "printjson(db.copyDatabase('test', '$db'))"
-fi
-
