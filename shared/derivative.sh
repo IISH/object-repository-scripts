@@ -23,5 +23,5 @@ if [ -f "$file" ] ; then
 else
     echo "We cannot make a derivative of type $derivative"
     echo "This is not an error. Just there is no such service."
-    exit 799
+    exit 255
 fi
