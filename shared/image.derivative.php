@@ -90,18 +90,19 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     } else {
         $original['dpis'] = (int)$original['dpis']['x'];
     }
+    $dpisx=(int)round($original['dpis']['x']);
+    $dpisy=(int)round($original['dpis']['y']);
 
     $original['px'] = $im->getImageGeometry();
     $original['depth'] = $im->getImageDepth();
-
 
     $targetDPIs = $original['dpis'];
     $targetWidth = $original['px']['width'];
     $targetHeight = $original['px']['height'];
     # Update our database
     $mongosh = "mongo $db --quiet --eval=\"var ns='$bucket';pid='$pid';var content={"
-                . "'x-resolution':" . (int)$original['dpis']['x'] . ","
-                . "'y-resolution':" . (int)$original['dpis']['y'] . ","
+                . "'x-resolution':" . $dpisx . ","
+                . "'y-resolution':" . $dpisy . ","
                 . "width:" . $targetWidth . ","
                 . "height:" . $targetHeight . "};"
                 . "''\" " . $script;
