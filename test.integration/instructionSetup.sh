@@ -20,6 +20,7 @@ action="upsert"
 
 mkdir -p $fileSet
 rm $fileSet/*
+rm -r $fileSet/TIFF
 mkdir /tmp/$na
 
 # empty our profile, instruction and stagingfile collections
@@ -32,7 +33,7 @@ query="{fileSet:'$fileSet'}"
 mongo sa --quiet --eval "db.getCollection('stagingfile').remove($query)"
 # Add a profile with a default workflow that only processes the StagingfileBindPIDs
 profile="{na:'$na', action:'upsert',access:'open',contentType:'text/plain',resolverBaseUrl:'http://hdl.handle.net/',
-    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null,plan:[]}"
+    autoGeneratePIDs:'none',autoIngestValidInstruction:true,pidwebserviceEndpoint:null,pidwebserviceKey:null,plan:['StagingfileIngestMaster','StagingfileBindPIDs','StagingfileIngestLevel1','StagingfileIngestLevel2','StagingfileIngestLevel3']}"
 mongo sa --eval "db.getCollection('profile').save($profile)"
 
 #  Get some 25 test files with the instruction. Remove any PIDs in the pid webservice.
