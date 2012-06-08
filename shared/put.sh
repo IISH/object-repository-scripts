@@ -61,7 +61,7 @@ resolverBaseUrl="$resolverBaseUrl"
     fi
 
     remove=$remove
-    if [ $remove ] ; then
+    if [ "$remove" == "yes" ] ; then
         # Now verify if a file with the given length and md5 exists so we can remove it from the fs
         query="{md5:'$md5',length:$length}"
         mustHave=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').findOne($query).metadata.pid")

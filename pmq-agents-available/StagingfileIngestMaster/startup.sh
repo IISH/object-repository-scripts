@@ -20,7 +20,7 @@ l="$l"
 # If we find a file we upload it
 if [ -f "$l" ] ; then
 
-    remove=true
+    remove="yes"
     source $scripts/shared/put.sh
     #count=$(ls $fileSet -1 | wc -l)
     #if [$count == 0] ; then

@@ -57,7 +57,7 @@ if [ -f "$targetFile" ]; then
 	contentType="image/jpeg"
 	bucket=$targetBucket
 	l=$targetFile
-	remove=true
+	remove="yes"
 	md5=$(md5sum $targetFile | cut -d ' ' -f 1)
 	echo "$md5  $targetFile" > "$targetFile.md5"
 	source $scripts/shared/put.sh
