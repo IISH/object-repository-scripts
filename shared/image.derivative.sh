@@ -42,7 +42,7 @@ if [ -f "$sourceFile" ]; then
 else
 	echo "Could not find sourceFile: $sourceFile"
 	echo "We need at least a master to produce a derivative."
-	exit -1
+	exit 240
 fi
 
 
@@ -63,6 +63,6 @@ if [ -f "$targetFile" ]; then
 	source $scripts/shared/put.sh
 else
 	echo "Unable to create derivative."
-	exit 0
+	exit 240
 fi
 
