@@ -31,8 +31,6 @@ fileSet=$fileSet
 key=$key
 l=$l
 location=$location
-tmp=/tmp
-mkdir -p $tmp
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 sourceFileExtension=$sourceFileExtension
 

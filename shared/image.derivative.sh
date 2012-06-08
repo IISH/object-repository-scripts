@@ -10,7 +10,7 @@ pid=$pid
 md5=$md5
 sourceBuckets=$sourceBuckets
 targetBucket=$targetBucket
-tmp=$tmp
+tmp=$derivative_cache
 targetFile=$tmp/$md5.$targetBucket
 sourceFileExtension=$sourceFileExtension
 

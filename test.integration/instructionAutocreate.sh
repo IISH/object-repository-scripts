@@ -18,7 +18,7 @@ folder="unittest"
 fileSet=$sa_path/$na/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
-testTotal=26
+testTotal=51
 testCounter=0
 action="upsert"
 autoGeneratePIDs="filename2pid"
@@ -46,7 +46,7 @@ let failSafe++
 # Now run the workflow: autoIngestValidInstruction:false
 mongo sa --quiet --eval "db.getCollection('instruction').update({fileSet:'$fileSet','workflow.n':0}, \
 	{\$set:{autoGeneratePIDs:'filename2pid',autoIngestValidInstruction:false,'workflow.$.name':'InstructionAutocreate', \
-	'workflow.$.statusCode':100, plan:['StagingfileIngestMaster,StagingfileBindPIDs']}}, false, false)"
+	'workflow.$.statusCode':100, plan:['StagingfileIngestMaster','StagingfileBindPIDs']}}, false, false)"
 
 while [ $failSafe -lt 100 ]
 do
@@ -84,6 +84,15 @@ do
             exit -1
         fi
         let testCounter++
+
+	query="db.getCollection('stagingfile').find({fileSet:'$fileSet',pid:'$pid'}).count()"
+	count=$(mongo sa --quiet --eval "$query")
+	if [ $count != 0 ] ; then
+            echo "The query $query ought to have one result."
+	    exit -1
+	fi
+        let testCounter++
+            break
     done
 done
 
