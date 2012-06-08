@@ -73,8 +73,10 @@ if [ -z "$sourceFileExtension" ]; then
 fi
 
 # Should the content NOT be a json string, we nullify it
-if [ -z "$content" ] || [[ $content == {* ]] ; then
-    content=null
+if [ ${content:0:1} == "{" ]; then
+	echo "Content: $content"
+else
+	content=null
 fi
 
 # If no webservice endpoint or key was given, we supply a custom value

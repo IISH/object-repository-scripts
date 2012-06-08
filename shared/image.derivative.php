@@ -84,14 +84,14 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
 
     $original['dpis'] = $im->getImageResolution();
     $original['dpisUnit'] = $im->getImageUnits();
+    $dpisx=(int)round($original['dpis']['x']);
+    $dpisy=(int)round($original['dpis']['y']);
 
     if ($original['dpisUnit'] == 2) {
         $original['dpis'] = (int)round($original['dpis']['x'] * 2.54237);
     } else {
         $original['dpis'] = (int)$original['dpis']['x'];
     }
-    $dpisx=(int)round($original['dpis']['x']);
-    $dpisy=(int)round($original['dpis']['y']);
 
     $original['px'] = $im->getImageGeometry();
     $original['depth'] = $im->getImageDepth();

@@ -20,9 +20,6 @@ sourceFile=$(php $scripts/shared/generic.derivative.php -f "$fileSet" -l "$locat
     		contentType=$(php $scripts/shared/contenttype.php -t $scripts/shared/contenttype.txt -l $sourceFile)
     		content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" $sourceFile)
 		# Should the content NOT be a json string, we nullify it
-		if [ -z "$content" ] || [[ $content == {* ]] ; then
-		    content=null
-		fi
 		remove=true
 		echo "contentType=$contentType"
 		echo "content=$content"

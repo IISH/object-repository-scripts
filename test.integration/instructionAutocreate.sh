@@ -53,6 +53,7 @@ do
     sleep 5
     let failSafe++
     count=$(mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet'}).count()")
+    echo "Stagingfiles $count/25"
     if [ $count == 25 ] ; then
             echo "Instruction completed."
         let testCounter++
@@ -77,8 +78,9 @@ do
     for j in 1 2 3 4 5
     do
 	pid=$na/$i.$j
-	 filename="$i.$j.txt"
+	filename="$i.$j.txt"
         file=$fileSet/$filename
+	echo "Check for file $file"
         if [ ! -f "$file" ] ; then
             echo "The file $file ought not to have been removed."
             exit -1
@@ -87,15 +89,14 @@ do
 
 	query="db.getCollection('stagingfile').find({fileSet:'$fileSet',pid:'$pid'}).count()"
 	count=$(mongo sa --quiet --eval "$query")
-	if [ $count != 0 ] ; then
+	echo "Check stagingfile presence $pid"
+	if [ $count != 1 ] ; then
             echo "The query $query ought to have one result."
 	    exit -1
 	fi
         let testCounter++
-            break
     done
 done
 
 source $scripts/shared/testreport.sh
 
-echo $testCounter
