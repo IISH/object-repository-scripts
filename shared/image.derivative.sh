@@ -14,7 +14,7 @@ tmp=$derivative_cache
 targetFile=$tmp/$md5.$targetBucket
 sourceFileExtension=$sourceFileExtension
 
-for sourceBucket in $sourceBuckets
+for sourceBucket in ${sourceBuckets[*]}
 do
 	echo "sourceBucket='$sourceBucket'"
     if [ ! "$sourceBucket" == "master" ]; then
@@ -40,8 +40,8 @@ if [ -f "$sourceFile" ]; then
 	echo "Creating derivative from $sourceFile"
 	php $scripts/shared/image.derivative.php -i $sourceFile -l $targetBucket -b $sourceBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile
 else
-	echo "Could not find sourceFile: $sourceFile"
-	echo "We need at least a master to produce a derivative."
+	echo "Could not find a master or higher level derivative to produce a $targetBucket file"
+	echo "We need at a master to produce a derivative."
 	exit 240
 fi
 

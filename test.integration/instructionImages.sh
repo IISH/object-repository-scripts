@@ -26,11 +26,11 @@ source $scripts/test.integration/instructionSetup.sh
 db=$db
 key=$key
 endpoint=$endpoint
-
 echo "====================================================================="
 
-rm -r /mnt/sa/12345/testuser/unittest
-mkdir -p /mnt/sa/12345/testuser/unittest
+rm /mnt/sa/12345/testuser/unittest/*
+rm /mnt/sa/12345/testuser/unittest/TIFF
+rm /mnt/sa/12345/testuser/unittest/TIFF/files
 cp -r /mnt/sa/12345/.testuser/unittest/TIFF $fileSet
 chown -R $na:$na /mnt/sa/12345/testuser/unittest
 
