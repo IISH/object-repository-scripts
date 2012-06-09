@@ -14,7 +14,7 @@ while [ "${1+isset}" ]; do
     shift
   eval ${k}=$(echo -ne \""${v}"\")
     echo "$k=$v"
-	if [ ${v:0:1} == "-" ]; then
+	if [[ ${v:0:1} == "-" ]]; then
 	    echo "Value cannot start with a hyphen."
 	    exit -1
 	fi
@@ -73,7 +73,7 @@ if [ -z "$sourceFileExtension" ]; then
 fi
 
 # Should the content NOT be a json string, we nullify it
-if [ ${content:0:1} == "{" ]; then
+if [[ ${content:0:1} == "{" ]]; then
 	echo "Content: $content"
 else
 	content=null
