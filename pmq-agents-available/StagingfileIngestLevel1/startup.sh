@@ -14,3 +14,5 @@ file="$scripts/shared/$derivative".derivative.sh
 if [ -f "$file" ] ; then
     source $file
 fi
+
+exit $?
