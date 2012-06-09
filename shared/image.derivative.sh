@@ -57,9 +57,9 @@ if [ -f "$targetFile" ]; then
 	contentType="image/jpeg"
 	bucket=$targetBucket
 	l=$targetFile
-	remove="yes"
 	md5=$(md5sum $targetFile | cut -d ' ' -f 1)
 	echo "$md5  $targetFile" > "$targetFile.md5"
+	remove="yes"
 	source $scripts/shared/put.sh
 else
 	echo "Unable to create derivative."
