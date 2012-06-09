@@ -12,7 +12,7 @@ while [ "${1+isset}" ]; do
     shift
  v=$1
     shift
-  eval ${k}=$(echo -ne \""${v}"\")
+  eval ${k}=$(echo \""${v}"\")
     echo "$k=$v"
 	if [[ ${v:0:1} == "-" ]]; then
 	    echo "Value cannot start with a hyphen."
