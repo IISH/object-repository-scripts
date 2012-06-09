@@ -15,7 +15,6 @@ scripts=$scripts
 na="12345"
 sa_path=$sa_path
 folder="unittest"
-fileSet=$sa_path/$na/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
 testTotal=51
@@ -23,6 +22,8 @@ testCounter=0
 action="upsert"
 autoGeneratePIDs="filename2pid"
 autocreateInstruction=true
+fileSet="/tmp"
+# This fileSet will be reset in the instructionSetup.sh
 source $scripts/test.integration/instructionSetup.sh
 db=$db
 key=$key

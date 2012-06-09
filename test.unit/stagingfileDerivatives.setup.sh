@@ -7,7 +7,7 @@ sa_path=$sa_path
 na="12345"
 cpuser=testuser
 folder=unittest/TIFF/files
-fileName="1_0001.tif"
+fileName="1.1.tif"
 fileSet=$sa_path/$na/$cpuser/unittest
 
 # Our "master" file is here as it should be in the instruction:
@@ -32,15 +32,15 @@ echo "Using test directory $d"
 # has a /TIFF attached to it.
 rm -r /mnt/sa/12345/testuser/unittest
 cp -r -v $d $fileSet
-testfile=$fileSet/TIFF/files/1_0001.tif
+testfile=$fileSet/TIFF/files/1.1.tif
 if [ ! -f "$testfile" ]; then
     echo "No testfile found: $testfile"
 fi
 
 md5=$(md5sum $testfile | cut -d ' ' -f 1)
-md5level1=$(md5sum $d/.level1/files/1_0001.jpg | cut -d ' ' -f 1)
-md5level2=$(md5sum $d/TIFF/.level2/files/1_0001.jpg | cut -d ' ' -f 1)
-md5level3=$(md5sum $d/TIFF/files/.level3/1_0001.jpg | cut -d ' ' -f 1)
+md5level1=$(md5sum $d/.level1/files/1.1.jpg | cut -d ' ' -f 1)
+md5level2=$(md5sum $d/TIFF/.level2/files/1.1.jpg | cut -d ' ' -f 1)
+md5level3=$(md5sum $d/TIFF/files/.level3/1.1.jpg | cut -d ' ' -f 1)
 
 echo "md5=$md5"
 echo "md5level1=$md5level1"

@@ -27,8 +27,14 @@ mkdir /tmp/$na
 query="{na:'$na'}"
 mongo sa --quiet --eval "db.getCollection('profile').remove($query)"
 mongo sa --quiet --eval "db.getCollection('instruction').remove($query)"
-mongo or_$na --quiet --eval "db.getCollection('master.files').remove()"
-mongo or_$na --quiet --eval "db.getCollection('master.chunks').remove()"
+
+for bucket in "master" "level1" "level2" "level3"
+do
+        mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
+        mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
+        mongo $db --quiet --eval "db.getCollection('$bucket.files').ensureIndex({md5:1,length:1}, {unique:true})"
+done
+
 query="{fileSet:'$fileSet'}"
 mongo sa --quiet --eval "db.getCollection('stagingfile').remove($query)"
 # Add a profile with a default workflow that only processes the StagingfileBindPIDs

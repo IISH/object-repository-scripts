@@ -14,10 +14,10 @@ while [ "${1+isset}" ]; do
     shift
   eval ${k}=$(echo \""${v}"\")
     echo "$k=$v"
-	if [[ ${v:0:1} == "-" ]]; then
-	    echo "Value cannot start with a hyphen."
-	    exit -1
-	fi
+        if [[ ${v:0:1} == "-" ]]; then
+            echo "Value cannot start with a hyphen."
+            exit -1
+        fi
 done
 
 sa_path=$sa_path

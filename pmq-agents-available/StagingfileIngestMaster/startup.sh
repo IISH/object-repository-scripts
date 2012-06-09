@@ -28,10 +28,24 @@ if [ -f "$l" ] ; then
     #fi
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
-    mongo $db --quiet --eval "db.getCollection('$bucket.files').update({'metadata.pid':'$pid'}, \
-        {\$set:{'metadata.access':'$access',contentType:'$contentType','metadata.label':'$label'}}, false, false);''"
-    exit $?
+    query="{'metadata.pid':'$pid'}"
+    update="{'metadata.access':'$access',contentType:'$contentType','metadata.label':'$label'}"
+    mongo $db --quiet --eval "db.getCollection('$bucket.files').update($query}, \
+        {\$set:$update}, false, false);''"
+    rc=$?
+    if [[ $rc != 0 ]] ; then
+        exit $rc
+    fi
+
+    # Verify
+    query="{\$and:[$query,$update]}"
+    count=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').find($query).count()")
+    if [ $count == 1 ] ; then
+	exit 0
+    fi
+    echo "The expected updated elements cannot be found with the query $query"
+    exit -1
 fi
 
 exit $?
-
+`
