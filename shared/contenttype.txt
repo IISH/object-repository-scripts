@@ -418,7 +418,6 @@
 .jfif,image/pjpeg
 .jpe,image/jpe
 .jpeg,image/jpeg
-.jpg,image/jpeg
 .png,image/png
 .x-png,image/png
 .tif,image/tiff
