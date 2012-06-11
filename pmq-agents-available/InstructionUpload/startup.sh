@@ -12,5 +12,6 @@ if [[ $rc != 0 ]] ; then
 fi
 
 rm $fileSet/instruction.xml
+rm $fileSet/instruction.xml.md5
 
 exit 0
