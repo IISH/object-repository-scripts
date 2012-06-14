@@ -39,10 +39,9 @@ ls $fileSet/TIFF/files  -al
 failSafe=0
 remember=0
 
-echo "Give the workflow controller some timem to detect the fileSet."
+echo "Give the workflow controller some time to detect the fileSet."
 sleep 10
 
-# Now run the workflow: autoIngestValidInstruction:false
 echo "fileSet=$fileSet"
 query="{fileSet:'$fileSet','workflow.n':0}"
 update="{\$set:{autoGeneratePIDs:'filename2pid',autoIngestValidInstruction:true,contentType:'image/tiff','workflow.$.name':'InstructionAutocreate', \
