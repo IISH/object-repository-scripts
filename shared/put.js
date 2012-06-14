@@ -206,7 +206,7 @@ function cache() {
     var length = collectionNames.length;
     for (var i = 0; i < length; i++) {
         var collectionName = collectionNames[i];
-        if (collectionName.lastIndexOf(".files") != -1 && 'master.files' != collectionName) {
+        if (collectionName.lastIndexOf(".files") != -1) {
             var bucket = db.getCollection(collectionName).findOne({'metadata.pid':pid});
             if (bucket) {
                 cache.push(
