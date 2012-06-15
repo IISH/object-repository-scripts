@@ -175,7 +175,7 @@ function metadata(document) {
     m.na = na;
     m.fileSet = fileSet;
     m.pid = pid;
-    if ( lid ) m.lid = lid;
+    if (lid) m.lid = lid;
     m.access = access;
     m.label = label;
     m.resolverBaseUrl = resolverBaseUrl;
@@ -208,6 +208,7 @@ function cache() {
         var collectionName = collectionNames[i];
         if (collectionName.lastIndexOf(".files") != -1) {
             var bucket = db.getCollection(collectionName).findOne({'metadata.pid':pid});
+            if ('master.files' == collectionName) delete bucket.metadata.cache;
             if (bucket) {
                 cache.push(
                     bucket
@@ -215,7 +216,7 @@ function cache() {
             }
         }
     }
-    db.getCollection('master.files').update( { 'metadata.pid': pid }, {$set:{'metadata.cache':cache}}, true, false );
+    db.getCollection('master.files').update({ 'metadata.pid':pid }, {$set:{'metadata.cache':cache}}, true, false);
 }
 
 var files = db.getCollection(ns + '.files');

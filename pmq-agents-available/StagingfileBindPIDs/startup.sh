@@ -13,6 +13,7 @@ pid=$pid
 resolveUrl=$resolveUrl
 OR_HOME=$OR_HOME
 source $scripts/shared/parameters.sh
+db=$db
 lid=$lid
 pidwebserviceKey=$pidwebserviceKey
 pidwebserviceEndpoint=$pidwebserviceEndpoint
@@ -40,5 +41,7 @@ soapenv="<?xml version='1.0' encoding='UTF-8'?>  \
 wget -O $OR_HOME/log/FileBindPIDs_$na.log --header="Content-Type: text/xml" \
     --header="Authorization: oauth $pidwebserviceKey" --post-data "$soapenv" \
     --no-check-certificate $pidwebserviceEndpoint
+
+mongo $db --quiet --eval "db.getCollection('master.files').update( {metadata.pid:'$pid'}, {\$set:{'metadata.piduser':true}}, true, false )"
 
 exit $?

@@ -34,6 +34,17 @@ resolverBaseUrl="$resolverBaseUrl"
     echo "-c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put"
 	java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put
 
+    rc=$?
+    if [[ $rc != 0 ]] ; then
+        exit $rc
+    fi
+
+    $(mongo $db --quiet --eval "\
+    var ns='$bucket'; \
+    var md5='$md5'; \
+    var length=$length; \
+    var pid = '$pid'; \
+    ''" $scripts/shared/integrity.js
 
     rc=$?
     if [[ $rc != 0 ]] ; then
@@ -63,16 +74,7 @@ resolverBaseUrl="$resolverBaseUrl"
     remove=$remove
     if [ "$remove" == "yes" ] ; then
         # Now verify if a file with the given length and md5 exists so we can remove it from the fs
-        query="{md5:'$md5',length:$length}"
-        mustHave=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').findOne($query).metadata.pid")
-        if [ "$mustHave" == "$pid" ] ; then
             rm $l
             rm $l.md5
             exit 0
-        else
-            echo "Error. No file found with $query"
-            echo "Expected  $pid"
-            echo "Was       $mustHave"
-            exit -1
-        fi
     fi
