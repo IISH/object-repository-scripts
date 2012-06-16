@@ -40,18 +40,6 @@ resolverBaseUrl="$resolverBaseUrl"
     fi
 
     mongo $db --quiet --eval "\
-    var ns='$bucket'; \
-    var md5='$md5'; \
-    var length=$length; \
-    var pid = '$pid'; \
-    ''" $scripts/shared/integrity.js
-
-    rc=$?
-    if [[ $rc != 0 ]] ; then
-        exit $rc
-    fi
-
-    mongo $db --quiet --eval "\
     var access='$access'; \
     var content=$content; \
     var filesDB='$db'; \
@@ -65,6 +53,19 @@ resolverBaseUrl="$resolverBaseUrl"
     var lid='$lid'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     ''" $scripts/shared/put.js
+
+
+    rc=$?
+    if [[ $rc != 0 ]] ; then
+        exit $rc
+    fi
+
+        mongo $db --quiet --eval "\
+        var ns='$bucket'; \
+        var md5='$md5'; \
+        var length=$length; \
+        var pid = '$pid'; \
+        ''" $scripts/shared/integrity.js
 
     rc=$?
     if [[ $rc != 0 ]] ; then
