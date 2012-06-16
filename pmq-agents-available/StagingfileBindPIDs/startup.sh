@@ -42,6 +42,6 @@ wget -O $OR_HOME/log/FileBindPIDs_$na.log --header="Content-Type: text/xml" \
     --header="Authorization: oauth $pidwebserviceKey" --post-data "$soapenv" \
     --no-check-certificate $pidwebserviceEndpoint
 
-mongo $db --quiet --eval "db.getCollection('master.files').update( {metadata.pid:'$pid'}, {\$set:{'metadata.pwuser':true}}, true, false )"
+mongo $db --quiet --eval "db.getCollection('master.files').update( {'metadata.pid':'$pid'}, {\$set:{'metadata.pidtype':'or'}}, true, false )"
 
 exit $?

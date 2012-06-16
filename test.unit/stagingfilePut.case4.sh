@@ -64,10 +64,10 @@ do
     do
 	    query="{'metadata.pid':'$pid'}"
         count=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').find($query).count()")
-	    if [ $count == 0 ] ; then
+	    if [ $count == 1 ] ; then
             let testCounter++
     	else
-            echo "Should not see a document with query $query in $bucket because the master has been given a new file."
+            echo "Still expect to see a document with query $query in $bucket."
             exit -1
         fi
     done
