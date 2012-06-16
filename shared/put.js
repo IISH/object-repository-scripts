@@ -137,7 +137,7 @@ function updateCollections(oldPid) {
 function removeDocuments(master) {
 
     if (ns != 'master') {
-        throw "Only an action intended for a master.files collection is allowed to remove all pids.";
+        throw "Only an action intended for a master.files collection is allowed to remove all associate files.";
     }
 
     var collectionNames = db.getCollectionNames();
@@ -157,6 +157,21 @@ function removeDocuments(master) {
             }
         }
     }
+}
+
+/**
+ * removeDocument
+ *
+ * Removes a document and it's chunks
+ *
+ * @param document
+ */
+function removeDocument(document) {
+
+    var files_id = document._id;
+    print("Removing duplicate PIDs from " + ns + ' with pid ' + pid + " and _id " + files_id);
+    files.remove({_id:files_id});
+    db.getCollection(ns + '.chunks').remove({files_id:files_id});
 }
 
 /**
@@ -275,7 +290,7 @@ switch (list.count()) {
         var match = list[0].md5 == md5 && list[0].length == length;
         var documentA = ( match ) ? list[1] : list[0];
         var documentB = ( match ) ? list[0] : list[1];
-        removeDocuments(documentA);
+        removeDocument(documentA);
         documentB.metadata = documentA.metadata;
         metadata(documentB);
         break;
