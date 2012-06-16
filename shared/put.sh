@@ -39,7 +39,7 @@ resolverBaseUrl="$resolverBaseUrl"
         exit $rc
     fi
 
-    $(mongo $db --quiet --eval "\
+    mongo $db --quiet --eval "\
     var ns='$bucket'; \
     var md5='$md5'; \
     var length=$length; \
