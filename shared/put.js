@@ -169,7 +169,7 @@ function removeDocuments(master) {
 function removeDocument(document) {
 
     var files_id = document._id;
-    print("Removing duplicate PIDs from " + ns + ' with pid ' + pid + " and _id " + files_id);
+    print("Removing duplicate PIDs from " + ns + " with pid " + pid + " and _id " + files_id);
     files.remove({_id:files_id});
     db.getCollection(ns + '.chunks').remove({files_id:files_id});
 }
@@ -210,7 +210,6 @@ function metadata(document) {
  *
  * Copy all metadata elements of non-master related files into the master.files array
  *
- * @param oldPid
  */
 function cache() {
 
@@ -223,8 +222,9 @@ function cache() {
         var collectionName = collectionNames[i];
         if (collectionName.lastIndexOf(".files") != -1) {
             var bucket = db.getCollection(collectionName).findOne({'metadata.pid':pid});
-            if ('master.files' == collectionName) delete bucket.metadata.cache;
             if (bucket) {
+                if ('master.files' == collectionName) delete bucket.metadata.cache;
+                bucket.metadata.pidUrl = 'http://hdl.handle.net/' + pid + '?locatt=view:' + bucket.metadata.bucket;
                 cache.push(
                     bucket
                 )
