@@ -280,24 +280,33 @@ switch (list.count()) {
         updateCollections(dropPid);
 
         break;
-    case 2:
+    default:
         // CASE 4: Pid replacement and document removal
         // Persisted was     document A {md5: a, 'metadata.pid': a}
         // Persisted is      document B {md5: b, 'metadata.pid': a}
         // Result: two documents with the same pid a
         // We will remove the document A and move its metadata into the new document B.
+        // Because of whatever errors there may be several documents. We remove all the document A types.
+        // Only metadata of the last Document A type is preserved.
         print("Case 4");
-        var match = list[0].md5 == md5 && list[0].length == length;
-        var documentA = ( match ) ? list[1] : list[0];
-        var documentB = ( match ) ? list[0] : list[1];
-        removeDocument(documentA);
-        documentB.metadata = documentA.metadata;
+        var documentB = null;
+        for (var i = 0; i < list.count(); i++) {
+            var match = list[i].md5 == md5 && list[i].length == length;
+            if (match == true) {
+                documentB = list[i];
+                break;
+            }
+        }
+        for (var i = 0; i < list.count(); i++) {
+            var remove = list[i].md5 != documentB.md5 || list[i].length != documentB.length;
+            if (remove) {
+                var documentA = list[i];
+                removeDocument(documentA);
+                documentB.metadata = documentA.metadata;
+            }
+        }
         metadata(documentB);
-        break;
-    default:
-        print("Query resulted in too many documents.");
-        printjson(query);
-        throw "We found more than two documents !";
+        print("Query resulted in " + list.count() + " documents.");
 }
 
-cache()
+cache();
