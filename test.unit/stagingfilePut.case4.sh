@@ -34,6 +34,8 @@ do
     pid="$na/2.$i"
     query="{'metadata.pid':'$pid'}"
     oldMD5=$(mongo $db --quiet --eval "db.getCollection('master.files').findOne($query).md5")
+    oldId=$(mongo $db --quiet --eval "db.getCollection('master.files').findOne($query)._id")
+    oldChunk=$(mongo $db --quiet --eval "db.getCollection('master.chunks').findOne({files_id:'$oldId'}).data")
     filename="master.3.$i.txt"
     location="/$folder/$filename"
     file="$fileSet/$filename"
@@ -42,6 +44,22 @@ do
     $scripts/shared/put.sh -na $na -bucket "master" -contentType "image/tif" -pid $pid -md5 $md5 \
         -location $location -access "open" -label "test label master" \
         -resolverBaseUrl "a resolverBaseUrl" -fileSet $fileSet
+
+    newId=$(mongo $db --quiet --eval "db.getCollection('master.files').findOne($query)._id")
+    newChunk=$(mongo $db --quiet --eval "db.getCollection('master.chunks').findOne({files_id:'$newId'}).data")
+    
+    echo "oldId=$oldId"
+    echo "newId=$newId"
+    echo "oldChunk=$oldChunk"
+    echo "newChunk=$newChunk"
+    if [ "$oldId" == "$newId" ] ; then
+        echo "The chunks ought to be different."
+        exit -1
+    fi
+    if [ "$oldChunk" == "$newChunk" ] ; then
+        echo "The chunks ought to be different."
+	exit -1
+    fi
 
     query="{md5:'$oldMD5'}"
     count=$(mongo $db --quiet --eval "db.getCollection('master.files').find($query).count()")

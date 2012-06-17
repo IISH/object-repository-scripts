@@ -13,7 +13,7 @@ folder="unittest"
 fileSet=$sa_path/$na/$testuser/$folder
 cpkey=$cpkey
 cpendpoint=$cpendpoint
-testTotal=75
+testTotal=50
 testCounter=0
 
 
@@ -49,7 +49,7 @@ do
     done
 done
 
-# Now test metadata updates
+# Now test metadata updates. As all files are removed, we do not have a location.
 bucket="master"
 for i in 1 2 3 4 5
 do
@@ -64,8 +64,9 @@ do
         access="liberal"
         label="hello Galifrey $pid"
         contentType="text/realySimple"
+        loc="/$folder/$filename"
         $scripts/pmq-agents-available/StagingfileIngestMaster/startup.sh -pid "$pid" -na $na -fileSet $fileSet -id $id \
-         -name $name -bucket $bucket -contentType $contentType -md5 $md5 -access $access -label "$label"
+         -name $name -bucket $bucket -contentType $contentType -md5 $md5 -access $access -label "$label" -location $loc
 
         query="{'metadata.pid':'$pid'}"
         e="db.getCollection('$bucket.files').findOne($query).contentType"

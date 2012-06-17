@@ -40,6 +40,7 @@ else
     query="{\$and:[$query,$update]}"
     countOne=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').find($query).count()")
     if [ $countOne == 1 ] ; then
+	    echo "File metadata updated."
 	    exit 0
     fi
     echo "The expected updated elements cannot be found with the query $query"
