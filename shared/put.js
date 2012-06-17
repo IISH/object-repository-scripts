@@ -298,9 +298,9 @@ switch (list.count()) {
             }
         }
         for (var i = 0; i < list.count(); i++) {
-            var remove = list[i].md5 != documentB.md5 || list[i].length != documentB.length;
+            var documentA = list[i];
+            var remove = documentA.md5 != documentB.md5 || documentA.length != documentB.length;
             if (remove) {
-                var documentA = list[i];
                 removeDocument(documentA);
                 documentB.metadata = documentA.metadata;
             }
