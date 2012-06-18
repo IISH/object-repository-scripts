@@ -272,7 +272,7 @@ switch (list.count()) {
         print("Case 3");
         var documentA = files.findOne({md5:md5, length:length});
         var documentB = list[0];
-        assert(documentA, "Expected to find a document with a md5, length match.");
+        assert(documentA, "Expected to find a document with a md5, length match. Possibly a document with a different calculated md5 was ingested which is different from the declared md5.");
         removeDocuments(documentB);
         var dropPid = documentA.metadata.pid;
         documentA.metadata = documentB.metadata;

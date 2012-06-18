@@ -21,7 +21,13 @@ assert(file.metadata.pid == pid, "The pid we find " + file.metadata.pid + " is n
 // Paranoid check each chunk
 var nc = Math.ceil(length / file.chunkSize);
 var chunkCollection = db.getCollection(ns + '.chunks');
-for (var n = 0; n < nc; n++) {
+for (var n = 0; n <= nc; n++) {
     var chunk = chunkCollection.findOne({files_id:file._id, n:n}, {data:0});
-    assert(chunk, "There are chunks missing ! Chunk n:" + n);
+    if (n == nc) {
+        assert(!chunk, "There are too many chunks !");
+    } else {
+        assert(chunk, "There are chunks missing ! Chunk n:" + n);
+    }
 }
+
+
