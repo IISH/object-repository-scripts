@@ -105,6 +105,11 @@
  * @param oldPid
  */
 
+// First a normalization. The md5 in the mongodb collection is always 32 characters in length
+md5 = "00000000000000000000000000000000" + md5 ;
+md5 = md5.substring(md5.length - 32);
+
+
 function updateCollections(oldPid) {
 
     print('Systemic identifier shift from ' + oldPid + ' to ' + pid);

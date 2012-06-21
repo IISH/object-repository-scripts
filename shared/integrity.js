@@ -12,6 +12,10 @@ assert(length, "Must have length as parameter.");
 assert(md5, "Must have md5 as parameter.");
 assert(pid, "Must have pid as parameter.");
 
+// First a normalization. The md5 in the mongodb collection is always 32 characters in length
+md5 = "00000000000000000000000000000000" + md5 ;
+md5 = md5.substring(md5.length - 32);
+
 var query = {md5:md5, length:length};
 var file = db.getCollection(ns + '.files').findOne(query);
 assert(file, "Did not find a file with the expected md5 and length)");
