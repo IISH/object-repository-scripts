@@ -15,8 +15,8 @@ $m =           $options['m'];
 echo "csv=$csv";
 echo "instruction=$instruction";
 echo "fileSet=$fileSet";
-echo "p=$p";
-echo "m=$m";
+echo "pid=$p";
+echo "master=$m";
 
 $fh = fopen($instruction, 'w') or die("Cannot open file $instruction");
 
@@ -24,7 +24,10 @@ fwrite($fh, "<instruction xmlns='http://objectrepository.org/instruction/1.0/'>"
 
 $handle = fopen($csv, "r");
 $header = fgetcsv($handle, 0, ",");
-// ToDo: find the pid and the master position
+
+// Find the pid and the master position
+$keys = fgetcsv($handle, 0, ",")
+
 
 while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $pid=$data[0];
