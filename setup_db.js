@@ -28,9 +28,8 @@ for (var i = 0; i < buckets.length; i++) {
     var collFiles = buckets[i] + ".files";
 
     // Add index
-    db.getCollection(collChunks).ensureIndex( {files_id:1}, {unique:false} );
-    db.getCollection(collFiles).ensureIndex( {md5:1, length:1}, {unique:true} );
-    db.getCollection(collFiles).ensureIndex( {'metadata.pid':1}, {unique:false} ); // Yes false...
+    db.getCollection(collChunks).ensureIndex({files_id:1}, {unique:false});
+    db.getCollection(collFiles).ensureIndex({'metadata.pid':1}, {unique:true});
 
     // Shard collection
     var shardThis = db.getName() + "." + collChunks;

@@ -58,9 +58,7 @@
  *
  * Indexes:
  * By default the _id and files_id fields are indexed.
- * In the [ns].files collection we will use the additional compound index as key: md5 plus length.
- * That is to say, we accept the unlikely situation where there may be different files stored
- * that have identical md5 hashes and so we fall back on a file length combination.
+ * In the [ns].files collection we will use the metadata.pid as unique key.
  **/
 
 /**
@@ -106,7 +104,7 @@
  */
 
 // First a normalization. The md5 in the mongodb collection is always 32 characters in length
-md5 = "00000000000000000000000000000000" + md5 ;
+md5 = "00000000000000000000000000000000" + md5;
 md5 = md5.substring(md5.length - 32);
 
 
@@ -240,10 +238,7 @@ function cache() {
 }
 
 var files = db.getCollection(ns + '.files');
-var query = {$or:[
-    {md5:md5, length:length, 'metadata.pid':pid},
-    {'metadata.pid':pid}
-]};
+var query = {'metadata.pid':pid};
 var list = files.find(query);
 
 switch (list.count()) {
@@ -253,9 +248,10 @@ switch (list.count()) {
         // We offered document      A (md5: a, 'metadata.pid': b)
         // Pid b is now to be used to identify A
         // We have a systemic change of identifiers.
-        print("Case 1");
-        var documentA = files.findOne({md5:md5, length:length});
-        updateCollections(documentA.metadata.pid);
+        throw "Case 0 is no longer supported. It ought to be impossible to see this option";
+        //print("Case 1");
+        //var documentA = files.findOne({md5:md5, length:length});
+        //updateCollections(documentA.metadata.pid);
         break;
     case 1:
         // CASE 2: new document with new Pid. Found by md5,length,pid match
@@ -275,14 +271,15 @@ switch (list.count()) {
         // Offered          document A {md5: a, 'metadata.pid': b}
         // Document B is to be removed and its metadata will replace that of A
         print("Case 3");
-        var documentA = files.findOne({md5:md5, length:length});
-        var documentB = list[0];
-        assert(documentA, "Expected to find a document with a md5, length match. Possibly a document with a different calculated md5 was ingested which is different from the declared md5.");
-        removeDocuments(documentB);
-        var dropPid = documentA.metadata.pid;
-        documentA.metadata = documentB.metadata;
-        metadata(documentA);
-        updateCollections(dropPid);
+        throw "Case 3 is no longer supported. It ought to be impossible ever to see this situation."
+        //var documentA = files.findOne({md5:md5, length:length});
+        //var documentB = list[0];
+        //assert(documentA, "Expected to find a document with a md5, length match. Possibly a document with a different calculated md5 was ingested which is different from the declared md5.");
+        //removeDocuments(documentB);
+        //var dropPid = documentA.metadata.pid;
+        //documentA.metadata = documentB.metadata;
+        //metadata(documentA);
+        //updateCollections(dropPid);
 
         break;
     default:
@@ -294,24 +291,25 @@ switch (list.count()) {
         // Because of whatever errors there may be several documents. We remove all the document A types.
         // Only metadata of the last Document A type is preserved.
         print("Case 4");
-        var documentB = null;
-        for (var i = 0; i < list.count(); i++) {
-            var match = list[i].md5 == md5 && list[i].length == length;
-            if (match == true) {
-                documentB = list[i];
-                break;
-            }
-        }
-        for (var i = 0; i < list.count(); i++) {
-            var documentA = list[i];
-            var remove = documentA.md5 != documentB.md5 || documentA.length != documentB.length;
-            if (remove) {
-                removeDocument(documentA);
-                documentB.metadata = documentA.metadata;
-            }
-        }
-        metadata(documentB);
-        print("Query resulted in " + list.count() + " documents.");
+        throw "Case 4 is no longer supported. It ought to be impossible ever to see this situation."
+    //var documentB = null;
+    //for (var i = 0; i < list.count(); i++) {
+//            var match = list[i].md5 == md5 && list[i].length == length;
+    //          if (match == true) {
+    //            documentB = list[i];
+    //          break;
+    //    }
+    //}
+    //for (var i = 0; i < list.count(); i++) {
+//            var documentA = list[i];
+    //          var remove = documentA.md5 != documentB.md5 || documentA.length != documentB.length;
+    //        if (remove) {
+    //          removeDocument(documentA);
+    //        documentB.metadata = documentA.metadata;
+    //  }
+    //}
+    //metadata(documentB);
+    //print("Query resulted in " + list.count() + " documents.");
 }
 
 cache();
