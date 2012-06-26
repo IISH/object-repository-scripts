@@ -18,7 +18,7 @@ manual=$manual
 orfiles=$orfiles
 make=$make
 manual=$manual
-testTotal=360
+testTotal=396
 testCounter=0
 
 
@@ -132,6 +132,34 @@ do
         done
     done
 done
+
+# Different pids for same documents will add
+for bucket in "master" "level1" "level2" "level3"
+do
+    for i in 0 1 2
+    do
+        for j in 0 1 2
+        do
+            pid=$na/$i.$j.$bucket
+            filename=$bucket.$i.$j.txt
+            file="$fileSet/$filename"
+            location="/$folder/$filename"
+            md5=$(md5sum $file | cut -d ' ' -f 1)
+
+	    $scripts/shared/put.sh -na $na -bucket $bucket -contentType "image/jpeg" -pid $pid -md5 $md5 -location $location \
+                    -action "open" -label "$pid" -fileSet $fileSet
+                count=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').find({'md5':'$md5'}).count()")
+                if [ $count == 2 ]; then
+                    let testCounter++
+                else
+                    echo "Expected 2 document in $bucket, not actual $count"
+                    exit -1
+                fi
+	done
+    done
+done
+
+
 source $scripts/shared/manual.sh $manual "Metadata access, label, lastUpload all updated"
 
 source $scripts/shared/testreport.sh

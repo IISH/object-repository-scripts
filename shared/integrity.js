@@ -16,10 +16,9 @@ assert(pid, "Must have pid as parameter.");
 md5 = "00000000000000000000000000000000" + md5 ;
 md5 = md5.substring(md5.length - 32);
 
-var query = {md5:md5, length:length};
+var query = {'metadata.pid':pid,md5:md5,length:length};
 var file = db.getCollection(ns + '.files').findOne(query);
 assert(file, "Did not find a file with the expected md5 and length)");
-assert(file.metadata.pid == pid, "The pid we find " + file.metadata.pid + " is not equal to the expected " + pid);
 
 
 // Paranoid check each chunk
