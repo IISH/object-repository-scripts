@@ -37,7 +37,6 @@ fi
 	
 	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
         mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
-        mongo $db --quiet --eval "db.getCollection('$bucket.files').ensureIndex({md5:1,length:1}, {unique:true})"
         for i in 0 1 2 3
         do
             for j in 0 1 2
