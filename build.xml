@@ -26,6 +26,7 @@
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/orfiles/orfiles-${version}.jar" dest="${tmp}/orfiles.jar"/>
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/instruction-manager/instruction-manager-${version}.jar" dest="${tmp}/instruction-manager.jar"/>
         <get src="${bamboo}/OR-SCRIPTS/${build}/artifact/JOB1/scripts/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-src.tar.gz"/>
+        <get src="${bamboo}/OR-FVAL/${build}/artifact/JOB1/validation/validation-${version}.jar" dest="${tmp}/validation.jar"/>
 
         <gunzip src="${tmp}/scripts-src.tar.gz" dest="${tmp}/scripts-src.tar"/>
         <delete file="${tmp}/scripts-src.tar.gz"/>
