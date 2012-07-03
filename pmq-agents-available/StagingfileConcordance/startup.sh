@@ -13,7 +13,7 @@ source $scripts/shared/parameters.sh
 fileSet=$fileSet
 na=$na
 
-prefix=$(dirname $fileSet)
+prefix=$(basename $fileSet)
 java -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet $fileSet -prefix $prefix -na $na
 
 exit $?
