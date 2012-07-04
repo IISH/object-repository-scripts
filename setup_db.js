@@ -24,8 +24,13 @@ admin.runCommand({ enablesharding:db.getName() });
 var keys = ['555555555555555555555555555555555555555555555555', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'];
 var buckets = ['master', 'level1', 'level2', 'level3'];
 for (var i = 0; i < buckets.length; i++) {
-    var collChunks = buckets[i] + ".chunks";
     var collFiles = buckets[i] + ".files";
+    var collChunks = buckets[i] + ".chunks";
+
+    if ( i == 0 ) { // master collection
+        collFiles.ensureIndex({'metadata.label':1});
+        collFiles.ensureIndex({uploadDate:1});
+    }
 
     // Add index
     db.getCollection(collChunks).ensureIndex({files_id:1}, {unique:false});
