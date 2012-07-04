@@ -10,8 +10,7 @@ cd /tmp
 # If the certificates are not placed in the keystore, run this script with the ./deploy.sh cacerts option
 if [ "$1" == "cacerts" ] ; then
 
-    aliases="bamboo.socialhistoryservices.org" "pid.socialhistoryservices.org"
-    for alias in aliases
+    for alias in "bamboo.socialhistoryservices.org" "pid.socialhistoryservices.org"
     do
         openssl s_client -connect $alias:443 > $alias.cer
         openssl x509 -outform der -in $alias.cer -out $alias.der
