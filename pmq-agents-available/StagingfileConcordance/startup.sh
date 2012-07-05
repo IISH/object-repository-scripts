@@ -14,6 +14,6 @@ fileSet=$fileSet
 na=$na
 
 prefix=$(basename $fileSet)
-java -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet $fileSet -prefix $prefix -na $na
+java -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet ${fileSet%/*} -prefix $prefix -na $na
 
 exit $?
