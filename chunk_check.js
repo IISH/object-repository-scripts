@@ -26,12 +26,12 @@ for (var i = 0; i < length; i++) {
         filesCollection.find().forEach(function (file) {
             count++;
             //print(c + ". Check document " + file._id);
-            var nc = Math.ceil(length / file.chunkSize);
+            var nc = Math.ceil(file.length / file.chunkSize);
             for (var n = 0; n <= nc; n++) {
                 var chunk = chunksCollection.findOne({files_id:file._id, n:n, data:{$exists:true}}, {data:0});
                 if (n == nc) {
                     if (chunk) {
-                        print(file._id + " = corrupt document. There are too many chunks !");
+                        print(file._id + " = corrupt document. There are too many chunks ! Expected " + nc + " but got " + n);
                     }
                 } else {
                     if (!chunk) {
