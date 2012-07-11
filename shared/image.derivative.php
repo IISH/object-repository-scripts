@@ -1,6 +1,6 @@
 <?php
-set_time_limit(10); //GIVE THE SCRIPT A LIMIT OF 10 SECONDS TO RUN
-ini_set("memory_limit", "2048M"); //SET THE MEMORY LIMIT TO 2Mb
+set_time_limit(60); //GIVE THE SCRIPT A LIMIT OF 60 SECONDS TO RUN
+#ini_set("memory_limit", "2048M"); //SET THE MEMORY LIMIT TO 2Mb
 
 
 //DEFINE DIFERENT DERIVATIVE TYPES
@@ -170,7 +170,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     //FORCED VALUES USED FOR GENERATING THUMBS
     if (isset($derivativeTypes[$derivativeType]['forceWidth'])) {
 
-        $commmand = "convert \"" . $input . "\" ";
+        $commmand = "convert -limit memory 32 -limit map 64 \"" . $input . "\" ";
         $commmand .= "-thumbnail " . $derivativeTypes[$derivativeType]['forceWidth'] . "x ";
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
@@ -182,7 +182,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
 
     } else {
 
-        $commmand = "convert \"" . $input . "\" ";
+        $commmand = "convert -limit memory 32 -limit map 64 \"" . $input . "\" ";
         $commmand .= "-compress " . $derivativeTypes[$derivativeType]['encode'] . " ";
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
