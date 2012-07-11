@@ -24,6 +24,7 @@ pid="$pid"
 lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
 identifier=$identifier
+hostname=$hostname
 
     if [ ! -f "$l" ] ; then
         echo "The file does not exist: $l"
@@ -36,20 +37,20 @@ while [ "$shardprefix"=="$empty" ] ;
 do
     shardprefix=$(mongo sa --quiet --eval "var doc=db.getCollection('shardprefix').findAndModify( { \
         query:{identifier:{\$exists:false}}, \
-        update:{\$set:{identifier:'$identifier'}}, \
+        update:{\$set:{identifier:'$identifier', hostname:'$hostname'}, \$inc:{count:1}}, \
         upsert:false, \
         fields:{_id:1 }}); \
         ( doc == null ) ? null : doc._id \
     ")
     if [ "$shardprefix"=="$empty" ] ; then
         sleep 5
-     fi
+    fi
 done
 
     # Upload our file.
 	java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s "$shardprefix" -t $contentType -M Put
-
     rc=$?
+    mongo sa --quiet --eval "db.shardprefix.update({identifier:'\$identifier'}, {\$unset:{identifier:1,hostname:1}}, true, true)"
     if [[ $rc != 0 ]] ; then
         exit $rc
     fi
@@ -68,8 +69,6 @@ done
     var lid='$lid'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     ''" $scripts/shared/put.js
-
-    mongo sa --quiet --eval "db.shardprefix.update({identifier:'\$identifier'}, {\$unset:{identifier:1}}, true, true)"
 
     rc=$?
     if [[ $rc != 0 ]] ; then
