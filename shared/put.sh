@@ -23,22 +23,27 @@ orfiles=$orfiles
 pid="$pid"
 lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
+identifier=$identifier
 
     if [ ! -f "$l" ] ; then
         echo "The file does not exist: $l"
         exit -1
     fi
 
-empty="{ }"
+empty="null"
 shardprefix=$empty
 while [ "$shardprefix"=="$empty" ] ;
 do
-    sleep 5
-    shardprefix=$(mongo sa --quiet --eval "db.shardprefix.findAndModify( {"\
-        "query:{identifier:{\$exists:false}}, "\
-        "update:{\$set:{identifier:\$identifier}}, "\
-        "upsert:true, fields:{_id:1 }"\
-        "})")
+    shardprefix=$(mongo sa --quiet --eval "var doc=db.getCollection('shardprefix').findAndModify( { \
+        query:{identifier:{\$exists:false}}, \
+        update:{\$set:{identifier:'$identifier'}}, \
+        upsert:false, \
+        fields:{_id:1 }}); \
+        ( doc == null ) ? null : doc._id \
+    ")
+    if [ "$shardprefix"=="$empty" ] ; then
+        sleep 5
+     fi
 done
 
     # Upload our file.
@@ -64,6 +69,7 @@ done
     var resolverBaseUrl='$resolverBaseUrl'; \
     ''" $scripts/shared/put.js
 
+    mongo sa --quiet --eval "db.shardprefix.update({identifier:'\$identifier'}, {\$unset:{identifier:1}}, true, true)"
 
     rc=$?
     if [[ $rc != 0 ]] ; then
