@@ -29,10 +29,20 @@ resolverBaseUrl="$resolverBaseUrl"
         exit -1
     fi
 
+empty="{ }"
+shardprefix=$empty
+while [ "$shardprefix"=="$empty" ] ;
+do
+    sleep 5
+    shardprefix=$(mongo sa --quiet --eval "db.shardprefix.findAndModify( {"\
+        "query:{identifier:{\$exists:false}}, "\
+        "update:{\$set:{identifier:\$identifier}}, "\
+        "upsert:true, fields:{_id:1 }"\
+        "})")
+done
+
     # Upload our file.
-    # The PUT will fail when md5 and length compound key is unique.
-    echo "-c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put"
-	java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -t $contentType -M Put
+	java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s "$shardprefix" -t $contentType -M Put
 
     rc=$?
     if [[ $rc != 0 ]] ; then
