@@ -47,7 +47,7 @@ do
      messageQueue=$(basename $f)
      log=$OR_HOME/log/$messageQueue.$(date +%Y-%m-%d).log
 
-     maxTasks=2
+     maxTasks=1
      setenv=$f/setenv.sh
      if [ -f "$setenv" ] ; then
          source $setenv
