@@ -11,7 +11,7 @@ scripts=$scripts
 na=$na
 pid=$pid
 resolveUrl=$resolveUrl
-OR_HOME=$OR_HOME
+identifier=$identifier
 source $scripts/shared/parameters.sh
 db=$db
 lid=$lid
@@ -38,9 +38,17 @@ soapenv="<?xml version='1.0' encoding='UTF-8'?>  \
     </soapenv:Body> \
 </soapenv:Envelope>"
 
-wget -O $OR_HOME/log/FileBindPIDs_$na.log --header="Content-Type: text/xml" \
+file=/tmp/$identifier.log
+wget -O $file --header="Content-Type: text/xml" \
     --header="Authorization: oauth $pidwebserviceKey" --post-data "$soapenv" \
     --no-check-certificate $pidwebserviceEndpoint
+
+pidCheck=$(php $scripts/shared/pid.php -l $file)
+rm $file
+if [ "${pidCheck}" != "${pid^^}" ] ; then
+    echo "Pid not returned by webservice"
+    exit -1
+fi
 
 mongo $db --quiet --eval "db.getCollection('master.files').update( {'metadata.pid':'$pid'}, {\$set:{'metadata.pidType':'or'}}, true, false )"
 
