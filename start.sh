@@ -39,20 +39,5 @@
 OR_HOME=$OR_HOME
 scripts=$scripts
 
-# Iterate over the startup folder and initialize a pmq agent for each
-FILES=$OR_HOME/pmq-agents-enabled/*
-for f in $FILES
-do
-     shellScript=$f/startup.sh
-     messageQueue=$(basename $f)
-     log=$OR_HOME/log/$messageQueue.$(date +%Y-%m-%d).log
-
-     maxTasks=1
-     setenv=$f/setenv.sh
-     if [ -f "$setenv" ] ; then
-         source $setenv
-     fi
-     echo "Starting agent for $messageQueue"
-     $scripts/agent.sh -shellScript $shellScript -messageQueue $messageQueue -maxTasks $maxTasks -log $log
-     sleep 1
-done
+log=$OR_HOME/log/agent.$(date +%Y-%m-%d).log
+$scripts/agent.sh -maxTasks 1 -shellScript startup.sh -messageQueues $OR_HOME/pmq-agents-enabled -log $log

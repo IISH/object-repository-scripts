@@ -170,7 +170,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     //FORCED VALUES USED FOR GENERATING THUMBS
     if (isset($derivativeTypes[$derivativeType]['forceWidth'])) {
 
-        $commmand = "convert -limit memory 1024mb -limit map 1024mb \"" . $input . "\" ";
+        $commmand = "convert -limit memory 1024 \"" . $input . "\" ";
         $commmand .= "-thumbnail " . $derivativeTypes[$derivativeType]['forceWidth'] . "x ";
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
@@ -182,7 +182,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
 
     } else {
 
-        $commmand = "convert -limit memory 1024mb -limit map 1024mb \"" . $input . "\" ";
+        $commmand = "convert -limit memory 1024 \"" . $input . "\" ";
         $commmand .= "-compress " . $derivativeTypes[$derivativeType]['encode'] . " ";
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
