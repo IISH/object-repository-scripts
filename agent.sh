@@ -8,6 +8,9 @@ agent=$agent
 while [ "${1+isset}" ]
 do
      case "$1" in
+    -id )      shift
+        id="$1"
+                   ;;
     -shellScript )      shift
         shellScript="$1"
                         ;;
@@ -23,5 +26,5 @@ do
     shift
 done
 
-CMD="java -server -Dor.properties=$OR -jar $agent -shellScript $shellScript -messageQueues $messageQueues -maxTasks $maxTasks"
+CMD="java -server -Dor.properties=$OR -jar $agent -id $id -shellScript $shellScript -messageQueues $messageQueues -maxTasks $maxTasks"
 $CMD > $log 2>&1 &

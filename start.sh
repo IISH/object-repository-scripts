@@ -40,4 +40,4 @@ OR_HOME=$OR_HOME
 scripts=$scripts
 
 log=$OR_HOME/log/agent.$(date +%Y-%m-%d).log
-$scripts/agent.sh -maxTasks 1 -shellScript startup.sh -messageQueues $OR_HOME/pmq-agents-enabled -log $log
+$scripts/agent.sh -id $HOSTNAME -maxTasks 1 -shellScript startup.sh -messageQueues $OR_HOME/pmq-agents-enabled -log $log
