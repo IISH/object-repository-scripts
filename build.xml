@@ -47,6 +47,7 @@
         <symlink link="${dest.opt}/log" resource="${dest.log}" overwrite="yes"/>
         <symlink link="${dest.opt}/pmq-agents-available" resource="${dest.bin}/scripts/pmq-agents-available" overwrite="yes"/>
         <symlink link="${dest.opt}/start.sh" resource="${dest.bin}/scripts/start.sh" overwrite="yes"/>
+        <symlink link="${dest.opt}/stop.sh" resource="${dest.bin}/scripts/stop.sh" overwrite="yes"/>
 
     </target>
 </project>
