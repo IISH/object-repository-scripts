@@ -11,4 +11,4 @@
 ####################################################################
 
 brokerURL=$brokerURL:8161
-wget --post-data="$1" $brokerURL/demo/message/connection?type=topic
+wget --post-data "body=$1" $brokerURL/demo/message/Connection?type=topic
