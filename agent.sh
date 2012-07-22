@@ -16,7 +16,7 @@ agent=$agent
 log=$OR_HOME/log/agent.$(date +%Y-%m-%d).log
 
 if [ "$1" = "start" ] ; then
-    CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME"
+    CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
     $CMD > $log 2>&1 &
 else
     brokerURL=$brokerURL:8161
