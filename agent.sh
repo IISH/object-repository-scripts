@@ -1,30 +1,24 @@
 #!/bin/bash
-# Starts a message queue agent.
 #
+# Start agent: ./agent.sh start
+#
+# Stop agent: ./agent.sh stop $HOSTNAME
+# Pause agent: ./agent.sh $HOSTNAME
+# Continue agent: ./agent.sh continue $HOSTNAME
+#
+# Stop all agents: ./agent.sh stop
+# Pause all agents: ./agent.sh pause
+# Continue all agents: ./agent.sh continue
+
+OR_HOME=$OR_HOME
 OR=$OR
 agent=$agent
+log=$OR_HOME/log/agent.$(date +%Y-%m-%d).log
 
-#Getting the parameters
-while [ "${1+isset}" ]
-do
-     case "$1" in
-    -id )      shift
-        id="$1"
-                   ;;
-    -shellScript )      shift
-        shellScript="$1"
-                        ;;
-    -messageQueues )    shift
-        messageQueues="$1"
-                        ;;
-        -maxTasks )     shift
-        maxTasks="$1"
-                        ;;
-        -log )          shift
-        log="$1"
-    esac
-    shift
-done
-
-CMD="java -server -Dor.properties=$OR -jar $agent -id $id -shellScript $shellScript -messageQueues $messageQueues -maxTasks $maxTasks"
-$CMD > $log 2>&1 &
+if [ "$1" = "start" ] ; then
+    CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME"
+    $CMD > $log 2>&1 &
+else
+    brokerURL=$brokerURL:8161
+    wget --post-data "body=$1" $brokerURL/demo/message/Connection?type=topic
+fi
