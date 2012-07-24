@@ -15,10 +15,20 @@ OR=$OR
 agent=$agent
 log=$OR_HOME/log/agent.$(date +%Y-%m-%d).log
 
-if [ "$1" = "start" ] ; then
-    CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
-    $CMD > $log 2>&1 &
+scope=$2
+if [ "$scope" = "" ] ; then
+    scope=$HOSTNAME
+fi
+
+if [ "$scope" = "$HOSTNAME" ] || [ "$scope" = "all" ] ; then
+    if [ "$1" = "start" ] ; then
+        CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
+        $CMD > $log 2>&1 &
+    else
+        brokerURL=$brokerURL:8161
+        wget --post-data "body=$1 $2" $brokerURL/demo/message/Connection?type=topic
+    fi
 else
-    brokerURL=$brokerURL:8161
-    wget --post-data "body=$1" $brokerURL/demo/message/Connection?type=topic
+    echo "Invalid command: $scope"
+    exit -1
 fi
