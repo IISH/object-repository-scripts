@@ -10,6 +10,8 @@ targetBucket="level3"
 source $scripts/shared/derivative.sh
 derivative=$derivative
 
+source $scripts/shared/limit_connections.sh
+
 file="$scripts/shared/$derivative".derivative.sh
 if [ -f "$file" ] ; then
     source $file

@@ -17,6 +17,8 @@ contentType=$contentType
 label="$label"
 l="$l"
 
+source $scripts/shared/limit_connections.sh
+
 # If we find a file we upload it
 if [ -f "$l" ] ; then
 
