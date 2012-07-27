@@ -19,21 +19,27 @@ var filesCollection = db.getCollection(namespace + '.files');
 var chunksCollection = db.getCollection(namespace + '.chunks');
 
 var count = 0;
+var errors = 0;
+
 filesCollection.find().forEach(function (file) {
     count++;
     //print(c + ". Check document " + file._id);
     var nc = Math.ceil(file.length / file.chunkSize);
-    for (var n = 0; n <= nc; n++) {
-        var chunk = chunksCollection.findOne({files_id:file._id, n:n, data:{$exists:true}}, {data:0});
-        if (n == nc) {
-            if (chunk) {
-                print(file._id + " = corrupt document. There are too many chunks ! Expected " + nc + " but got " + n);
+    var chunks = chunksCollection.count({files_id:file._id, data:{$exists:true}});
+
+    if (chunks != nc) {
+        errors++;
+        print(errors + ". _id:" + file._id + ",pid:" + file.metadata.pid + " found " + chunks + " chunks but expected " + nc);
+        // find any gaps...
+        for (var n = 0; n < nc; n++) {
+            var chunk = chunksCollection.find({files_id:file._id, n:n}, {data:0});
+            if (chunk.count == 0) {
+                print("Chunk missing! n=" + n);
             }
-        } else {
-            if (!chunk) {
-                print(file._id + " = corrupt document. Chunks are missing! n=" + n);
+            if (chunk.count > 1) {
+                print("Found " + chunk.count + " chunks while there ought to be one only for n=" + n);
             }
         }
     }
-});
+})
 print("Checked documents: " + count);
