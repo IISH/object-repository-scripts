@@ -22,16 +22,6 @@ fi
 
 if [ "$scope" = "$HOSTNAME" ] || [ "$scope" = "all" ] ; then
     if [ "$1" = "start" ] ; then
-
-    # make sure our mongos is running
-    service mongos restart
-    ok=0
-    while [ "$ok" != "1" ]
-    do
-            sleep 1
-            ok=$(mongo --quiet --eval "db.serverStatus().ok")
-    done
-
         CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
         $CMD > $log 2>&1 &
     else
