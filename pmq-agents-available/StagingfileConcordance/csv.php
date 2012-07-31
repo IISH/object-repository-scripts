@@ -1,17 +1,18 @@
 <?php
 
-// c = location of the csv file
-// i = instruction file
-// f = fileSet
-// p = index position of the PID ( starting from zero )
-// m = index position of the Master file ( starting from zero )
+// f = csv file
+// p = name of the pid key
+// m = name of the master key
+
+ini_set('auto_detect_line_endings', 1);
 
 $options = getopt("f:p:m:", array("access:", "contentType:"));
 if (!isset($options['f'])) {
-    exit("fileSet -f is not set\n");
+    exit("file -f is not set\n");
 }
-$fileSet = $options['f'];
-echo "fileSet=$fileSet\n";
+$f = $options['f'];
+echo "f=$f\n";
+$fileSet = pathinfo($f, PATHINFO_BASENAME);
 
 $pidKey = "PID";
 if (isset($options['p'])) {
@@ -21,9 +22,6 @@ $masterKey = "master";
 if (isset($options['m'])) {
     $masterKey = $options['m'];
 }
-
-print("pid key: $pidKey\n");
-print("master key: $masterKey\n");
 
 $instruction = $fileSet . '/instruction.xml';
 $fh = fopen($instruction, 'w') or die("Cannot open file $instruction\n");
@@ -41,8 +39,7 @@ foreach ($options as $key => $value) {
 }
 fwrite($fh, ">\n");
 
-$csv = $fileSet . "/" . pathinfo($fileSet, PATHINFO_BASENAME) . ".csv";
-$handle = fopen($csv, "r");
+$handle = fopen($f, "r");
 $header = fgetcsv($handle, 0, ",");
 
 // Find the pid and the master index.
@@ -52,6 +49,14 @@ $index_master = array_search($masterKey, $header);
 if ($index_pid == -1) exit("$pidKey not present in header\n");
 if ($index_master == -1) exit("$masterKey not present in header\n");
 
+print("header: ");
+foreach ($header as $key) {
+        echo " - " . $key ;
+}
+print("\npid key: $pidKey at index $index_pid");
+print("\nmaster key: $masterKey at index $index_master\n");
+
+
 $basename = pathinfo($fileSet, PATHINFO_DIRNAME);
 while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $pid = $data[$index_pid];
@@ -59,10 +64,10 @@ while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $file = $basename . $location;
     $md5 = md5_file($file);
     $md5file = $file . '.md5';
-    fopen($md5file, 'w') or die("Cannot open file $md5file\n");
-    fwrite($md5file, $md5 . '  ' . $file);
-    fclose($md5file);
-    print("Add stagingfile " . $file . " - " . $md5 . "\n");
+    $md5handle=fopen($md5file, 'w') or die("Cannot open file $md5file\n");
+    fwrite($md5handle, $md5 . '  ' . $file);
+    fclose($md5handle);
+    print("Add stagingfile " . $file . " - " . $md5 . " - " . $pid . "\n");
     fwrite($fh, "    <stagingfile>\n");
     fwrite($fh, "        <pid>" . $pid . "</pid>\n");
     fwrite($fh, "        <location>" . $location . "</location>\n");
