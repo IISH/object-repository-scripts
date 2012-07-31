@@ -14,6 +14,8 @@ fileSet=$fileSet
 na=$na
 
 prefix=$(basename $fileSet)
-java -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet ${fileSet%/*} -prefix $prefix -na $na > $fileSet/$prefix.report.txt
+report=$fileSet/$prefix.report.txt
+echo "Validation for $prefix\nStarted on $(date)\n\n" > $report
+java -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet ${fileSet%/*} -prefix $prefix -na $na >> $report
 
 exit $?
