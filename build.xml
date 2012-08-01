@@ -25,6 +25,7 @@
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/pmq-agent/pmq-agent-${version}.jar" dest="${tmp}/pmq-agent.jar"/>
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/orfiles/orfiles-${version}.jar" dest="${tmp}/orfiles.jar"/>
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/instruction-manager/instruction-manager-${version}.jar" dest="${tmp}/instruction-manager.jar"/>
+        <get src="${bamboo}/VMETS-VMETS1-44/artifact/shared/Mets-maker/metsmaker-${version}.jar" dest="${tmp}/metsmaker.jar"/>
         <get src="${bamboo}/OR-SCRIPTS/${build}/artifact/JOB1/scripts/scripts-${version}-src.tar.gz" dest="${tmp}/scripts-src.tar.gz"/>
         <get src="${bamboo}/OR-FVAL/${build}/artifact/JOB1/validation/validation-${version}.jar" dest="${tmp}/validation.jar"/>
 
