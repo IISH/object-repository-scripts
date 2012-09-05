@@ -18,8 +18,6 @@ lid=$lid
 pidwebserviceKey=$pidwebserviceKey
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 
-source $scripts/shared/limit_connections.sh
-
 soapenv="<?xml version='1.0' encoding='UTF-8'?>  \
 <soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:pid='http://pid.socialhistoryservices.org/'>  \
     <soapenv:Body> \

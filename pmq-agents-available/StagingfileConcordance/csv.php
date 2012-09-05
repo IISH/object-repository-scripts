@@ -12,7 +12,7 @@ if (!isset($options['f'])) {
 }
 $f = $options['f'];
 echo "f=$f\n";
-$fileSet = pathinfo($f, PATHINFO_BASENAME);
+$fileSet = pathinfo($f, PATHINFO_DIRNAME);
 
 $pidKey = "PID";
 if (isset($options['p'])) {
