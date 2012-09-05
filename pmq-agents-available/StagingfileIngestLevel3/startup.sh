@@ -4,8 +4,11 @@
 #
 # The convert script to create the level 1 derivative
 
+
 scripts=$scripts
-sourceBuckets=("level1" "master")
+source $scripts/shared/primary.sh
+
+sourceBuckets="level1 master"
 targetBucket="level3"
 source $scripts/shared/derivative.sh
 derivative=$derivative

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# primary.sh
+# primaries.sh
 #
 # ensures the MongoDB primaries are those servers we want them to be.
 
