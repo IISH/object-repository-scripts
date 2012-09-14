@@ -17,7 +17,7 @@ source $scripts/shared/get.sh
 if [ -f $l ] ; then
     md5check=$(md5sum $l)
     rm $l
-    echo "$pid $md5 $md5check"
+    "$pid $md5 $md5check" >> /tmp/validate.$db.txt
 else
-    echo "$pid $md5 NA NA"
+    "$pid $md5 NA NA" >> /tmp/validate.$db.txt
 fi
