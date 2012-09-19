@@ -20,14 +20,10 @@ l="$l"
 source $scripts/shared/primary.sh
 
 # If we find a file we upload it
+mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"
 if [ -f "$l" ] ; then
-
     remove="yes"
     source $scripts/shared/put.sh
-    #count=$(ls $fileSet -1 | wc -l)
-    #if [$count == 0] ; then
-    #    echo "The folder $fileSet can be deleted. We leave this up to the end user."
-    #fi
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
     query="{'metadata.pid':'$pid'}"
@@ -48,5 +44,7 @@ else
     echo "The expected updated elements cannot be found with the query $query"
     exit -1
 fi
+
+
 
 exit $?
