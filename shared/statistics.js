@@ -100,7 +100,7 @@ function map() {
             var value = {};
             value[ "files.count"] = 1;
             value[ "files.length"] = document.length;
-            value[ "files.label.'" + document.metadata.label + "'"] = 1;
+            //value[ "files.label.'" + document.metadata.label + "'"] = 1;
             value[ "files.count." + document.metadata.bucket] = 1;
             value[ "files.length." + document.metadata.bucket] = document.length;
             value[ "access.count." + document.metadata.access] = 1;
