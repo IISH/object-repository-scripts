@@ -4,7 +4,6 @@
 #
 # The convert script to create the level 1 derivative
 
-
 scripts=$scripts
 source $scripts/shared/primary.sh
 

@@ -31,27 +31,10 @@ hostname=$hostname
         exit -1
     fi
 
-#empty="null"
-#shardprefix=$empty
-#while [ "$shardprefix" == "$empty" ] ;
-#do
-#    shardprefix=$(mongo sa --quiet --eval "var doc=db.getCollection('shardprefix').findAndModify( { \
-#        query:{identifier:{\$exists:false}}, \
-#        update:{\$set:{identifier:'$identifier', hostname:'$hostname'}, \$inc:{count:1}}, \
-#        upsert:false, \
-#        fields:{_id:1 }}); \
-#        ( doc == null ) ? null : doc._id \
-#    ")
-#
-#    if [ "$shardprefix" == "$empty" ] ; then
-#        sleep 5
-#    fi
-#done
-
     # Upload our file.
     java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s "" -t $contentType -M Put
     rc=$?
-#mongo sa --quiet --eval "db.shardprefix.update({identifier:'$identifier'}, {\$unset:{identifier:1,hostname:1}}, false, true)"
+
     if [[ $rc != 0 ]] ; then
         exit $rc
     fi
@@ -87,6 +70,9 @@ hostname=$hostname
     if [[ $rc != 0 ]] ; then
         exit $rc
     fi
+
+    # Add to the statistics
+    mongo $db --quiet --eval "var pid = '$pid';" $scripts/shared/statistics.js
 
     remove=$remove
     if [ "$remove" == "yes" ] ; then

@@ -27,11 +27,6 @@ for (var i = 0; i < buckets.length; i++) {
     var collFiles = buckets[i] + ".files";
     var collChunks = buckets[i] + ".chunks";
 
-    if ( i == 0 ) { // master collection
-        collFiles.ensureIndex({'metadata.label':1});
-        collFiles.ensureIndex({uploadDate:1});
-    }
-
     // Add index
     db.getCollection(collChunks).ensureIndex({files_id:1}, {unique:false});
     db.getCollection(collFiles).ensureIndex({'metadata.pid':1}, {unique:true});
