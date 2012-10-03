@@ -1,7 +1,7 @@
 /**
  * /shared/statistics.js
  *
- * Usage: mongo [database] --quiet --eval "var pid='pid';"
+ * Usage: mongo [database] --quiet --eval "var pid='pid';var ns='namespace'"
  *
  */
 
@@ -75,39 +75,34 @@ function map() {
         return date;
     }
 
-    if (this.metadata.cache) {
-        this.metadata.cache.forEach(function (document) {
-            var d = ISODateString(document.uploadDate);
-            var key = null;
-            switch (unit) {  // unit is a scope variable
-                case 'year':
-                    key = d.substring(0, 4) + "-01-01";
-                    break;
-                default:
-                case 'month':
-                    key = d.substring(0, 7) + "-01";
-                    break;
-                case 'day':
-                    key = d.substring(0, 10);
-                    break;
-                case 'week':
-                    var onejan = new Date(document.uploadDate.getUTCFullYear(), 0, 1);
-                    var week = Math.ceil((((document.uploadDate - onejan) / 86400000) + onejan.getDay() + 1) / 7);
-                    var fwoy = firstDayOfWeek(week, document.uploadDate.getFullYear());
-                    key = ISODateString(new Date(fwoy)).substring(0, 10);
-                    break;
-            }
-            var value = {};
-            value[ "files.count"] = 1;
-            value[ "files.length"] = document.length;
-            //value[ "files.label.'" + document.metadata.label + "'"] = 1;
-            value[ "files.count." + document.metadata.bucket] = 1;
-            value[ "files.length." + document.metadata.bucket] = document.length;
-            value[ "access.count." + document.metadata.access] = 1;
-            value[ "contentType.count." + document.contentType] = 1;
-            emit(new ISODate(key), value);
-        });
+    var d = ISODateString(this.uploadDate);
+    var key = null;
+    switch (unit) {  // unit is a scope variable
+        case 'year':
+            key = d.substring(0, 4) + "-01-01";
+            break;
+        default:
+        case 'month':
+            key = d.substring(0, 7) + "-01";
+            break;
+        case 'day':
+            key = d.substring(0, 10);
+            break;
+        case 'week':
+            var onejan = new Date(this.uploadDate.getUTCFullYear(), 0, 1);
+            var week = Math.ceil((((this.uploadDate - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+            var fwoy = firstDayOfWeek(week, this.uploadDate.getFullYear());
+            key = ISODateString(new Date(fwoy)).substring(0, 10);
+            break;
     }
+    var value = {};
+    value[ "files.count"] = 1;
+    value[ "files.length"] = this.length;
+    value[ "files.count." + this.metadata.bucket] = 1;
+    value[ "files.length." + this.metadata.bucket] = this.length;
+    value[ "access.count." + this.metadata.access] = 1;
+    value[ "contentType.count." + this.contentType] = 1;
+    emit(new ISODate(key), value);
 }
 
 function reduce(key, values) {
@@ -123,12 +118,16 @@ function reduce(key, values) {
 }
 
 ['year', 'month', 'week', 'day'].forEach(function (unit) {
-    var collection = unit + ".statistics";
+    var collection = unit + ".storage.statistics";
     print("Collection: " + collection);
     if (pid) {
+        assert(ns, "When a PID value is defined, we must have a bucket value: var ns='ns'") ;
         var query = {'metadata.pid':pid};
-        db.master.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}, query:query });
+        db.getCollection(ns+'.files').mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}, query:query });
     } else {
-        db.master.files.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit} });
+        db.master.files.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit}});
+        db.level1.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
+        db.level2.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
+        db.level3.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
     }
 })

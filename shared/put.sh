@@ -72,7 +72,7 @@ hostname=$hostname
     fi
 
     # Add to the statistics
-    mongo $db --quiet --eval "var pid = '$pid';" $scripts/shared/statistics.js
+    mongo $db --quiet --eval "var pid = '$pid';var ns='$bucket';" $scripts/shared/statistics.js
 
     remove=$remove
     if [ "$remove" == "yes" ] ; then
