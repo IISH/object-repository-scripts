@@ -23,7 +23,7 @@ do
     c=${r:23:2}
 
     # Cut to "GeoIP Country Edition: NL". A value of 'IP' would mean unknown.
-    u="db.siteusage.update({ ip : '$ip' }, {\$set:{c:'$c'}}, true, true )"
+    u="db.siteusage.update( {\$and: [ { ip : '$ip' }, {c:{\$exists:false}} ], {\$set:{c:'$c'}}, true, true )"
     echo "Update for $u"
     mongo $db --eval "$u"
 
