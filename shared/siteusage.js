@@ -95,9 +95,9 @@ function map() {
             break;
     }
     var value = {};
-    value[ "count." + this.bucket] = 1;
+    value[ this.bucket] = 1;
     var c = (this.c === undefined) ? 'IP' : this.c;
-    value["country." + c + "." + this.bucket] = 1;
+    value[c + "." + this.bucket] = 1;
     value[ "total"] = 1;
     emit(new ISODate(key), value);
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# /shared/siteusage.sh
+# /shared/siteusage.sh -na [na]
 #
 # Adds the GeoIP country code to the collection siteusage
 #
@@ -14,18 +14,16 @@ db=$db
 # returns _id and IP
 for i in {0..10000} # Do not overdo it... 10000 views
 do
-    doc=$(mongo $db --quiet --eval "var doc=db.siteusage.findOne( {c:{\$exists:false}} ); if ( doc ) { print(doc._id + doc.ip) } else {print('')}")
-    if [ "$doc" == "" ] ; then
+    ip=$(mongo $db --quiet --eval "var doc=db.siteusage.findOne( {c:{\$exists:false}} ); if ( doc ) { print(doc.ip) } else {print('')}")
+    if [ "$ip" == "" ] ; then
         exit 0
     fi
 
-    id=${doc:0:24} # An ObjectId has a length of 24 positions
-    ip=${doc:24}
     r=$(geoiplookup $ip)
     c=${r:23:2}
 
     # Cut to "GeoIP Country Edition: NL". A value of 'IP' would mean unknown.
-    u="db.siteusage.update({ _id : ObjectId('$id') }, {\$set:{c:'$c'}}, true, false )"
+    u="db.siteusage.update({ ip : '$ip' }, {\$set:{c:'$c'}}, true, true )"
     echo "Update for $u"
     mongo $db --eval "$u"
 
