@@ -74,14 +74,6 @@ function map() {
         return date;
     }
 
-    function getGeoIp(ip){
-             var o = ip.split('.');
-             var integer_ip = 16777216 * o[0] + 65536 * o[1] + 256 * o[2] + o[3];
-             var query = {$and:[{_id:{ $lte: integer_ip }}, {t:{$gte:integer_ip}}]};
-             var county = db.getSiblingDB("test").getCollection('geoip').findOne(query);
-             return ( country ) ? country.c : ".."  ;
-    }
-
     var d = ISODateString(this.downloadDate);
     var key = null;
     switch (unit) {  // unit is a scope variable
@@ -104,10 +96,9 @@ function map() {
     }
     var value = {};
     value[ "count." + this.bucket] = 1;
+    var c = (this.c === undefined) ? 'IP' : this.c;
+    value["country." + c + "." + this.bucket] = 1;
     value[ "total"] = 1;
-    var country = getGeoIp(this.ip, geoIP);
-    print(country);
-    value["country." + country] = 1;
     emit(new ISODate(key), value);
 }
 
@@ -124,7 +115,6 @@ function reduce(key, values) {
 }
 
 ['year', 'month', 'week', 'day'].forEach(function (unit) {
-
     var collection = unit + ".siteusage.statistics";
     print("Collection: " + collection);
     if (pid) {
