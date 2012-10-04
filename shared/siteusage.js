@@ -1,7 +1,7 @@
 /**
  * /shared/siteusage.js
  *
- * Usage: mongo [database] --quiet --eval "var pid='pid';"
+ * Usage: mongo [database] siteusage.js
  *
  */
 
@@ -117,10 +117,5 @@ function reduce(key, values) {
 ['year', 'month', 'week', 'day'].forEach(function (unit) {
     var collection = unit + ".siteusage.statistics";
     print("Collection: " + collection);
-    if (pid) {
-        var query = {pid:pid};
-        db.siteusage.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}, query:query });
-    } else {
-        db.siteusage.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit} });
-    }
+    db.siteusage.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit} });
 })
