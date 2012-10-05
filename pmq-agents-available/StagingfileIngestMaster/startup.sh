@@ -16,8 +16,13 @@ access=$access
 contentType=$contentType
 label="$label"
 l="$l"
+action=$action
 
 source $scripts/shared/primary.sh
+
+if [ "$action" == "delete" ] ; then
+    source $scripts/shared/delete.sh
+fi
 
 # If we find a file we upload it
 mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"
