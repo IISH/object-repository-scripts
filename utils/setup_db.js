@@ -20,7 +20,7 @@ var admin = db.getMongo().getDB("admin");
 admin.runCommand("flushRouterConfig");
 admin.runCommand({ enablesharding:db.getName() });
 
-// The shard key is
+// The shard key is a integer of 32 bit over three parts
 var keys = ['555555555555555555555555555555555555555555555555', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'];
 var buckets = ['master', 'level1', 'level2', 'level3'];
 for (var i = 0; i < buckets.length; i++) {
