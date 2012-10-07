@@ -18,7 +18,7 @@
  *
  * [ns].files:
  * {
- *      _id  : md5+hex(length)
+ *      _id  : integer 32 bit
  *      chunkSize : NumberLong
  *      length : NumberLong
  *      md5
@@ -43,7 +43,7 @@
  *
  * [na].chunks:
  * {
- *      files_id: md5+hex(length)
+ *      files_id: integer 32 bit
  *      n
  *      data
  * }
