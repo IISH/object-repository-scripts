@@ -9,14 +9,12 @@
  */
 
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
-assert(collection, "Must have collection name: [ns].files");
-var index = collection.lastIndexOf(".files");
-assert(index != -1, "Collections must be [ns].files");
+assert(ns, "Must have collection name: var ns='[ns]'");
 
 print("Begin check FSGrid collection " + collection);
 var namespace = collection.substring(0, index);
-var filesCollection = db.getCollection(namespace + '.files');
-var chunksCollection = db.getCollection(namespace + '.chunks');
+var filesCollection = db.getCollection(ns + '.files');
+var chunksCollection = db.getCollection(ns + '.chunks');
 
 var count = 0;
 var errors = 0;
@@ -25,7 +23,7 @@ filesCollection.find().forEach(function (file) {
     count++;
     //print(c + ". Check document " + file._id);
     var nc = Math.ceil(file.length / file.chunkSize);
-    var chunks = chunksCollection.count({files_id:file._id, data:{$exists:true}});
+    var chunks = chunksCollection.count({files_id:file._id});
 
     if (chunks != nc) {
         errors++;
