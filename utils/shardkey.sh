@@ -29,10 +29,9 @@ scripts=$scripts
 #    done
 #done
 
-for db in new_or_10848 new_or_10851
-do
+db=$1
     for ns in level3 level2 level1 master
     do
         mongo $db --eval "var ns='$ns';" shardkey.files.js
+        mongo $db --eval "db.$ns.chunks.find({},{files_id:1}).forEach(function(d){print(d.files_id)})" > report.$db.$ns.txt
     done
-done
