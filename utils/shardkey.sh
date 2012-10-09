@@ -29,9 +29,11 @@ scripts=$scripts
 #    done
 #done
 
+host=localhost:27020
 db=$1
-    for ns in level3 level2 level1 master
-    do
-        mongo $db --eval "var ns='$ns';" shardkey.files.js
-        mongo $db --eval "db.$ns.chunks.find({},{files_id:1}).forEach(function(d){print(d.files_id)})" > report.$db.$ns.txt
-    done
+for ns in level3 level2 level1 master
+do
+    mongo $host/$db --eval "var ns='$ns';" shardkey.files.js > files.$db.$ns.txt
+    sleep 1
+    mongo $host/$db --eval "db.$ns.chunks.find({},{files_id:1}).forEach(function(d){print(d.files_id)})" > chunks.$db.$ns.txt
+done

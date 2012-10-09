@@ -8,6 +8,12 @@ assert(ns, "Need a namespace: var ns = 'ns'");
 
 var files = db.getCollection(ns + ".files");
 var chunks = db.getCollection(ns + ".chunks");
+
+files.ensureIndex( { old_id : 1 } , { unique : false } ) ;
+chunks.ensureIndex( { files_id : 1 , n : 1 } , { unique : true, dropDups : true } ) ;
+
+var expect=files.count();
+
 var interval = Math.round(4294967294 / (files.count() + 1));
 var min = -2147483648;
 var from = -2147483648 + Math.round(interval / 2);
@@ -17,31 +23,32 @@ print("min=" + min);
 print("max=" + max);
 print("from=" + from);
 print("interval=" + interval);
-files.find().forEach(function (d) {
-    if (d.old_id === undefined) {
-        delete d.metadata.cache;
-        d.old_id = d._id;
-        var new_id = from + i++ * interval;
-        assert(new_id > min || new_id < max, "The identifier is outside of the key's range: " + new_id);
-        d._id = new_id;
-        print("new_id=" + new_id);
-        assert(d._id == new_id, "Identifiers do not match.");
-        if (d.old_id.length != 48) {
-            print("Warning: old key has not the expected length of 48 characters.");
-        }
-        files.save(d);
-        files.remove({_id:d.old_id});
-    }
+var query = { old_id : {$exists : false } } ;
+var d = files.findOne( query );
+while (d) {
+    delete d.metadata.cache;
+    d.old_id = d._id;
+    var new_id = from + i++ * interval;
+    assert(new_id > min || new_id < max, "The identifier is outside of the key's range: " + new_id);
+    d._id = new_id;
+    print("new_id=" + new_id);
+
+    files.remove({_id:d.old_id});
+    files.save(d);
 
     print('Update ' + d.old_id + ' with: ');
     var update = {$set:{files_id:d._id}};
-    printjson(update);
     chunks.update({ files_id:d.old_id}, update, false, true);
 
     if ( ns == 'master' ) {
         cache(files, d.metadata.pid)
     }
-})
+
+    d = files.findOne( query );
+}
+
+print("Found: " + (i + 1));
+print("Expect: " + expect);
 
 /**
  * cache

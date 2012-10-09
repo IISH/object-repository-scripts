@@ -33,9 +33,9 @@ hostname=$hostname
 
     # Upload our file.
     # Legacy issue... we migrate from the dataType: from a string identifier to a integer 32 bit
-    shardkeyDatatype="string"
-    if [ "$db" == "or_10891" ] || [ "$db" == "or_10796" ] || [ "$db" == "or_10848" ]; then
-        shardkeyDatatype="int"
+    shardkeyDatatype="int"
+    if [ "$db" == "or_10622" ]; then
+        shardkeyDatatype="string"
     fi
     java -DshardkeyDatatype=$shardkeyDatatype -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s "" -t $contentType -M Put
     rc=$?
