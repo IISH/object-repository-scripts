@@ -35,7 +35,9 @@ hostname=$hostname
     # Legacy issue... we migrate from the dataType: from a string identifier to a integer 32 bit
     shardkeyDatatype="int"
     if [ "$db" == "or_10622" ]; then
-        shardkeyDatatype="string"
+        if [ "$bucket" == "master" ] || [ "$bucket" == "level1" ]; then
+            shardkeyDatatype="string"
+        fi
     fi
     java -DshardkeyDatatype=$shardkeyDatatype -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s "" -t $contentType -M Put
     rc=$?
