@@ -4,8 +4,9 @@
 #
 # Backup for the metadata
 #
+#
+# ToDo: retrieve the database names from the database itself
 cd /data/backup
-cd $1
 scripts=$scripts
 
 for d in or_10622 or_10798 or_10848 or_10851 or_10891
