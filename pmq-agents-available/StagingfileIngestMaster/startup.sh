@@ -21,7 +21,11 @@ action=$action
 source $scripts/shared/primary.sh
 
 if [ "$action" == "delete" ] ; then
-    source $scripts/shared/delete.sh
+    for b in "master" "level1" "level2" "level3"
+    do
+        bucket=$b
+        source $scripts/shared/delete.sh
+    done
 fi
 
 # If we find a file we upload it

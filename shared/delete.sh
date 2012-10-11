@@ -4,9 +4,8 @@
 #
 db=$db
 pid=$pid
+bucket=$bucket
 
-for bucket in "master" "level1" "level2" "level3"
-do
     files_id=$(mongo $db --quiet --eval "var doc=db.$bucket.files.findOne({'metadata.pid':'$pid'}, {_id:1});if ( doc ){print(doc._id)}")
     if [ -z $files_id ] ; then
         echo "PID $pid not in database."
@@ -28,7 +27,6 @@ do
         echo "Failed to delete document $pid in chunks.$bucket"
         exit -1
     fi
-done
 
 echo "Document $pid removed"
 
