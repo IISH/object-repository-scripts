@@ -32,5 +32,5 @@ if [ -f "$sourceFile" ]; then
     source $scripts/shared/put.sh
 fi
 
-echo "No custom derivative found."
+echo "No custom derivative found"
 exit 245
