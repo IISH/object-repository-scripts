@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# StagingfileIngestCustomLevel3_/startup.sh
+# StagingfileIngestCustomLevel3/startup.sh
 #
 # Ingests any custom derivatives of level 3
 
