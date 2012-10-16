@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# StagingfileIngestCustomLevel3/startup.sh
+# StagingfileIngestCustomLevel3_/startup.sh
 #
-# Ingests any custom derivatives of the level1, level2 and level3 sort.
+# Ingests any custom derivatives of level 3
 
 scripts=$scripts
 bucket="level3"
