@@ -9,7 +9,6 @@ source $scripts/shared/primary.sh
 
 sourceBuckets="level1 master"
 targetBucket="level2"
-source $scripts/shared/derivative.sh
 derivative=$derivative
 
 file="$scripts/shared/$derivative".derivative.sh

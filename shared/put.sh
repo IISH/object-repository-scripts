@@ -25,6 +25,7 @@ lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
 identifier=$identifier
 hostname=$hostname
+continueOnSuccess==$continueOnSuccess
 
     if [ ! -f "$l" ] ; then
         echo "The file does not exist: $l"
@@ -35,7 +36,7 @@ hostname=$hostname
     # Legacy issue... we migrate from the dataType: from a string identifier to a integer 32 bit
     shardkeyDatatype="int"
     if [ "$db" == "or_10622" ]; then
-        if [ "$bucket" == "master" ] || [ "$bucket" == "level1" ]; then
+        if [ "$bucket" == "master" ]; then
             shardkeyDatatype="string"
         fi
     fi
@@ -86,5 +87,9 @@ hostname=$hostname
         # Now verify if a file with the given length and md5 exists so we can remove it from the fs
             rm $l
             rm $l.md5
-            exit 0
+            if [ "$continueOnSuccess" == "yes" ] ; then
+                echo ""
+            else
+                exit 0
+            fi
     fi
