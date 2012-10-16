@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# StagingfileIngestCustomLevel1/startup.sh
+# IngestCustomLevel3/startup.sh
 #
 # Ingests any custom derivatives of the level1, level2 and level3 sort.
 
 scripts=$scripts
-bucket="level1"
+bucket="level3"
 source $scripts/shared/parameters.sh
 action=$action
 source $scripts/shared/primary.sh
