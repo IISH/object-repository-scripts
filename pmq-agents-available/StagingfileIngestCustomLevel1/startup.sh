@@ -2,7 +2,7 @@
 #
 # StagingfileIngestCustomLevel1/startup.sh
 #
-# Ingests any custom derivatives of the level1, level2 and level3 sort.
+# Ingests any custom derivatives of level 1
 
 scripts=$scripts
 bucket="level1"
