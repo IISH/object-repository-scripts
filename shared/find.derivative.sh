@@ -13,7 +13,7 @@ pid=$pid
 derivative=$derivative
 
 echo "Check for existing derivative on fs for master $location"
-sourceFile=$(php $scripts/StagingfileIngestCustom/find.derivative.php -f "$fileSet" -l "$location" -b ".$bucket")
+sourceFile=$(php $scripts/shared/find.derivative.php -f "$fileSet" -l "$location" -b ".$bucket")
 if [ -f "$sourceFile" ]; then
         echo "Found custom file: $sourceFile"
         contentType=$(php $scripts/shared/contenttype.php -t $scripts/shared/contenttype.txt -l $sourceFile)
