@@ -84,12 +84,7 @@ continueOnSuccess==$continueOnSuccess
 
     remove=$remove
     if [ "$remove" == "yes" ] ; then
-        # Now verify if a file with the given length and md5 exists so we can remove it from the fs
-            rm $l
-            rm $l.md5
-            if [ "$continueOnSuccess" == "yes" ] ; then
-                echo ""
-            else
-                exit 0
-            fi
+        rm $l
+        rm $l.md5
+        exit 0
     fi
