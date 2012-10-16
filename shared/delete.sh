@@ -29,5 +29,3 @@ bucket=$bucket
     fi
 
 echo "Document $pid removed"
-
-exit $?

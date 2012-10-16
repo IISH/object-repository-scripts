@@ -6,10 +6,8 @@
 
 scripts=$scripts
 fileSet=$fileSet
-bucket=$bucket
 location=$location
 targetBucket=$targetBucket
-shouldHave=$shouldHave
 db=$db
 pid=$pid
 derivative=$derivative
@@ -33,5 +31,6 @@ sourceFile=$(php $scripts/shared/generic.derivative.php -f "$fileSet" -l "$locat
 		bucket=$targetBucket
 		remove="yes"
     	source $scripts/shared/put.sh
-	fi
-echo "No custom derivative found."
+    fi
+
+    echo "No custom derivative found."

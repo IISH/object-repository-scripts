@@ -7,11 +7,7 @@
 
 scripts=$scripts
 source $scripts/shared/parameters.sh
-sourceBuckets=$sourceBuckets
-targetBucket=$targetBucket
-useCustom=$useCustom
 derivative=$derivative
-md5=$md5
 
 source $scripts/shared/generic.derivative.sh
 
