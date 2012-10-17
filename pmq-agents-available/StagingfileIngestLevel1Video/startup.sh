@@ -11,11 +11,5 @@ sourceBuckets="master"
 targetBucket="level1"
 derivative=$derivative
 
-file="$scripts/shared/$derivative".derivative.sh
-if [ -f "$file" ] ; then
-    source $file
-fi
-
-echo "We cannot make a derivative of type $derivative"
-echo "This is not an error. Just there is no such service."
-exit 250
+source $scripts/shared/video.derivative.sh
+exit $?

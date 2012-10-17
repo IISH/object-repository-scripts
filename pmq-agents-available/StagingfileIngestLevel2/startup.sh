@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# /StagingfileIngestLevel2/startup.sh
+# /StagingfileIngestLevel2Image/startup.sh
 #
 # The convert script to create the level 1 derivative
 
@@ -16,4 +16,6 @@ if [ -f "$file" ] ; then
     source $file
 fi
 
-exit $?
+echo "We cannot make a derivative of type $derivative"
+echo "This is not an error. Just there is no such service."
+exit 250
