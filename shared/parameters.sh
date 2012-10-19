@@ -32,6 +32,7 @@ key=$key
 l=$l
 location=$location
 pidwebserviceEndpoint=$pidwebserviceEndpoint
+pidwebserviceKey=$pidwebserviceKey
 sourceFileExtension=$sourceFileExtension
 
 if [ -z "$sa_path" ] ; then
@@ -82,10 +83,8 @@ fi
 # If no webservice endpoint or key was given, we supply a custom value
 if [ -z "$pidwebserviceEndpoint" ]; then
         pidwebserviceEndpoint=$endpoint
-        pidwebserviceKey=$key
 fi
 if [ -z "$pidwebserviceKey" ]; then
-        pidwebserviceEndpoint=$endpoint
         pidwebserviceKey=$key
 fi
 
@@ -102,3 +101,4 @@ identifier=$identifier
 instruction="{instruction:{workflow:{workflow:{name:'$name',statusCode:$statusCode, identifier:'$identifier'}},'fileSet':'$fileSet', \
     autoGeneratePIDs:'$autoGeneratePIDs',resolverBaseUrl:'$resolverBaseUrl',na:'$na',contentType:'$contentType', \
     access:'$access',action:'$action',id:'$id'}}"
+
