@@ -7,7 +7,6 @@
  * - prevent unnecessary file PUTs when the file's md5 and length are identical to a GridFS file.
  * - update metadata.pid during PID replacements
  * - removed documents when new filecontent is offered
- * - Upserts the 'master.metadata.cache' array to hold a cached version of our FSGrid storage.
  *
  * PUT actions will be the responsibility for mongofiles and cannot be performed by this script.
  **/
@@ -208,108 +207,8 @@ function metadata(document) {
     printjson(document);
 }
 
-/**
- * cache
- *
- * Copy all metadata elements of non-master related files into the master.files array
- *
- */
-function cache() {
-
-    print("caching");
-
-    var cache = [];
-    var collectionNames = db.getCollectionNames();
-    var length = collectionNames.length;
-    for (var i = 0; i < length; i++) {
-        var collectionName = collectionNames[i];
-        if (collectionName.lastIndexOf(".files") != -1) {
-            var bucket = db.getCollection(collectionName).findOne({'metadata.pid':pid});
-            if (bucket) {
-                if ('master.files' == collectionName) delete bucket.metadata.cache;
-                bucket.metadata.pidUrl = 'http://hdl.handle.net/' + pid + '?locatt=view:' + bucket.metadata.bucket;
-                cache.push(
-                    bucket
-                )
-            }
-        }
-    }
-    db.getCollection('master.files').update({ 'metadata.pid':pid }, {$set:{'metadata.cache':cache}}, true, false);
-}
-
 var files = db.getCollection(ns + '.files');
 var query = {'metadata.pid':pid};
 var document = files.findOne(query);
 assert(document.md5 == md5 && document.length == length, "Length and md5 do not match !");
 metadata(document);
-
-/*
- switch (list.count()) {
- case 0:
- // CASE 1: Pid replacement
- // Persisted is document    A {md5: a, 'metadata.pid': a}
- // We offered document      A (md5: a, 'metadata.pid': b)
- // Pid b is now to be used to identify A
- // We have a systemic change of identifiers.
- print("Case 1");
- var documentA = files.findOne({md5:md5, length:length});
- updateCollections(documentA.metadata.pid);
- break;
- case 1:
- // CASE 2: new document with new Pid. Found by md5,length,pid match
- // Persisted is     document A {md5: a, 'metadata.pid': a}
- // We offered       document A (md5: a, 'metadata.pid': a)
- // Only metadata will be changed:
- var isCase2 = list[0].md5 == md5 && list[0].length == length && list[0].metadata.pid == pid;
- if (isCase2) {
- print("Case 2");
- metadata(list[0]);
- break;
- }
-
- // CASE 3: Pid replacement and document removal.
- // Persisted is     document A {md5: a, 'metadata.pid': a}
- // Persisted is     document B {md5: b, 'metadata.pid': b}
- // Offered          document A {md5: a, 'metadata.pid': b}
- // Document B is to be removed and its metadata will replace that of A
- print("Case 3");
- var documentA = files.findOne({md5:md5, length:length});
- var documentB = list[0];
- assert(documentA, "Expected to find a document with a md5, length match. Possibly a document with a different calculated md5 was ingested which is different from the declared md5.");
- removeDocuments(documentB);
- var dropPid = documentA.metadata.pid;
- documentA.metadata = documentB.metadata;
- metadata(documentA);
- updateCollections(dropPid);
- break;
- default:
- // CASE 4: Pid replacement and document removal
- // Persisted was     document A {md5: a, 'metadata.pid': a}
- // Persisted is      document B {md5: b, 'metadata.pid': a}
- // Result: two documents with the same pid a
- // We will remove the document A and move its metadata into the new document B.
- // Because of whatever errors there may be several documents. We remove all the document A types.
- // Only metadata of the last Document A type is preserved.
- print("Case 4");
- var documentB = null;
- for (var i = 0; i < list.count(); i++) {
- var match = list[i].md5 == md5 && list[i].length == length;
- if (match == true) {
- documentB = list[i];
- break;
- }
- }
- for (var i = 0; i < list.count(); i++) {
- var documentA = list[i];
- var remove = documentA.md5 != documentB.md5 || documentA.length != documentB.length;
- if (remove) {
- removeDocument(documentA);
- documentB.metadata = documentA.metadata;
- }
- }
- metadata(documentB);
- print("Query resulted in " + list.count() + " documents.");
- }
- */
-
-cache();
