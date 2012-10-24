@@ -9,7 +9,7 @@ bucket=$bucket
     files_id=$(mongo $db --quiet --eval "var doc=db.$bucket.files.findOne({'metadata.pid':'$pid'}, {_id:1});if ( doc ){print(doc._id)}")
     if [ -z $files_id ] ; then
         echo "PID $pid not in database."
-        exit -1
+        exit 245
     fi
 
     mongo $db --quiet --eval "db.$bucket.files.remove({_id:'$files_id'})"

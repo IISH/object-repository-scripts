@@ -26,6 +26,7 @@ if [ "$action" == "delete" ] ; then
         bucket=$b
         source $scripts/shared/delete.sh
     done
+    exit $?
 fi
 
 # If we find a file we upload it

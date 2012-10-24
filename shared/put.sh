@@ -32,15 +32,25 @@ continueOnSuccess==$continueOnSuccess
         exit -1
     fi
 
+    # Prepare a key
+    max=9223372036854775807
+    primaries=$primaries
+    i=0
+    p=0
+    for primary in ${primaries[*]}
+    do
+        c=$(timeout 5 mongo $primary/$db --quiet --eval "db.$bucket.chunks.dataSize()")
+        if [ $c -lt $max ] ; then
+           max=$c
+           p=$i
+         fi
+        let i++
+    done
+    shardKey=$(php $scripts/shared/shardkey.php -s $i -p $p)
+    echo "Shardkey: shard $p key $shardKey"
+
     # Upload our file.
-    # Legacy issue... we migrate from the dataType: from a string identifier to a integer 32 bit
-    shardkeyDatatype="int"
-    if [ "$db" == "or_10622" ]; then
-        if [ "$bucket" == "master" ]; then
-            shardkeyDatatype="string"
-        fi
-    fi
-    java -DshardkeyDatatype=$shardkeyDatatype -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s "" -t $contentType -M Put
+    java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
 
     if [[ $rc != 0 ]] ; then

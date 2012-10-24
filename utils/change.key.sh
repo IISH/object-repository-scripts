@@ -1,0 +1,32 @@
+ns=master
+old_id=$1
+new_id=$2
+pid=$3
+
+# Make sure all primaries are running on the expected hosts.
+for primary in rosaluxemburg0 rosaluxemburg2 rosaluxemburg4
+do
+    host=$primary.objectrepository.org:27018
+    ismaster=$(mongo $host --quiet --eval "db.serverStatus().repl.ismaster")
+    if [ ! "$ismaster" = "true" ] ; then
+        echo "$host is not primary; {db.serverStatus().repl.ismaster:$ismaster)"
+        exit -1
+    fi
+done
+
+# Make sure all secondaries are running on the expected hosts.
+for primary in rosaluxemburg1 rosaluxemburg3 rosaluxemburg5
+do
+    host=$primary.objectrepository.org:27018
+    ismaster=$(mongo $host --quiet --eval "db.serverStatus().repl.ismaster")
+    if [ ! "$ismaster" = "true" ] ; then
+        echo "$host is not primary; {db.serverStatus().repl.ismaster:$ismaster)"
+        exit -1
+    fi
+done
+
+evl="var ns='$ns'; var old_id='$old_id'; var new_id=$new_id; var pid='$pid';"
+echo $evl >> change.key.log
+mongo or_10622 --quiet --eval "$evl" change.key.js >> change.key.log
+
+sleep 1
