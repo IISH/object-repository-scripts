@@ -6,6 +6,7 @@
 
 scripts=$scripts
 source $scripts/shared/primary.sh
+source $scripts/shared/parameters.sh
 
 sourceBuckets="level1 master"
 targetBucket="level3"
