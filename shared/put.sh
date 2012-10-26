@@ -39,7 +39,8 @@ continueOnSuccess==$continueOnSuccess
     p=0
     for primary in ${primaries[*]}
     do
-        c=$(timeout 5 mongo $primary/$db --quiet --eval "db.$bucket.chunks.dataSize()")
+        c=0
+        c=$(timeout 5 mongo $primary/$db --quiet --eval "Number(db.$bucket.chunks.dataSize())")
         if [ $c -lt $max ] ; then
            max=$c
            p=$i
