@@ -13,7 +13,7 @@ sourceBucket=$sourceBucket
 
 #checking params
 if [ -z "$pid" ] ; then
-    echo "missing PID; exiting"
+    echo "missing PID $pid : exiting"
     exit -1
 fi
 
