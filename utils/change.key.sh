@@ -15,12 +15,12 @@ do
 done
 
 # Make sure all secondaries are running on the expected hosts.
-for primary in rosaluxemburg1 rosaluxemburg3 rosaluxemburg5
+for secondary in rosaluxemburg1 rosaluxemburg3 rosaluxemburg5
 do
-    host=$primary.objectrepository.org:27018
-    ismaster=$(mongo $host --quiet --eval "db.serverStatus().repl.ismaster")
-    if [ ! "$ismaster" = "true" ] ; then
-        echo "$host is not primary; {db.serverStatus().repl.ismaster:$ismaster)"
+    host=$secondary.objectrepository.org:27018
+    issecondary=$(mongo $host --quiet --eval "db.serverStatus().repl.secondary")
+    if [ ! "$issecondary" = "true" ] ; then
+        echo "$host is not secondary; {db.serverStatus().repl.secondary:$issecondary)"
         exit -1
     fi
 done
