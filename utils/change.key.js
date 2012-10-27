@@ -57,11 +57,12 @@ function changeKeys(master) {
 }
 
 function writeOk(db) {
-    if (db.getLastError()) {
+    var lastError = db.getLastError("majority"); // waits for more than 50% of the members to acknowledge the write (until replication is applied to the point of that write).
+    if (lastError) {
         print("Error:");
         print("old_id:" + old_id);
         print("new_id:" + new_id);
-        printjson(db.getLastError());
+        printjson(lastError);
         return false;
     }
     return true;

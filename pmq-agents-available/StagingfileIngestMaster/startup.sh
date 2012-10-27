@@ -44,9 +44,6 @@ if [ -f "$l" ] ; then
     if [ "$derivative" == "video" ] ; then
         content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
     fi
-    if [[ ${content:0:1} != "{" ]]; then
-    	content=null
-    fi
 
     source $scripts/shared/put.sh
 else
