@@ -30,4 +30,10 @@ evl="var ns='$ns'; var old_id='$old_id'; var new_id=$new_id; var pid='$pid';"
 echo $evl >> change.key.log
 mongo or_10622 --quiet --eval "$evl" $scripts/utils/change.key.js >> change.key.log
 
-sleep 1
+rc=$?
+if [[ $rc != 0 ]] ; then
+    echo "mongo command did not return a clean exit value."
+    exit $rc
+fi
+
+sleep 30
