@@ -25,7 +25,6 @@ lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
 identifier=$identifier
 hostname=$hostname
-continueOnSuccess==$continueOnSuccess
 
     if [ ! -f "$l" ] ; then
         echo "The file does not exist: $l"

@@ -99,21 +99,6 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     $targetDPIs = $original['dpis'];
     $targetWidth = $original['px']['width'];
     $targetHeight = $original['px']['height'];
-    # Update our database
-    $mongosh = "mongo $db --quiet --eval=\"var ns='$bucket';pid='$pid';var content={"
-                . "'x-resolution':" . $dpisx . ","
-                . "'y-resolution':" . $dpisy . ","
-                . "width:" . $targetWidth . ","
-                . "height:" . $targetHeight . "};"
-                . "''\" " . $script;
-    exec($mongosh);
-
-	echo "mongosh=$mongosh";
-
-    if (!$output) {
-        echo "Output not set so will not produce a derivative.";
-        return;
-    }
 
     //PARSE DPIs RULES
     if (isset($derivativeTypes[$derivativeType]['targetDPI'])) {

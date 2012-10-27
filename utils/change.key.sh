@@ -1,3 +1,4 @@
+scripts=$scripts
 ns=master
 old_id=$1
 new_id=$2
@@ -27,6 +28,6 @@ done
 
 evl="var ns='$ns'; var old_id='$old_id'; var new_id=$new_id; var pid='$pid';"
 echo $evl >> change.key.log
-mongo or_10622 --quiet --eval "$evl" change.key.js >> change.key.log
+mongo or_10622 --quiet --eval "$evl" $scripts/utils/change.key.js >> change.key.log
 
 sleep 1
