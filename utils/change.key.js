@@ -26,21 +26,25 @@ function changeKeys(master) {
     var chunks = db.getCollection(ns + ".chunks");
     var nc = Math.ceil(master.length / master.chunkSize);
     print("Copy and save " + nc + " chunks: " + old_id + " to " + new_id);
+    var moved = 0;
     for (var n = 0; n < nc; n++) {
         var file = chunks.findOne({files_id:old_id, n:n});
         if (file) {
             delete file._id;
             file.files_id = new_id;
             chunks.save(file);
-            if (db.getLastError()) {
+            if (!writeOk(db)) {
                 if (db.getLastError().startsWith('E11000')) { // We can ignore a duplicate key in case we like to repeat the insert.
                     print('Ignoring duplicate key error E11000');
                 } else {
-                    assert(writeOk(db), "chunks.save(file)");
+                    assert(false, "chunks.save(file)");
                 }
             }
+            moved++;
         }
     }
+
+    if ( moved == 0 ) print("Warn: there were no chunks found to move to the new identifier.");
 
     assert(chunks.count({files_id:new_id}) == nc, "Chunk count not correct. Expect: " + nc);
 
