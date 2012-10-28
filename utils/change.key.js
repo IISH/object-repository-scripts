@@ -35,9 +35,9 @@ function changeKeys(master) {
             chunks.save(file);
             if (!writeOk(db)) {
                 if (db.getLastError().startsWith('E11000')) { // We can ignore a duplicate key in case we like to repeat the insert.
-                    print('Ignoring duplicate key error E11000');
+                    print('Ignoring duplicate key error E11000... skipping copy');
                 } else {
-                    assert(false, "chunks.save(file)");
+                    throw "Stopping because of the last error when invoking: chunks.save(file)";
                 }
             }
             moved++;
@@ -46,7 +46,8 @@ function changeKeys(master) {
 
     if ( moved == 0 ) print("Warn: there were no chunks found to move to the new identifier.");
 
-    assert(chunks.count({files_id:new_id}) == nc, "Chunk count not correct. Expect: " + nc);
+    var countNewChunks = chunks.count({files_id:new_id});
+    assert(countNewChunks == nc, "Chunk count not correct. Was " + countNewChunks + " but expect: " + nc);
 
     // As we confirmed each chunk insert, we remove the old ones.
     chunks.remove({files_id:old_id});
