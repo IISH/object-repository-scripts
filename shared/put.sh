@@ -31,7 +31,7 @@ hostname=$hostname
         exit -1
     fi
 
-    # Prepare a key
+    # Prepare a key. We suggest a key based on the shard with the fewest documents.
     max=9223372036854775807
     primaries=$primaries
     i=0

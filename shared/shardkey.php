@@ -11,6 +11,7 @@ $options = getopt("s:p:");
 $p = $options['p'];
 $s = $options['s'];
 
+// Assume a range of Integer 32
 $max = 4294967296;
 $min = -2147483648;
 $range = floor($max / $s);
