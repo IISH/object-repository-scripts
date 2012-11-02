@@ -16,7 +16,7 @@ do
 done
 
 # Make sure all secondaries are running on the expected hosts.
-for secondary in rosaluxemburg1 rosaluxemburg3 rosaluxemburg5
+for secondary in rosaluxemburg1 rosaluxemburg5 rosaluxemburg7
 do
     host=$secondary.objectrepository.org:27018
     issecondary=$(mongo $host --quiet --eval "db.serverStatus().repl.secondary")

@@ -16,6 +16,7 @@ assert(master, 'The document is not found!');
 if (master._id == old_id) {
     assert(files.findOne({_id:new_id}) == null, "The new_id is already taken.");
     changeKeys(master);
+    print('Done');
 } else if (master._id == new_id) {
     print("The document is already converted.");
 } else {
