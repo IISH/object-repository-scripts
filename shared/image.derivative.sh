@@ -12,13 +12,12 @@ sourceBuckets=$sourceBuckets
 targetBucket=$targetBucket
 tmp=$derivative_cache
 targetFile=$tmp/$md5.$targetBucket
-sourceFileExtension=$sourceFileExtension
 
 for sourceBucket in ${sourceBuckets[*]}
 do
 	echo "sourceBucket='$sourceBucket'"
     if [ ! "$sourceBucket" == "master" ]; then
-        sourceFileExtension="jpg"
+        sourceFileExtension="jpeg"
     fi
     sourceFile=$tmp/$md5.$sourceBucket.$sourceFileExtension
     echo "sourceFile=$sourceFile"

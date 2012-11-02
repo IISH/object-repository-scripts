@@ -14,7 +14,6 @@ contentType=$contentType
 db=$db
 fileSet=$fileSet
 host=$host
-l="$l"
 label="$label"
 length=$length
 md5=$md5
@@ -25,6 +24,18 @@ lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
 identifier=$identifier
 hostname=$hostname
+
+derivative=$derivative
+l="$l"
+if [ "$derivative" == "image" ] ; then
+        content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" "$l")
+fi
+if [ "$derivative" == "audio" ] ; then
+        content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
+fi
+if [ "$derivative" == "video" ] ; then
+        content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
+fi
 
     if [ ! -f "$l" ] ; then
         echo "The file does not exist: $l"

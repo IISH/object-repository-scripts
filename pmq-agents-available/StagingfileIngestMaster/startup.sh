@@ -34,17 +34,6 @@ fi
 mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"
 if [ -f "$l" ] ; then
     remove="yes"
-
-    if [ "$derivative" == "image" ] ; then
-        content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" "$l")
-    fi
-    if [ "$derivative" == "audio" ] ; then
-        content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
-    fi
-    if [ "$derivative" == "video" ] ; then
-        content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
-    fi
-
     source $scripts/shared/put.sh
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"

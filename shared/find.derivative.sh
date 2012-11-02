@@ -15,17 +15,8 @@ derivative=$derivative
 echo "Check for existing derivative on fs for master $location"
 sourceFile=$(php $scripts/shared/find.derivative.php -f "$fileSet" -l "$location" -b ".$bucket")
 if [ -f "$sourceFile" ]; then
-        echo "Found custom file: $sourceFile"
-        contentType=$(php $scripts/shared/contenttype.php -t $scripts/shared/contenttype.txt -l $sourceFile)
-        if [ "$derivative" = "image" ] ; then
-            content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" $sourceFile)
-        fi
-        if [ "$derivative" = "audio" ] ; then
-            content=$(ffprobe -v quiet -print_format json -show_format -show_streams $sourceFile)
-        fi
-        if [ "$derivative" = "video" ] ; then
-            content=$(ffprobe -v quiet -print_format json -show_format -show_streams $sourceFile)
-        fi
+    echo "Found custom file: $sourceFile"
+    contentType=$(php $scripts/shared/contenttype.php -t $scripts/shared/contenttype.txt -l $sourceFile)
     l=$sourceFile
     md5=$(md5sum $l | cut -d ' ' -f 1)
     remove="yes"

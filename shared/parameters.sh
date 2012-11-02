@@ -33,7 +33,6 @@ l=$l
 location=$location
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 pidwebserviceKey=$pidwebserviceKey
-sourceFileExtension=$sourceFileExtension
 
 if [ -z "$sa_path" ] ; then
     echo "Path sa_path not set as environment variable."
@@ -61,17 +60,15 @@ fi
 
 # Split the contentType [family/type] into two separate variables. Example:
 # contentType = image/jpeg => derivative:image,sourceFileExtension=jpeg
-if [ -z "$sourceFileExtension" ]; then
-    sentence=${contentType//\//$' '}  # change the / to the separator white space
-    i=0;
-    for word in $sentence
-        do
-                a[$i]=$word;
-                let i++;
-        done
-    derivative=${a[0]}
-    sourceFileExtension=${a[1]}
-fi
+sentence=${contentType//\//$' '}  # change the / to the separator white space
+i=0;
+for word in $sentence
+    do
+            a[$i]=$word;
+            let i++;
+    done
+derivative=${a[0]}
+sourceFileExtension=${a[1]}
 
 # Should the content NOT be a json string, we nullify it
 if [[ ${content:0:1} == "{" ]]; then
