@@ -19,14 +19,10 @@ label="$label"
 l="$l"
 action=$action
 
-source $scripts/shared/primary.sh
+source $scripts/shared/secondaries.sh
 
 if [ "$action" == "delete" ] ; then
-    for b in "master" "level1" "level2" "level3"
-    do
-        bucket=$b
-        source $scripts/shared/delete.sh
-    done
+    source $scripts/shared/delete.sh
     exit $?
 fi
 

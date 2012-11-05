@@ -6,10 +6,7 @@
  * Prepares a database for the sharded environment.
  * See http://www.mongodb.org/display/DOCS/Configuring+Sharding
  *
- * In our environment we use the String(md5)+HexLong(length) as a shardkey. Its range is between:
- * minKey = 00000000000000000000000000000000 0000000000000000
- * maxKey = ffffffffffffffffffffffffffffffff 7fffffffffffffff
- * It is the same value in the key's: [ns].files.id and [ns].chunks.files_id
+ * The shardkey is the same value in the key's: [ns].files.id and [ns].chunks.files_id
  */
 
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
@@ -20,10 +17,11 @@ var admin = db.getMongo().getDB("admin");
 admin.runCommand("flushRouterConfig");
 admin.runCommand({ enablesharding:db.getName() });
 
-// The shard key is a integer of 32 bit over three parts
+// The shard key is a integer of 32 bit over three ( purely an arbitrary choice )
 // shard 0: [-2147483648, -715827884] = 1431655765
-// shard 1: [-715827883, 715827882]   = 1431655765
-// shard 2: [715827883, 2147483647]   = 1431655765
+// shard 1: [ -715827883,  715827882] = 1431655765
+// shard 2: [  715827883, 2147483647] = 1431655765
+// shard 3: [ 2147483648, 3579139412] = 1431655765
 var keys = [-715827883, 715827882];
 var buckets = ['master', 'level1', 'level2', 'level3'];
 for (var i = 0; i < buckets.length; i++) {
