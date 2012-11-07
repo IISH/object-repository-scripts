@@ -36,7 +36,9 @@ fi
 if [ "$derivative" == "video" ] ; then
         content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
-
+if [ ! -z "$content" ] ; then
+    content=$(php $scripts/shared/utf8_encode.php -i "$content")
+fi
     if [ ! -f "$l" ] ; then
         echo "The file does not exist: $l"
         exit -1
@@ -68,7 +70,7 @@ fi
         exit $rc
     fi
 
-    mongo $db --quiet --eval "\
+ mongo $db --quiet --eval "\
     var access='$access'; \
     var content=$content; \
     var filesDB='$db'; \
@@ -82,6 +84,7 @@ fi
     var lid='$lid'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     ''" $scripts/shared/put.js
+
 
     rc=$?
     if [[ $rc != 0 ]] ; then

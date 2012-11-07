@@ -40,7 +40,7 @@ if [ -f "$sourceFile" ]; then
 	php $scripts/shared/image.derivative.php -i $sourceFile -l $targetBucket -b $sourceBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile
 else
 	echo "Could not find a master or higher level derivative to produce a $targetBucket file"
-	echo "We need at a master to produce a derivative."
+	echo "We need at least a master to produce a derivative."
 	exit 240
 fi
 
