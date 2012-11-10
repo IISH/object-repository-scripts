@@ -45,14 +45,14 @@ fi
     fi
 
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
-    max=9223372036854775807
+    max=2147483647
     primaries=$primaries
     i=0
     p=0
     for primary in ${primaries[*]}
     do
         c=0
-        c=$(timeout 5 mongo $primary/$db --quiet --eval "Number(db.$bucket.chunks.dataSize())")
+        c=$(timeout 5 mongo $primary/$db --quiet --eval "Math.round(Math.sqrt(db.$bucket.chunks.dataSize()))")
         if [ $c -lt $max ] ; then
            max=$c
            p=$i
@@ -83,7 +83,7 @@ fi
     var pid='$pid'; \
     var lid='$lid'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
-    ''" $scripts/shared/put.js
+    " $scripts/shared/put.js
 
 
     rc=$?

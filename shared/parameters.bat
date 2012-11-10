@@ -6,7 +6,7 @@ Rem Set the parameters
     IF "%arg:~0,1%" == "-" (
         set key=%arg:~1%
         set value=%2
-	set %key%=%value%
+	    set %key%=%value%
     )
     shift
 goto :LOOP
@@ -18,5 +18,9 @@ IF "%na%"=="" (
 )
 
 set db=or_%na%
+
+if EXIST "%l%" (
+    call %scripts%\shared\set.bat length php -r "print(filesize('%l%'));"
+)
 
 

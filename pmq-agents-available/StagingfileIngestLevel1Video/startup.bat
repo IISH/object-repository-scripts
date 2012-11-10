@@ -11,6 +11,8 @@ set targetBucket=level1
 
 Rem Preset 902 = H.264 HD Video (1080p, 16:9)
 set preset=902
+set targetContentType=video/mp4
+set derivative=video
 
-call %scripts%\shared\video.derivative.bat
+call %scripts%\shared\av.derivative.bat
 exit %errorlevel%

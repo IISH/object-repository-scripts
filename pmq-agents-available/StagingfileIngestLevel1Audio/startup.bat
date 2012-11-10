@@ -11,6 +11,7 @@ set targetBucket=level1
 
 Rem Preset 119 = Audio Only: MP3 Good Quality
 set preset=119
+set targetContentType=audio/mp3
 
-call %scripts%\shared\video.derivative.bat
+call %scripts%\shared\av.derivative.bat
 exit %errorlevel%
