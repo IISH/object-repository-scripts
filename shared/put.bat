@@ -32,7 +32,7 @@ Rem
     if %rc% neq 0 exit %rc%
 
     Rem Add to the statistics
-    mongo %db% --quiet --eval "var pid = '%pid%';var ns='%bucket%';" %scripts%\shared\statistics.js
+    Rem mongo %db% --quiet --eval "var pid = '%pid%';var ns='%bucket%';" %scripts%\shared\statistics.js
 
         del "%l%"
         rm "%l%.md5"
