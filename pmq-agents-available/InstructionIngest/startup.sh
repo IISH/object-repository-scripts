@@ -21,4 +21,9 @@ if [ $count != 0 ] ; then
     exit -1
 fi
 
+# The application does not set the start and end dates correctly. Hence we set that here.
+mongo sa --quiet --eval "db.getCollection('stagingfile').update({fileSet:'$fileSet', 'workflow.name':'Start'}, \
+    {\$set:{'workflow.\$.start':new Date(), 'workflow.\$.end':new Date()}}, \
+    false, true)"
+
 exit 0
