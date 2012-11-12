@@ -7,6 +7,7 @@ Rem Set the parameters
         set key=%arg:~1%
         set value=%2
 	    set %key%=%value%
+	    shift
     )
     shift
 goto :LOOP

@@ -14,6 +14,7 @@ Rem
     set rc=%errorlevel%
     if %rc% neq 0 exit %rc%
 
+    Rem assemble a batch script for the metadata update:
     set batch=%temp%\%identifier%.content.bat
     echo set content=>%batch%
     ffprobe -v quiet -print_format json -show_format -show_streams "%l%">>%batch%
@@ -31,9 +32,6 @@ Rem
     set rc=%errorlevel%
     if %rc% neq 0 exit %rc%
 
-    Rem Add to the statistics
-    Rem mongo %db% --quiet --eval "var pid = '%pid%';var ns='%bucket%';" %scripts%\shared\statistics.js
-
-        del "%l%"
-        rm "%l%.md5"
-        exit 0
+    del "%l%"
+    rm "%l%.md5"
+    exit 0
