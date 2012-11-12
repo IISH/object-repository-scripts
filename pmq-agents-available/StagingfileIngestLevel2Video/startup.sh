@@ -61,18 +61,21 @@ fi
 
 # Construct the correct parameters for the extraction of stilled images
 db=$db
-imCmd=$(mongo $db --quiet --eval "var desired_frames=16; var r=0;ss=0;var doc=db.master.files.findOne('metadata.pid':'\$pid',{'metadata.content':1}); \
-    if (doc) {\
-        doc.metadata.content.streams.forEach(function(d){if (d.codec_type=='video ') { \
-            desired_frames++;
-            r = desired_frames / d.duration; \
-            ss = d.duration / (desired_frames * 10); \
-            }})}; \
-            if ( r == 0 ) print('-vframes 16') else print('-r ' + r + ' -ss ' + ss);
-            ")
+pid=$pid
+imParams=$(mongo $db --quiet --eval "var desired_frames = 16; \
+var r = 0; \
+ss = 0; \
+var doc = db.master.files.findOne({'metadata.pid':'$pid'}, {'metadata.content':1}); \
+if (doc) doc.metadata.content.streams.forEach(function (d) { \
+    if (d.codec_type == 'video') { \
+        desired_frames++; \
+        r = desired_frames / d.duration; \
+        ss = d.duration / (desired_frames"\*"10); \
+    }}); \
+if (r == 0) print('-vframes 16'); else print('-r ' + r + ' -ss ' + ss); \
+")
 
-
-ffmpeg -i $sourceFile -f image2 $imCmd $tmp/$md5.$bucket-%05d.png
+ffmpeg -i $sourceFile -f image2 $imParams $tmp/$md5.$bucket-%05d.png
 rm $sourceFile
 
 contentType="image/jpeg"

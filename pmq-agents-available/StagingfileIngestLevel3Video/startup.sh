@@ -52,16 +52,17 @@ fi
 
 # Construct the correct parameters for the extraction of stilled images
 db=$db
-imCmd=$(mongo $db --quiet --eval "var ss=10;var doc=db.master.files.findOne('metadata.pid':'\$pid',{'metadata.content':1}); \
-    if (doc) {\
-        doc.metadata.content.streams.forEach(function(d){if (d.codec_type=='video ') { \
-            ss = Math.round(d.duration / 2); \
-            }})}; \
-            print('-ss ' + ss);
-            ")
+imParams=$(mongo $db --quiet --eval "var ss = 10; \
+var doc = db.master.files.findOne({'metadata.pid':'$pid'}, {'metadata.content':1}); \
+if (doc) doc.metadata.content.streams.forEach(function (d) { \
+    if (d.codec_type == 'video') { \
+        ss = d.duration / 2; \
+    }}); \
+print('-ss ' + ss); \
+")
 
 l=$tmp/$md5.$bucket.jpg
-ffmpeg -y -i $sourceFile -vframes 1 $imCmd -an -vcodec jpg -f rawvideo -s 320x $l
+ffmpeg -y -i $sourceFile -vframes 1 $imParams -an -vcodec jpg -f rawvideo -s 320x $l
 if [ ! -f $l ] ; then
     echo "Extracting a still failed."
     exit -1
