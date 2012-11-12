@@ -108,7 +108,7 @@ fi
 
     remove=$remove
     if [ "$remove" == "yes" ] ; then
-        rm $l
-        rm $l.md5
+        rm "$l"
+        rm "$l.md5"
         exit 0
     fi
