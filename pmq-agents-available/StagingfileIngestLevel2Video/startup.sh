@@ -19,12 +19,19 @@ source $scripts/shared/parameters.sh
 sourceBuckets="level1 master"
 bucket=level2
 md5=$md5
-tmp=$tmp
+tmp=$derivative_cache
 
 action=$action
 if [ "$action" == "delete" ] ; then
     source $scripts/shared/delete.sh
     exit $?
+fi
+
+db=$db
+if [ "$db" == "or_10622" ] ; then
+    echo "proceed"
+else
+    source $scripts/shared/video.derivative.sh
 fi
 
 for sourceBucket in ${sourceBuckets[*]}
