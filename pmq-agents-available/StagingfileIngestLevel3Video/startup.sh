@@ -64,7 +64,7 @@ print('-ss ' + ss); \
 
 l=$tmp/$md5.$bucket.jpg
 tmp=$tmp/$md5.$bucket.bmp
-ffmpeg -y -i $sourceFile -an $imParams $tmp
+ffmpeg -y -i $sourceFile -vcodec libx264 -an $imParams $tmp
 if [ ! -f $tmp ] ; then
     echo "Extracting a still failed."
     exit -1
