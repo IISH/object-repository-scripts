@@ -75,7 +75,7 @@ if (doc) doc.metadata.content.streams.forEach(function (d) { \
 if (r == 0) print('-vframes 16'); else print('-r ' + r + ' -ss ' + ss); \
 ")
 
-ffmpeg -i $sourceFile -f image2 $imParams $tmp/$md5.$bucket-%05d.png
+ffmpeg -i $sourceFile -vcodec copy -an -f image2 $imParams $tmp/$md5.$bucket-%05d.png
 rm $sourceFile
 
 contentType="image/jpeg"

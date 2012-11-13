@@ -28,7 +28,7 @@ fi
 for sourceBucket in ${sourceBuckets[*]}
 do
 	echo "sourceBucket='$sourceBucket'"
-    sourceFile=$tmp/$md5.$sourceBucket
+    sourceFile=$tmp/$md5.$sourceBucket.jpg
     echo "sourceFile=$sourceFile"
     if [ -f "$sourceFile" ]; then
 	    echo "Using existing cached file on $sourceFile"
@@ -64,7 +64,7 @@ print('-ss ' + ss); \
 
 l=$tmp/$md5.$bucket.jpg
 tmp=$tmp/$md5.$bucket.bmp
-ffmpeg -y -i $sourceFile -vframes 12222 $imParams $tmp
+ffmpeg -y -i $sourceFile -an $imParams $tmp
 if [ ! -f $tmp ] ; then
     echo "Extracting a still failed."
     exit -1

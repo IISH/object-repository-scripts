@@ -24,9 +24,14 @@ lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
 identifier=$identifier
 hostname=$hostname
-
 derivative=$derivative
 l="$l"
+
+if [ ! -f "$l" ] ; then
+    echo "The file does not exist: $l"
+    exit -1
+fi
+
 if [ "$derivative" == "image" ] ; then
         content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" "$l")
 fi
@@ -39,11 +44,6 @@ fi
 if [ ! -z "$content" ] ; then
     content=$(php $scripts/shared/utf8_encode.php -i "$content")
 fi
-    if [ ! -f "$l" ] ; then
-        echo "The file does not exist: $l"
-        exit -1
-    fi
-
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     max=2147483647
     primaries=$primaries
