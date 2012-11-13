@@ -52,6 +52,7 @@ fi
 
 # Construct the correct parameters for the extraction of stilled images
 db=$db
+pid=$pid
 imParams=$(mongo $db --quiet --eval "var ss = 10; \
 var doc = db.master.files.findOne({'metadata.pid':'$pid'}, {'metadata.content':1}); \
 if (doc) doc.metadata.content.streams.forEach(function (d) { \
@@ -62,11 +63,22 @@ print('-ss ' + ss); \
 ")
 
 l=$tmp/$md5.$bucket.jpg
-ffmpeg -y -i $sourceFile -vframes 1 $imParams -an -vcodec jpg -f rawvideo -s 320x $l
-if [ ! -f $l ] ; then
+tmp=$tmp/$md5.$bucket.bmp
+ffmpeg -y -i $sourceFile -vframes 12222 $imParams $tmp
+if [ ! -f $tmp ] ; then
     echo "Extracting a still failed."
     exit -1
 fi
+
+# reduce to a width of at least 320 px
+min=320
+width=$(identify -format "%w" "$tmp")
+if [ $width -lt $min ] ; then
+    convert $tmp $l
+else
+    convert $tmp -thumbnail "$min"x $l
+fi
+rm $tmp
 
 md5=$(md5sum $l | cut -d ' ' -f 1)
 echo "$md5  $l" > "$l.md5"
