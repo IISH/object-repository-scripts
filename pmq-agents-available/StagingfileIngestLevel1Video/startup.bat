@@ -9,8 +9,8 @@ call %scripts%\shared\secondaries.bat
 set sourceBucket=master
 set targetBucket=level1
 
-Rem Preset 902 = H.264 HD Video (1080p, 16:9)
-set preset=902
+Rem Preset 4169 = H.264 AAC ; same framerate as input
+set preset=4169
 set targetContentType=video/mp4
 set derivative=video
 
