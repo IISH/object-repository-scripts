@@ -25,10 +25,11 @@ else
     source $scripts/shared/video.derivative.sh
 fi
 
+sourceBucket=level1
 for sourceBucket in ${sourceBuckets[*]}
 do
 	echo "sourceBucket='$sourceBucket'"
-    sourceFile=$tmp/$md5.$sourceBucket.jpg
+    sourceFile=$tmp/$md5.$sourceBucket
     echo "sourceFile=$sourceFile"
     if [ -f "$sourceFile" ]; then
 	    echo "Using existing cached file on $sourceFile"
@@ -64,7 +65,7 @@ print('-ss ' + ss); \
 
 l=$tmp/$md5.$bucket.jpg
 tmp=$tmp/$md5.$bucket.bmp
-ffmpeg -y -i $sourceFile -an $imParams $tmp
+ffmpeg -y -i $sourceFile -an $imParams -vframes 1 $tmp
 if [ ! -f $tmp ] ; then
     echo "Extracting a still failed."
     exit -1

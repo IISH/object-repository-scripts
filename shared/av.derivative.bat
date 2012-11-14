@@ -37,7 +37,7 @@ if %rc% == 31 echo The conversion has been interrupted by the user. & EXIT -1
 if %rc% == 32 echo The trial period has been expired. & EXIT -1
 if %rc% == 33 echo Copy-protected DVD. & EXIT -1
 
-del %l%
+del "%l%"
 
 if NOT EXIST "%targetFile%" (
     echo Unable to create derivative.
