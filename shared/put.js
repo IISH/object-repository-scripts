@@ -188,6 +188,7 @@ function metadata(document) {
 
     var now = new Date();
     var m = document.metadata;
+    document.contentType = contentType;
     m.bucket = ns;
     m.na = na;
     m.fileSet = fileSet;

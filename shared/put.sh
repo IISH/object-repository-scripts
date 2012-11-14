@@ -83,6 +83,7 @@ fi
     var pid='$pid'; \
     var lid='$lid'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
+    var contentType='$contentType'; \
     " $scripts/shared/put.js
 
 
