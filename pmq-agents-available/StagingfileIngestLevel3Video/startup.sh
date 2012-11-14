@@ -64,7 +64,7 @@ print('-ss ' + ss); \
 
 l=$tmp/$md5.$bucket.jpg
 tmp=$tmp/$md5.$bucket.bmp
-ffmpeg -y -i $sourceFile -vcodec libx264 -an $imParams $tmp
+ffmpeg -y -i $sourceFile -an $imParams $tmp
 if [ ! -f $tmp ] ; then
     echo "Extracting a still failed."
     exit -1
@@ -83,6 +83,6 @@ rm $tmp
 md5=$(md5sum $l | cut -d ' ' -f 1)
 echo "$md5  $l" > "$l.md5"
 remove="yes"
-$scripts/shared/put.sh
+source $scripts/shared/put.sh
 
 exit $?

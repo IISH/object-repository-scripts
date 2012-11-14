@@ -69,8 +69,8 @@ var doc = db.master.files.findOne({'metadata.pid':'$pid'}, {'metadata.content':1
 if (doc) doc.metadata.content.streams.forEach(function (d) { \
     if (d.codec_type == 'video') { \
         desired_frames++; \
-        r = desired_frames / d.duration; \
-        ss = d.duration / (desired_frames"\*"10); \
+        r = Math.round( desired_frames"\*"1000 / d.duration ) / 1000; \
+        ss = Math.round( d.duration / (desired_frames"\*"10)); \
     }}); \
 if (r == 0) print('-vframes 16'); else print('-r ' + r + ' -ss ' + ss); \
 ")
@@ -91,6 +91,6 @@ fi
 md5=$(md5sum $l | cut -d ' ' -f 1)
 echo "$md5  $l" > "$l.md5"
 remove="yes"
-$scripts/shared/put.sh
+source $scripts/shared/put.sh
 
 exit $?
