@@ -13,6 +13,7 @@ Rem Preset 119 = Audio Only: MP3 Good Quality
 set preset=119
 set targetContentType=audio/mp3
 set derivative=audio
+set format=mp3
 
 call %scripts%\shared\av.derivative.bat
 exit %errorlevel%

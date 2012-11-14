@@ -2,7 +2,7 @@ Rem /shared/video.derivative.bat
 Rem
 Rem Retrieve the source file and make a derivative
 set tmp=%derivative_cache%
-set targetFile=%tmp%\%md5%.%targetBucket%
+set targetFile=%tmp%\%md5%.%targetBucket%.%format%
 
     set l=%tmp%\%md5%.%sourceBucket%
     if EXIST "%l%" del %l%

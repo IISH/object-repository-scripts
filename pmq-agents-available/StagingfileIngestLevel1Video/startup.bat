@@ -13,6 +13,7 @@ Rem Preset 4169 = H.264 AAC ; same framerate as input
 set preset=4169
 set targetContentType=video/mp4
 set derivative=video
+set format=mp4
 
 call %scripts%\shared\av.derivative.bat
 exit %errorlevel%
