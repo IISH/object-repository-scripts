@@ -54,11 +54,11 @@ fi
 db=$db
 pid=$pid
 imParams=$(mongo $db --quiet --eval "var ss = 10; \
-var doc = db.master.files.findOne({'metadata.pid':'$pid'}, {'metadata.content':1}); \
-if (doc) doc.metadata.content.streams.forEach(function (d) { \
-    if (d.codec_type == 'video') { \
-        ss = d.duration / 2; \
-    }}); \
+var m = db.$sourceBucket.files.findOne({'metadata.pid':'$pid'}, {'metadata.content.format':1}); \
+if (m) { \
+    var format=m.metadata.content.format; \
+    ss = Math.round(format.duration / 2); \
+    }; \
 print('-ss ' + ss); \
 ")
 

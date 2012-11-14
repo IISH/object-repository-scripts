@@ -33,7 +33,6 @@ if [ "$db" == "or_10622" ] ; then
 else
     source $scripts/shared/video.derivative.sh
 fi
-
 for sourceBucket in ${sourceBuckets[*]}
 do
 	echo "sourceBucket='$sourceBucket'"
@@ -65,21 +64,23 @@ pid=$pid
 imParams=$(mongo $db --quiet --eval "var desired_frames = 16; \
 var r = 0; \
 ss = 0; \
-var doc = db.master.files.findOne({'metadata.pid':'$pid'}, {'metadata.content':1}); \
-if (doc) doc.metadata.content.streams.forEach(function (d) { \
-    if (d.codec_type == 'video') { \
-        desired_frames++; \
-        r = Math.round( desired_frames"\*"1000 / d.duration ) / 1000; \
-        ss = Math.round( d.duration / (desired_frames"\*"10)); \
-    }}); \
+var m = db.$sourceBucket.files.findOne({'metadata.pid':'$pid'}, {'metadata.content.format':1}); \
+if (m) { \
+    var format=m.metadata.content.format; \
+    desired_frames++; \
+    r = Math.round(desired_frames "\*" 1000 / format.duration) / 1000; \
+    ss = Math.round( format.duration "\*" 1000 / (desired_frames "\*" 10))/1000; \
+    }; \
 if (r == 0) print('-vframes 16'); else print('-r ' + r + ' -ss ' + ss); \
 ")
 
-ffmpeg -i $sourceFile -vcodec libx264 -an -f image2 $imParams $tmp/$md5.$bucket-%05d.png
+ffmpeg -i $sourceFile -an -f image2 $imParams $tmp/$md5.$bucket-%02d.png
 rm $sourceFile
 
 contentType="image/jpeg"
 l=$tmp/$md5.$bucket.jpg
+#roundError=$tmp/$md5.$bucket-17.png # sometimes there is one too many
+#if [ -f $roundError ] ; then rm $roundError ; fi
 montage $tmp/$md5.$bucket-* -geometry 320x+4+4 -frame 1 $l # see http://www.imagemagick.org/Usage/montage/
 rm $tmp/$md5.$bucket-*
 

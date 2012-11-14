@@ -33,5 +33,5 @@ Rem
     if %rc% neq 0 exit %rc%
 
     del "%l%"
-    rm "%l%.md5"
+    del "%l%.md5"
     exit 0
