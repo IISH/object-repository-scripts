@@ -63,6 +63,7 @@ if (m) { \
 print('-ss ' + ss); \
 ")
 
+contentType="image/jpeg"
 l=$tmp/$md5.$bucket.jpg
 tmp=$tmp/$md5.$bucket.bmp
 ffmpeg -y -i $sourceFile -an $imParams -vframes 1 $tmp
