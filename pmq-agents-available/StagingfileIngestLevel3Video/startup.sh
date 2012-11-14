@@ -71,6 +71,8 @@ if [ ! -f $tmp ] ; then
     exit -1
 fi
 
+rm $sourceFile
+
 # reduce to a width of at least 320 px
 min=320
 width=$(identify -format "%w" "$tmp")
