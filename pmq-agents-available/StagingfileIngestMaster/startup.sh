@@ -21,7 +21,6 @@ action=$action
 
 source $scripts/shared/secondaries.sh
 source $scripts/shared/delete.sh
-source $scripts/shared/hasdocument.sh
 
 # If we find a file we upload it
 mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"
