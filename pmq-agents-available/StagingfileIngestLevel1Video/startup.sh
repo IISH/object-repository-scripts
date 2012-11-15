@@ -12,5 +12,7 @@ sourceBuckets="master"
 targetBucket="level1"
 derivative=$derivative
 
+source $scripts/shared/hasdocument.sh
+
 source $scripts/shared/video.derivative.sh
 exit $?

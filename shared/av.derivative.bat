@@ -7,7 +7,6 @@ set targetFile=%tmp%\%md5%.%targetBucket%.%format%
     set l=%tmp%\%md5%.%sourceBucket%
     if EXIST "%l%" del %l%
     call %scripts%\shared\get.bat
-    rem copy /y "%l%.bk" "%l%"
 
 if NOT EXIST "%l%" (
     echo Could not find a master or higher level derivative to produce a %targetBucket% file.
@@ -16,7 +15,6 @@ if NOT EXIST "%l%" (
 )
 
 mvccl /file "%l%" /outputfile "%targetFile%" /preset %preset% %mvccl_opts%
-rem copy /y "%targetFile%.bk" "%targetFile%"
 
 set rc=%errorlevel%
 if %rc% == 1 echo The program has been compromised. & EXIT -1

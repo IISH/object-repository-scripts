@@ -13,7 +13,7 @@ Rem Set the parameters
 goto :LOOP
 :NEXT
 
-IF "%na%"=="" (
+IF not defined na (
     echo NA is not set.
     EXIT -1
 )

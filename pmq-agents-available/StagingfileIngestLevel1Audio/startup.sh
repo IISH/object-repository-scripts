@@ -11,12 +11,9 @@ source $scripts/shared/parameters.sh
 sourceBuckets="master"
 targetBucket="level1"
 
-action=$action
-if [ "$action" == "delete" ] ; then
-    bucket=$targetBucket
-    source $scripts/shared/delete.sh
-    exit $?
-fi
+bucket=$targetBucket
+source $scripts/shared/delete.sh
+source $scripts/shared/hasdocument.sh
 
 source $scripts/shared/audio.derivative.sh
 exit $?

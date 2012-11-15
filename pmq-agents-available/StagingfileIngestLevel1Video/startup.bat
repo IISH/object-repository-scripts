@@ -9,6 +9,8 @@ call %scripts%\shared\secondaries.bat
 set sourceBucket=master
 set targetBucket=level1
 
+call %scripts%\shared\hasdocument.bat
+
 Rem Preset 4169 = H.264 AAC ; same framerate as input
 set preset=4169
 set targetContentType=video/mp4

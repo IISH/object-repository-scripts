@@ -2,9 +2,13 @@
 #
 # Reads a file from the database.collection and removes it.
 #
-db=$db
-pid=$pid
-bucket=$bucket
+
+action=$action
+if [ "$action" == "delete" ] ; then
+
+    db=$db
+    pid=$pid
+    bucket=$bucket
 
     files_id=$(mongo $db --quiet --eval "var doc=db.$bucket.files.findOne({'metadata.pid':'$pid'}, {_id:1});if ( doc ){print(doc._id)}")
     if [ -z "$files_id" ] ; then
@@ -28,4 +32,6 @@ bucket=$bucket
         exit -1
     fi
 
-echo "Document $pid removed"
+    echo "Document $pid removed"
+    exit 0
+fi

@@ -21,18 +21,9 @@ bucket=level2
 md5=$md5
 tmp=$derivative_cache
 
-action=$action
-if [ "$action" == "delete" ] ; then
-    source $scripts/shared/delete.sh
-    exit $?
-fi
+source $scripts/shared/delete.sh
+source $scripts/shared/hasdocument.sh
 
-db=$db
-if [ "$db" == "or_10622" ] ; then
-    echo "proceed"
-else
-    source $scripts/shared/video.derivative.sh
-fi
 for sourceBucket in ${sourceBuckets[*]}
 do
 	echo "sourceBucket='$sourceBucket'"

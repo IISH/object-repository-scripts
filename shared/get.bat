@@ -3,7 +3,7 @@ Rem Reads a file from the database
 Rem
 
 Rem checking params
-IF "%pid%"=="" (
+IF not defined pid (
     echo missing PID : exiting
     exit -1
 )
