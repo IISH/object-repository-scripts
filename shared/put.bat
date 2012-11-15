@@ -20,7 +20,7 @@ Rem
     ffprobe -v quiet -print_format json -show_format -show_streams "%l%">>%batch%
     php %scripts%\shared\wrapper.php -i %batch% -o %batch%
     echo ;>>%batch%
-    echo mongo %db% --quiet --eval "var access='%access%'; var content=%%content%%;var filesDB='%db%'; var na='%na%'; var fileSet='%fileSet%'; var label='%label%'; var length=%length%; var md5='%md5%'; var ns='%bucket%'; var pid='%pid%'; var lid='%lid%'; var resolverBaseUrl='%resolverBaseUrl%'" %scripts%\shared\put.js>>%batch%
+    echo mongo %db% --quiet --eval "var access='%access%'; var content=%%content%%;var filesDB='%db%'; var na='%na%'; var fileSet='%fileSet%'; var label='%label%'; var length=%length%; var md5='%md5%'; var ns='%bucket%'; var pid='%pid%'; var lid='%lid%'; var resolverBaseUrl='%resolverBaseUrl%'; var contentType='%contentType%'; \" %scripts%\shared\put.js>>%batch%
     call %batch%
     del %batch%
 
