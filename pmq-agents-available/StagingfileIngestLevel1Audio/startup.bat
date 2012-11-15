@@ -9,6 +9,9 @@ call %scripts%\shared\secondaries.bat
 set sourceBucket=master
 set targetBucket=level1
 
+call %scripts%\shared\delete.bat
+call %scripts%\shared\hasdocument.bat
+
 Rem Preset 119 = Audio Only: MP3 Good Quality
 set preset=119
 set targetContentType=audio/mp3
