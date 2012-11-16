@@ -20,6 +20,8 @@ IF not defined na (
 
 set db=or_%na%
 
+set label=empty
+
 if EXIST "%l%" (
     call %scripts%\shared\set.bat length php -r "print(filesize('%l%'));"
 )
