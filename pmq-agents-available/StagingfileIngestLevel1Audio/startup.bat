@@ -4,7 +4,6 @@ Rem The convert script to create the level 1 derivative for an Audio
 
 set scripts=%scripts%
 call %scripts%\shared\parameters.bat %*
-call %scripts%\shared\secondaries.bat
 
 set sourceBucket=master
 set targetBucket=level1

@@ -14,7 +14,6 @@
 # ffmpeg -i input.avi -f image2 -r $r -s qvga frame-%05d.png
 
 scripts=$scripts
-source $scripts/shared/secondaries.sh
 source $scripts/shared/parameters.sh
 sourceBuckets="level1 master"
 bucket=level2

@@ -19,7 +19,6 @@ label="$label"
 l="$l"
 action=$action
 
-source $scripts/shared/secondaries.sh
 source $scripts/shared/delete.sh
 
 # If we find a file we upload it

@@ -7,7 +7,6 @@
 scripts=$scripts
 bucket="level2"
 source $scripts/shared/parameters.sh
-source $scripts/shared/secondaries.sh
 source $scripts/shared/delete.sh
 source $scripts/shared/hasdocument.sh
 source $scripts/shared/find.derivative.sh

@@ -10,19 +10,17 @@
  */
 
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
-
+assert(shards, "Must have the shard key ranges defined for presplitting: var shards={shardId:{p:'primary',minKey:[key]}, ...}");
 
 // Shard database
 var admin = db.getMongo().getDB("admin");
 admin.runCommand("flushRouterConfig");
 admin.runCommand({ enablesharding:db.getName() });
 
-// The shard key is a integer of 32 bit over three ( purely an arbitrary choice )
-// shard 0: [-2147483648, -715827884] = 1431655765
-// shard 1: [ -715827883,  715827882] = 1431655765
-// shard 2: [  715827883, 2147483647] = 1431655765
-// shard 3: [ 2147483648, 3579139412] = 1431655765
-var keys = [-715827883, 715827882];
+// The shard key is a 64 bit integer.
+// The default shard range is 1/3 of a 32 integer ( purely an arbitrary and part legacy choice )
+
+
 var buckets = ['master', 'level1', 'level2', 'level3'];
 for (var i = 0; i < buckets.length; i++) {
     var collFiles = buckets[i] + ".files";
@@ -31,24 +29,26 @@ for (var i = 0; i < buckets.length; i++) {
     // Add index
     db.getCollection(collChunks).ensureIndex({files_id:1, n:1}, {unique:true});
     db.getCollection(collFiles).ensureIndex({'metadata.pid':1}, {unique:true});
+    db.getCollection(collFiles).ensureIndex({'metadata.label':1}, {unique:false});
 
     // Shard collection
     var shardThis = db.getName() + "." + collChunks;
     admin.runCommand({ shardcollection:shardThis, key:{ files_id:1 }, unique:false});
 
     // Pre splitting the chunks over the shard. For each shard we have a key range: shards=[n]; keys=[n-1].
-    for (var k = 0; k < keys.length; k++) {
-        var key = keys[k];
-        print("split collection " + shardThis + " with shardkey " + key);
-        admin.runCommand({ split:shardThis, middle:{ files_id:key} });
+    for (var shard in shards) {
+        if (shards.hasOwnProperty(shard)) {
+            print("split collection " + shardThis + " with shardkey " + shard.minKey);
+            admin.runCommand({ split:shardThis, middle:{ files_id:shard.minKey} });
+        }
     }
 
-    for (k = 0; k < keys.length; k++) {
-        key = keys[k];
-        var shard = "rs_or" + (k + 1);
-        print("moveChunk from collection " + shardThis + " with shardkey " + key + " to shard " + shard);
-        admin.runCommand({ moveChunk:shardThis, find:{ files_id:key }, to:shard })
+    for (shard in shards) {
+        if (shards.hasOwnProperty(shard)) {
+            print("moveChunk from collection " + shardThis + " with shardkey " + shard.minKey + " to shard " + shard);
+            admin.runCommand({ moveChunk:shardThis, find:{ files_id:shard.minKey }, to:shard })
+        }
     }
 }
 
-print(db.printShardingStatus());
+print('Use db.printShardingStatus() to see the shard status');

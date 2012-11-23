@@ -33,36 +33,32 @@ if [ ! -f "$l" ] ; then
 fi
 
 if [ "$derivative" == "image" ] ; then
-        content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" "$l")
+    # ToDo: do not use format, but parse the entire identify response to json
+    content=$(identify -format "{height:'%h',width:'%w','x-resolution':'%x','y-resolution':'%y'}" "$l")
 fi
 if [ "$derivative" == "audio" ] ; then
-        content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
+    content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
 if [ "$derivative" == "video" ] ; then
-        content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
+    content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
 if [ ! -z "$content" ] ; then
     content=$(php $scripts/shared/utf8_encode.php -i "$content")
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
-    max=2147483647
-    primaries=$primaries
-    i=0
-    p=0
-    for primary in ${primaries[*]}
-    do
-        c=0
-        c=$(timeout 5 mongo $primary/$db --quiet --eval "Math.round(Math.sqrt(db.$bucket.chunks.dataSize()))")
-        if [ $c -lt $max ] ; then
-           max=$c
-           p=$i
-         fi
-        let i++
-    done
-    shardKey=$(php $scripts/shared/shardkey.php -s $i -p $p)
-    echo "Shardkey: shard $p key $shardKey"
+    shards=$shards
+    shardKey=$(timeout 60 mongo $db --quiet --eval "var bucket='$bucket'; var shards=$shards" $scripts/shared/shardkey.js)
+    is_numeric=$(php -r "print(is_numeric('$shardKey'));")
+    if [ -z "$is_numeric" ] ; then
+        shardKey=0
+    fi
+    if [[ $shardKey == 0 ]]; then
+        echo "Could not retrieve a shardkey. Primaries may be down."
+        exit -1
+    fi
 
     # Upload our file.
+    echo "Shardkey: $shardKey"
     java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
 
@@ -92,7 +88,7 @@ fi
         exit $rc
     fi
 
-        mongo $db --quiet --eval "\
+    mongo $db --quiet --eval "\
         var ns='$bucket'; \
         var md5='$md5'; \
         var length=$length; \

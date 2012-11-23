@@ -8,8 +8,19 @@ Rem
         exit -1
     )
 
+    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var bucket='%bucket%'; var shards=%shards%" %scripts%/shared/shardkey.js
+    call %scripts%\shared\set.bat is_numeric php -r "print(is_numeric('%shardKey%'));"
+    if NOT DEFINED is_numeric (
+        set shardKey=0
+    )
+
+    if %shardKey% == 0 (
+        echo Could not retrieve a shardkey. Primaries may be down.
+        exit -1
+    )
+
     Rem Upload our file.
-    java -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -M Put
+    java -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
 
     set rc=%errorlevel%
     if %rc% neq 0 exit %rc%
