@@ -8,7 +8,7 @@ Rem
         exit -1
     )
 
-    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var bucket='%bucket%'; var shards=%shards%" %scripts%/shared/shardkey.js
+    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var bucket='%bucket%'; var shards=%shards%" %scripts%\shared\shardkey.js
     call %scripts%\shared\set.bat is_numeric php -r "print(is_numeric('%shardKey%'));"
     if NOT DEFINED is_numeric (
         set shardKey=0

@@ -17,7 +17,7 @@ var shardkey = 0;
 
 function getShardCandidate() {
 
-    var doc = db.candidate.runCommand("findAndModify", {query:{b:bucket}, remove:true });
+    var doc = db.candidate.runCommand("findAndModify", {query:{b:bucket}, sort:{ _id:1 }, remove:true });
     if (doc && doc.value && doc.value.s) {
         return doc.value.s;
     } else {
@@ -87,4 +87,4 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     }
 }
 
-printjson(shardkey);
+print(shardkey);
