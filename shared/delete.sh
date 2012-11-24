@@ -21,13 +21,13 @@ if [ "$action" == "delete" ] ; then
 
     # Verify our removal
     count=$(mongo $db --quiet --eval "db.$bucket.files.count({_id:$files_id})")
-    if [ $count != 0 ] ; then
+    if [[ $count != 0 ]] ; then
         echo "Failed to delete document $pid in files.$bucket"
         exit -1
     fi
 
     count=$(mongo $db --quiet --eval "db.$bucket.chunks.count({files_id:$files_id})")
-    if [ $count != 0 ] ; then
+    if [[ $count != 0 ]] ; then
         echo "Failed to delete document $pid in chunks.$bucket"
         exit -1
     fi

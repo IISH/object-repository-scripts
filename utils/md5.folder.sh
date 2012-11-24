@@ -1,6 +1,6 @@
 #!/bin/bash
 
-d=$1
-if [ -d $d ] ; then
-        find $1 -type f -exec md5.file.sh {} \;
+scripts=$scripts
+if [ -d "$1" ] ; then
+        find "$1" -type f -exec $scripts/utils/md5.file.sh {} \;
 fi

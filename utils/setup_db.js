@@ -35,20 +35,22 @@ for (var i = 0; i < buckets.length; i++) {
     var shardThis = db.getName() + "." + collChunks;
     admin.runCommand({ shardcollection:shardThis, key:{ files_id:1 }, unique:false});
 
-    // Pre splitting the chunks over the shard. For each shard we have a key range: shards=[n]; keys=[n-1].
-    for (var shard in shards) {
-        if (shards.hasOwnProperty(shard)) {
-            print("split collection " + shardThis + " with shardkey " + shard.minKey);
+    // Pre splitting the chunks over the shard.
+    for (var shardId in shards) {
+        if (shards.hasOwnProperty(shardId)) {
+            var shard = shards[shardId];
+            print('split collection ' + shardThis + ' with shardkey  + shard.minKey');
             admin.runCommand({ split:shardThis, middle:{ files_id:shard.minKey} });
         }
     }
 
-    for (shard in shards) {
-        if (shards.hasOwnProperty(shard)) {
-            print("moveChunk from collection " + shardThis + " with shardkey " + shard.minKey + " to shard " + shard);
-            admin.runCommand({ moveChunk:shardThis, find:{ files_id:shard.minKey }, to:shard })
+    for (shardId in shards) {
+        if (shards.hasOwnProperty(shardId)) {
+            shard = shards[shardId];
+            print('moveChunk from collection ' + shardThis + ' with shardkey ' + shard.minKey + ' to shard ' + shardId);
+            db.runCommand({ moveChunk:shardThis, find:{ files_id:shard.minKey }, to:shardId});
         }
     }
 }
 
-print('Use db.printShardingStatus() to see the shard status');
+print('Use db.printShardingStatus() to see the shard status.');

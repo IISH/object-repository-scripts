@@ -17,5 +17,12 @@ set targetContentType=audio/mp3
 set derivative=audio
 set format=mp3
 
+Rem ToDo: use audio/mp4
+Rem Preset 211 = Audio Only: MP4 Good Quality
+Rem set preset=211
+Rem set targetContentType=audio/mp4
+Rem set derivative=audio
+Rem set format=m4a
+
 call %scripts%\shared\av.derivative.bat
 exit %errorlevel%

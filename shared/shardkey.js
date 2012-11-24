@@ -21,7 +21,7 @@ function getShardCandidate() {
     if (doc && doc.value && doc.value.s) {
         return doc.value.s;
     } else {
-        var stats = db.getCollection(bucket + '.chunks').stats();
+        var stats = (db.getName() == 'test') ? {shards:{}} : db.getCollection(bucket + '.chunks').stats();
 
         var limit = Object.keySet(shards).length / slice;
         var list = [];
@@ -82,7 +82,9 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     var repl = removeDb.serverStatus().repl;
     assert(repl, 'Host is not a replicaset: ' + shard);
     if (repl.ismaster && !repl.secondary) {
-        shardkey = shard.minKey + Math.round(Math.random() * interval);
+        do {
+            shardkey = shard.minKey + Math.round(Math.random() * interval);
+        } while (db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:shardkey}));
         break;
     }
 }
