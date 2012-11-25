@@ -6,15 +6,16 @@ assert(db.getName() != 'test', "The database is the test database. Startup speci
 assert(bucket, "Need a bucket");
 assert(new_id, "Need an new_id");
 assert(!isNaN(new_id), "new_id must be a number");
+assert(new_id != 0, "new_id must not be zero.");
 assert(old_id, "Need a old_id");
-assert(isNaN(old_id), "old_id must be a string");
 assert(pid, "Need a pid");
 
 var files = db.getCollection(bucket + ".files");
 var master = files.findOne({'metadata.pid':pid});
-assert(master, 'The document is not found!');
 
-if (master._id == old_id) {
+if (master == null) {
+    print('The document is not found. It may have been removed.');
+} else if (master._id == old_id) {
     assert(files.findOne({_id:new_id}) == null, "The new_id is already taken.");
     changeKeys(master);
     print('Done');

@@ -12,7 +12,7 @@ assert(shards, 'Must have a list of shard min keys defined: var shards="shards"'
 
 var slice = 1.5; // List cannot contain any more than [total shard number] / [slice]
 var total = 10; // Total number of candidate keys per shard for this bucket. Number of keys produced will be [total shard number] / [slice] * total
-var interval = 1431655765; // interval of a shard.
+var interval = 1431655765; // interval of a shard. The keys of a shard have range: [shard.minKey, shard.minKey+interval]
 var shardkey = 0;
 
 function getShardCandidate() {
@@ -84,7 +84,7 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     if (repl.ismaster && !repl.secondary) {
         do {
             shardkey = shard.minKey + Math.round(Math.random() * interval);
-        } while (db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:shardkey}));
+        } while (shardkey == 0 || db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:shardkey}));
         break;
     }
 }
