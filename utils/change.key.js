@@ -55,7 +55,11 @@ function changeKeys(master) {
     }
 
     assert(writeOk(db), "Error after batch files_id update");
+
+    // In some cases the documents are still being processed... hence we retry after 60 seconds.
     var countNewChunks = chunks.count({files_id:new_id});
+    if (countNewChunks != nc) sleep(60000);
+    countNewChunks = chunks.count({files_id:new_id});
     assert(countNewChunks == nc, "Chunk count not correct. Was " + countNewChunks + " but expect " + nc + " " +
         "The operation should be undone by removing all files_id:" + new_id + " from " + chunks.getName());
 
