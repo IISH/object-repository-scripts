@@ -27,6 +27,11 @@ if (master == null) {
 }
 
 function changeKeys(master) {
+
+    // Reserve the key
+    files.save({_id:new_id});
+    assert(writeOk(db), "Key could not be saved.");
+
     var chunks = db.getCollection(bucket + ".chunks");
     var nc = Math.ceil(master.length / master.chunkSize);
     print("Copy and save " + nc + " chunks: " + old_id + " to " + new_id);
