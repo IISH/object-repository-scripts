@@ -10,6 +10,7 @@ assert(new_id != 0, "new_id must not be zero.");
 assert(old_id, "Need a old_id");
 assert(pid, "Need a pid");
 
+var start = new Date();
 var files = db.getCollection(bucket + ".files");
 var master = files.findOne({'metadata.pid':pid});
 
@@ -18,7 +19,8 @@ if (master == null) {
 } else if (master._id == old_id) {
     assert(files.findOne({_id:new_id}) == null, "The new_id is already taken.");
     changeKeys(master);
-    print('Done');
+    var end = new Date();
+    print('Done in ' + (end.getTime() - start.getTime()) / 1000 + ' seconds.');
 } else {
     assert(!isNaN(master._id), "The _id found is not a number.");
     print("The document is already converted and has _id: " + master._id);
@@ -46,8 +48,8 @@ function changeKeys(master) {
         printjson(db.getPrevError());
         throw "The operation should be undone by removing all files_id:" + new_id + " from " + chunks.getName();
     }
-    assert(moved == 0, "Warn: there were no chunks found to be moved.");
 
+    assert(writeOk(db), "Error after batch files_id update");
     var countNewChunks = chunks.count({files_id:new_id});
     assert(countNewChunks == nc, "Chunk count not correct. Was " + countNewChunks + " but expect " + nc + " " +
         "The operation should be undone by removing all files_id:" + new_id + " from " + chunks.getName());
