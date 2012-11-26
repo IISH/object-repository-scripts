@@ -11,11 +11,11 @@ set bucket=level1
 call %scripts%\shared\delete.bat
 call %scripts%\shared\hasdocument.bat
 
-Rem Preset 211 = Audio Only: AAC Good Quality
-set preset=211
-set targetContentType=audio/mp4
+Rem Preset 120 = Audio Only: MP3 High Quality
+set preset=120
+set targetContentType=audio/mp3
 set derivative=audio
-set format=m4a
+set format=mp3
 
 call %scripts%\shared\av.derivative.bat
 exit %errorlevel%
