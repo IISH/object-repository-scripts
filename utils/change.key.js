@@ -29,27 +29,28 @@ function changeKeys(master) {
     var nc = Math.ceil(master.length / master.chunkSize);
     print("Copy and save " + nc + " chunks: " + old_id + " to " + new_id);
     var moved = 0;
+
+    db.resetError();
     for (var n = 0; n < nc; n++) {
         var file = chunks.findOne({files_id:old_id, n:n});
         if (file) {
             delete file._id;
             file.files_id = new_id;
             chunks.save(file);
-            if (!writeOk(db)) {
-                if (db.getLastError().startsWith('E11000')) { // We can ignore a duplicate key in case we like to repeat the insert.
-                    print('Ignoring duplicate key error E11000... skipping copy');
-                } else {
-                    throw "Stopping because of the last error when invoking: chunks.save(file)";
-                }
-            }
             moved++;
         }
     }
 
-    if (moved == 0) print("Warn: there were no chunks found to be moved.");
+    if (db.getPrevError().err) {
+        print("Error with chunks.save(file);");
+        printjson(db.getPrevError());
+        throw "The operation should be undone by removing all files_id:" + new_id + " from " + chunks.getName();
+    }
+    assert(moved == 0, "Warn: there were no chunks found to be moved.");
 
     var countNewChunks = chunks.count({files_id:new_id});
-    assert(countNewChunks == nc, "Chunk count not correct. Was " + countNewChunks + " but expect: " + nc);
+    assert(countNewChunks == nc, "Chunk count not correct. Was " + countNewChunks + " but expect " + nc + " " +
+        "The operation should be undone by removing all files_id:" + new_id + " from " + chunks.getName());
 
     // As we confirmed each chunk insert, we remove the old ones.
     chunks.remove({files_id:old_id});
@@ -64,13 +65,13 @@ function changeKeys(master) {
 }
 
 function writeOk(db) {
-    var lastError = db.getLastError("majority"); // waits for more than 50% of the members to acknowledge the write (until replication is applied to the point of that write).
-    if (lastError) {
+    var lastError = db.runCommand({getlasterror:1, j:true}); // waits for the journal to flush.
+    if (lastError && lastError.value) {
         print("Error: ");
         print("old_id:" + old_id);
         print("new_id:" + new_id);
         print("pid:" + pid);
-        printjson(lastError);
+        printjson(lastError.value);
         return false;
     }
     return true;
