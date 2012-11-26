@@ -2,7 +2,7 @@ Rem /shared/video.derivative.bat
 Rem
 Rem Retrieve the source file and make a derivative
 set tmp=%derivative_cache%
-set targetFile=%tmp%\%md5%.%targetBucket%.%format%
+set targetFile=%tmp%\%md5%.%bucket%.%format%
 
     call %scripts%\shared\set.bat extension php -r "print(explode('/', '%contentType%')[1]);"
     set l=%tmp%\%md5%.%sourceBucket%.%extension%
@@ -10,7 +10,7 @@ set targetFile=%tmp%\%md5%.%targetBucket%.%format%
     call %scripts%\shared\get.bat
 
 if NOT EXIST "%l%" (
-    echo Could not find a master or higher level derivative to produce a %targetBucket% file.
+    echo Could not find a master or higher level derivative to produce a %bucket% file.
     echo We need at least master to produce a derivative.
     EXIT 240
 )
@@ -48,5 +48,4 @@ set l=%targetFile%
 call %scripts%\shared\set.bat md5 java -cp %orfiles% org.objectrepository.util.Checksum "%l%" --arg
 echo %md5% %targetFile% > %targetFile%.md5
 call %scripts%\shared\set.bat length php -r "print(filesize('%l%'));"
-set bucket=%targetBucket%
 call %scripts%\shared\put.bat

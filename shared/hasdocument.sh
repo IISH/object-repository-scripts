@@ -1,11 +1,11 @@
 #!/bin/bash
 
 db=$db
-targetBucket=$targetBucket
+bucket=$bucket
 pid=$pid
 scripts=$scripts
-hasdocument=$(mongo $db --quiet --eval "var bucket='$targetBucket';var pid='$pid'" $scripts/shared/hasdocument.js)
+hasdocument=$(mongo $db --quiet --eval "var bucket='$bucket';var pid='$pid'" $scripts/shared/hasdocument.js)
 if [ "$hasdocument" == "true" ] ; then
-    echo "The file in $targetBucket with $pid exists. Hence we stop processing here."
+    echo "The file in $bucket with $pid exists. Hence we stop processing here."
     exit 245
 fi

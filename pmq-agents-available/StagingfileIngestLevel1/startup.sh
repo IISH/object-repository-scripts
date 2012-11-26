@@ -8,7 +8,7 @@ scripts=$scripts
 source $scripts/shared/parameters.sh
 
 sourceBuckets="master"
-targetBucket="level1"
+bucket="level1"
 
 source $scripts/shared/delete.sh
 source $scripts/shared/hasdocument.sh

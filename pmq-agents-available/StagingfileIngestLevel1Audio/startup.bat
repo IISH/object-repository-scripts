@@ -6,16 +6,16 @@ set scripts=%scripts%
 call %scripts%\shared\parameters.bat %*
 
 set sourceBucket=master
-set targetBucket=level1
+set bucket=level1
 
 call %scripts%\shared\delete.bat
 call %scripts%\shared\hasdocument.bat
 
 Rem Preset 211 = Audio Only: AAC Good Quality
-Rem set preset=211
-Rem set targetContentType=audio/mp4
-Rem set derivative=audio
-Rem set format=m4a
+set preset=211
+set targetContentType=audio/mp4
+set derivative=audio
+set format=m4a
 
 call %scripts%\shared\av.derivative.bat
 exit %errorlevel%

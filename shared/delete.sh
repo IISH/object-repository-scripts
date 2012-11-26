@@ -9,10 +9,6 @@ if [ "$action" == "delete" ] ; then
     db=$db
     pid=$pid
     bucket=$bucket
-    if [ -z "$bucket" ] ; then
-        targetBucket=$targetBucket
-        bucket=$targetBucket
-    fi
 
     files_id=$(mongo $db --quiet --eval "var doc=db.$bucket.files.findOne({'metadata.pid':'$pid'}, {_id:1});if ( doc ){print(doc._id)}")
     if [ -z "$files_id" ] ; then

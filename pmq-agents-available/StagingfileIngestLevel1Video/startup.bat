@@ -6,7 +6,7 @@ set scripts=%scripts%
 call %scripts%\shared\parameters.bat %*
 
 set sourceBucket=master
-set targetBucket=level1
+set bucket=level1
 
 call %scripts%\shared\delete.bat
 call %scripts%\shared\hasdocument.bat

@@ -9,9 +9,9 @@ db=$db
 pid=$pid
 md5=$md5
 sourceBuckets=$sourceBuckets
-targetBucket=$targetBucket
+bucket=$bucket
 tmp=$derivative_cache
-targetFile=$tmp/$md5.$targetBucket
+targetFile=$tmp/$md5.$bucket
 
 for sourceBucket in ${sourceBuckets[*]}
 do
@@ -37,9 +37,9 @@ done
 # Run the convert script to create derivative.
 if [ -f "$sourceFile" ]; then
 	echo "Creating derivative from $sourceFile"
-	php $scripts/shared/image.derivative.php -i $sourceFile -l $targetBucket -b $sourceBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile
+	php $scripts/shared/image.derivative.php -i $sourceFile -l $bucket -b $sourceBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile
 else
-	echo "Could not find a master or higher level derivative to produce a $targetBucket file"
+	echo "Could not find a master or higher level derivative to produce a $bucket file"
 	echo "We need at least a master to produce a derivative."
 	exit 240
 fi
@@ -54,7 +54,6 @@ fi
 targetFile="$targetFile.jpg"
 if [ -f "$targetFile" ]; then
 	contentType="image/jpeg"
-	bucket=$targetBucket
 	l=$targetFile
 	md5=$(md5sum $targetFile | cut -d ' ' -f 1)
 	echo "$md5  $targetFile" > "$targetFile.md5"

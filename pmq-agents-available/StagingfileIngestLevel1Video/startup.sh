@@ -9,7 +9,7 @@ source $scripts/shared/primary.sh
 source $scripts/shared/parameters.sh
 
 sourceBuckets="master"
-targetBucket="level1"
+bucket="level1"
 derivative=$derivative
 
 source $scripts/shared/hasdocument.sh
