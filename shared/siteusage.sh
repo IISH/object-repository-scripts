@@ -6,7 +6,6 @@
 #
 
 scripts=$scripts
-source $scripts/shared/parameters.sh
 db=$db
 
 

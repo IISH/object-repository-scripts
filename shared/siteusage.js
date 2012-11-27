@@ -60,8 +60,8 @@ function map() {
 
     function firstWeekday(date) {
 
-        var day = date.getDay(),
-            day = (day === 0) ? 7 : day;
+        var day = date.getDay();
+        day = (day === 0) ? 7 : day;
 
         if (day > 3) {
 
@@ -102,14 +102,13 @@ function map() {
     emit(new ISODate(key), value);
 }
 
-function reduce(key, values) {
-
+function reduce(k, values) {
+    k = null;
     var reducto = {};
     values.forEach(function (value) {
         for (var key in value) {
-            reducto[key] = (reducto[key] === undefined) ? value[key] : reducto[key] + value[key];
+            if (value.hasOwnProperty(key)) reducto[key] = (reducto[key] === undefined) ? value[key] : reducto[key] + value[key];
         }
-        ;
     });
     return reducto;
 }
@@ -117,5 +116,6 @@ function reduce(key, values) {
 ['year', 'month', 'week', 'day'].forEach(function (unit) {
     var collection = unit + ".siteusage.statistics";
     print("Collection: " + collection);
-    db.siteusage.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit} });
-})
+    db.siteusage.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit},
+        query:{downloadDate:{$exists:true}} });
+});
