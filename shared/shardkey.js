@@ -315,7 +315,7 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     if (repl.ismaster && !repl.secondary) {
         do {
             shardkey = shard.minKey + Math.round(Math.random() * interval);
-        } while (shardkey == 0 || db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:shardkey}));
+        } while (shardkey == 0 || db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:1}));
         break;
     }
 }
