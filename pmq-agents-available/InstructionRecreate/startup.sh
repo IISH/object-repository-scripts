@@ -7,8 +7,18 @@
 scripts=$scripts
 source $scripts/shared/parameters.sh
 db=$db
+na=$na
 fileSet=$fileSet
 
 mongo $db --quiet --eval "var fileSet='$fileSet'" $scripts/pmq-agents-available/InstructionRecreate/recreate.js
 
-exit $?
+rc=$?
+if [[ $rc != 0 ]] ; then
+    exit $rc
+fi
+
+if [ ! -d $fileSet ] ; then
+    mkdir -p $fileSet
+    chown $na:$na $fileSet
+    chmod 775 $fileSet
+fi
