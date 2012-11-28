@@ -20,6 +20,10 @@ db.master.files.find({'metadata.fileSet':fileSet}, {'metadata.content':0}).forEa
         pid:d.pid,
         fileSet:fileSet
     };
+
+    if ( instruction.access == document.access ) delete document.access;
+    if ( instruction.contentType == document.contentType ) delete document.contentType;
     if (d.lid) document.lid = d.lid;
+
     sa.stagingfile.save(document);
 });

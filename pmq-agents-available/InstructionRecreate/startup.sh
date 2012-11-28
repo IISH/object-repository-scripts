@@ -9,6 +9,6 @@ source $scripts/shared/parameters.sh
 db=$db
 fileSet=$fileSet
 
-mongo $db --quiet --eval "var fileSet='$fileSet'"
+mongo $db --quiet --eval "var fileSet='$fileSet'" $scripts/pmq-agents-available/InstructionRecreate/recreate.js
 
 exit $?
