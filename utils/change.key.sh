@@ -3,7 +3,7 @@ shards=$shards
 db=or_10622
 bucket=master
 _id=$1
-pid=$3
+pid=$2
 
 new_id=$(mongo $db --quiet --eval "var bucket='$bucket'; var shards=$shards" $scripts/shared/shardkey.js)
 if [[ $new_id == 0 ]] ; then
