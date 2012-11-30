@@ -42,8 +42,10 @@ fi
 if [ "$derivative" == "video" ] ; then
     content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
-if [ ! -z "$content" ] ; then
+if [[ ${content:0:1} == "{" ]]; then
     content=$(php $scripts/shared/utf8_encode.php -i "$content")
+else
+    content=""
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shards=$shards
