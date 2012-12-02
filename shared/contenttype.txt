@@ -593,9 +593,9 @@
 .mpeg,video/mpeg
 .mpg,video/mpeg
 .avi,video/msvideo
-.moov,video/quicktime
 .mov,video/quicktime
 .qt,video/quicktime
+.moov,video/quicktime
 .vdo,video/vdo
 .viv,video/vivo
 .vivo,video/vivo

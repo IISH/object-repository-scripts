@@ -80,6 +80,7 @@ if [ ! -f $l ] ; then
 fi
 
 md5=$(md5sum $l | cut -d ' ' -f 1)
+length=$(stat -c%s "$l")
 echo "$md5  $l" > "$l.md5"
 remove="yes"
 source $scripts/shared/put.sh
