@@ -10,9 +10,8 @@
 assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
 assert(shards, 'Must have a list of shard min keys defined: var shards="shards"');
 
-var slice = 1.5; // List cannot contain any more than [total shard number] / [slice]
+var slice = 1.5; // List cannot contain any more than a round [total shard number] / [slice]
 var interval = 1431655765; // interval of a shard. The keys of a shard have range: [shard.minKey, shard.minKey+interval]
-var shardkey = 0;
 var total = 10; // Total number of candidate keys per shard for this bucket. Number of keys produced will be [total shard number] / [slice] * total
 
 // Math.random seed taken from seedrandom.js version 2.0.
@@ -245,6 +244,18 @@ var total = 10; // Total number of candidate keys per shard for this bucket. Num
     52    // significance: there are 52 significant digits in a double
 );
 
+/**
+ * getShardCandidate
+ *
+ * Returns the next shard from the candidate collection.
+ * If we are out of candidates, the collection will be refilled using the stats command.
+ *
+ * The stats command may take a second or minutes, depending on the state of the nodes. This will inevitably
+ * lead to other clients calling this method that invoke this script. To prevent this the shards in the shards list
+ * are added to the candidate collection.
+ *
+ * @return {*}
+ */
 function getShardCandidate() {
 
     Math.seedrandom(ObjectId().valueOf());
@@ -253,13 +264,18 @@ function getShardCandidate() {
     if (doc && doc.value && doc.value.s) {
         return doc.value.s;
     } else {
-        var stats = (db.getName() == 'test') ? {shards:{}} : db.getCollection(bucket + '.chunks').stats();
+        for (var shardId in shards) {
+            if (shards.hasOwnProperty(shardId)) {
+                db.candidate.save({s:shardId, b:bucket});
+            }
+        }
 
+        var stats = (db.getName() == 'test') ? {shards:{}} : db.getCollection(bucket + '.chunks').stats();
         var limit = Object.keySet(shards).length / slice;
         var list = [];
         var l = {};
         for (var c = 0; c < total; c++) {
-            for (var shardId in shards) {
+            for (shardId in shards) {
                 if (shards.hasOwnProperty(shardId)) {
                     var shard = stats.shards[shardId];
                     var size = (shard) ? Math.round(Math.sqrt(shard.size)) : 0;
@@ -301,16 +317,16 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     var shard = shards[candidate];
     assert(shard, 'ShardId not found: ' + candidate.s);
 
-    var removeDb = null;// Verify the shard candidate belongs to an active primary... otherwise choose another.
+    var host = null;// Verify the shard candidate belongs to an active primary... otherwise choose another.
     try {
-        removeDb = (db.getName() == 'test') ? {serverStatus:function () {
+        host = (db.getName() == 'test') ? {serverStatus:function () {
             return {repl:{ismaster:true, secondary:false}}
         }} : connect(shard.p + '/test');
     } catch (e) {
         continue;
     }
 
-    var repl = removeDb.serverStatus().repl;
+    var repl = host.serverStatus().repl;
     assert(repl, 'Host is not a replicaset: ' + shard);
     if (repl.ismaster && !repl.secondary) {
         do {
