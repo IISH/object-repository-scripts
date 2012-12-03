@@ -10,25 +10,19 @@
  * No matches results in returning the last item in the content list
  */
 
-// l = file with extension and t = file that contains extensions and content types
-$options = getopt("l:t:");
-$l = $options['l'];
+// c = contentType and t = file that contains extensions and content types
+$options = getopt("c:t:");
+$c = $options['c'];
 $t = $options['t'];
-$contentType = "application/octet-stream";
 
-$extension = "." . pathinfo($l, PATHINFO_EXTENSION);
-if ($extension == ".") {
-    print($contentType);
-    exit(0);
-}
-
+$contentType="bin";
 $file = fopen($t, "r") or exit("Unable to open file $t!");
 while (!feof($file)) {
     $line = trim(fgets($file));
     if ($line[0] == "#") continue;
     $split = preg_split("/[\\s,]+/", $line, 2);
-    if ($split[0] == strtolower($extension)) {
-        $contentType = trim($split[1]);
+    if ($split[1] == strtolower($c)) {
+        $contentType = trim($split[0]);
         break;
     }
 }

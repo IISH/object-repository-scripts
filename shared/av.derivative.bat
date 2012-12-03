@@ -4,8 +4,8 @@ Rem Retrieve the source file and make a derivative
 set tmp=%derivative_cache%
 set targetFile=%tmp%\%md5%.%bucket%.%format%
 
-    call %scripts%\shared\set.bat extension php -r "print(explode('/', '%contentType%')[1]);"
-    set l=%tmp%\%md5%.%sourceBucket%.%extension%
+    call %scripts%\shared\set.bat extension php %scripts%\shared\contenttype2extension.php -t %scripts%\shared\contenttype.txt -c %contentType%
+    set l=%tmp%\%md5%.%sourceBucket%%extension%
     if EXIST "%l%" del %l%
     call %scripts%\shared\get.bat
 
