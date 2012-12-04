@@ -27,5 +27,3 @@ do
     mongo $db --eval "$u"
 
 done
-
-mongo $db --eval "var pid=null;" $scripts/shared/siteusage.js

@@ -103,7 +103,6 @@ function map() {
 }
 
 function reduce(k, values) {
-    k = null;
     var reducto = {};
     values.forEach(function (value) {
         for (var key in value) {
