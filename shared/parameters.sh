@@ -95,7 +95,8 @@ action=$action
 id=$id
 resolverBaseUrl=$resolverBaseUrl
 identifier=$identifier
-instruction="{instruction:{workflow:{workflow:{name:'$name',statusCode:$statusCode, identifier:'$identifier'}},'fileSet':'$fileSet', \
-    autoGeneratePIDs:'$autoGeneratePIDs',resolverBaseUrl:'$resolverBaseUrl',na:'$na',contentType:'$contentType', \
-    access:'$access',action:'$action',id:'$id'}}"
+plan=$plan
+instruction="{instruction:{workflow:{workflow:{name:'$name',statusCode:$statusCode, identifier:'$identifier'}}, \
+    fileSet:'$fileSet', autoGeneratePIDs:'$autoGeneratePIDs', resolverBaseUrl:'$resolverBaseUrl', na:'$na', \
+    contentType:'$contentType', access:'$access', action:'$action', id:'$id', plan:'$plan'}}"
 
