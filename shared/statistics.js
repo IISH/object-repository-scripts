@@ -61,21 +61,18 @@ function map() {
 
     function firstWeekday(date) {
 
-        var day = date.getDay(),
-            day = (day === 0) ? 7 : day;
+        var day = date.getDay();
+        day = (day === 0) ? 7 : day;
 
         if (day > 3) {
-
-            var remaining = 8 - day,
-                target = remaining + 1;
-
-            date.setDate(target);
+            var remaining = 8 - day;
+            date.setDate(remaining + 1);
         }
 
         return date;
     }
 
-    if (this.uploadDate && this.metadata) {
+    if (this.uploadDate && this.metadata && this.metadata.access) {
         var d = ISODateString(this.uploadDate);
         var key = null;
         switch (unit) {  // unit is a scope variable
@@ -108,13 +105,12 @@ function map() {
 }
 
 function reduce(key, values) {
-
     var reducto = {};
     values.forEach(function (value) {
-        for (var key in value) {
-            reducto[key] = (reducto[key] === undefined) ? value[key] : reducto[key] + value[key];
+        for (var k in value) {
+            if (value.hasOwnProperty(k))
+                reducto[k] = (reducto[k] === undefined) ? value[k] : reducto[k] + value[k];
         }
-        ;
     });
     return reducto;
 }
@@ -132,4 +128,4 @@ function reduce(key, values) {
         db.level2.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
         db.level3.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
     }
-})
+});
