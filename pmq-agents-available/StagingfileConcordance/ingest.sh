@@ -10,13 +10,8 @@
 # We move the mets into a separate folder
 #
 scripts=$scripts
-validation=$validation
-metsmaker=$metsmaker
-ftpUser=$ftpUser
-ftpPassword=$ftpPassword
 source $scripts/shared/parameters.sh
 fileSet=$fileSet
-na=$na
 prefix=$(basename $fileSet)
 log=$fileSet/$prefix.log.txt
 echo $(date)>$log

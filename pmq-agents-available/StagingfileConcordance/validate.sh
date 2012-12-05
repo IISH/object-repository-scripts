@@ -24,6 +24,7 @@ na=$na
 
 echo "Validation for $prefix\nStarted on $(date)\n\n" > $report
 java -Xms512m -Xmx512m -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet ${fileSet%/*} -prefix $prefix -na $na >> $report
+mv $fileSet/concordanceValidWithPID.csv $fileSet/$prefix.concordanceValidWithPID.csv
 
 echo $(date)>>$log
 echo "Done validate.">>$log
