@@ -2,18 +2,14 @@
 #
 # StagingFileIngestConcordance/ingest.sh
 #
-# Produce validation
 # Add Instruction
 # Prepare a mets document
-#
-# We offer the files in the current folder
-# We move the mets into a separate folder
 #
 scripts=$scripts
 source $scripts/shared/parameters.sh
 fileSet=$fileSet
 prefix=$(basename $fileSet)
-log=$fileSet/$prefix.log.txt
+log=$fileSet/$prefix.log
 echo $(date)>$log
 echo "Start preparing ingest...">>$log
 

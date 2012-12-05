@@ -51,7 +51,7 @@ if ($index_master == -1) exit("$masterKey not present in header\n");
 
 print("header: ");
 foreach ($header as $key) {
-        echo " - " . $key ;
+    echo " - " . $key;
 }
 print("\npid key: $pidKey at index $index_pid");
 print("\nmaster key: $masterKey at index $index_master\n");
@@ -64,18 +64,36 @@ while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $file = $basename . $location;
     $md5 = md5_file($file);
     $md5file = $file . '.md5';
-    $md5handle=fopen($md5file, 'w') or die("Cannot open file $md5file\n");
+    $md5handle = fopen($md5file, 'w') or die("Cannot open file $md5file\n");
     fwrite($md5handle, $md5 . '  ' . $file);
     fclose($md5handle);
+
+    // Any alternative contentType or Access ?
+    $access = getCustom(pathinfo($file, PATHINFO_DIRNAME) . '/.access.txt');
+    $contentType = getCustom(pathinfo($file, PATHINFO_DIRNAME) . '/.contentType.txt');
+
     print("Add stagingfile " . $file . " - " . $md5 . " - " . $pid . "\n");
     fwrite($fh, "    <stagingfile>\n");
     fwrite($fh, "        <pid>" . $pid . "</pid>\n");
     fwrite($fh, "        <location>" . $location . "</location>\n");
     fwrite($fh, "        <md5>" . $md5 . "</md5>\n");
+    if ($access) fwrite($fh, "        <access>" . $access . "</access>\n");
+    if ($contentType) fwrite($fh, "        <contentType>" . $access . "</contentType>\n");
     fwrite($fh, "    </stagingfile>\n");
 }
 
 fwrite($fh, '</instruction>');
 fclose($fh);
+
+function getCustom($override)
+{
+    $text = null;
+    if (file_exists($override)) {
+        $handle = fopen($override, 'r') or die("Cannot open file $override\n");
+        $text = fread($handle, filesize($override));
+        fclose($handle);
+    }
+    return $text;
+}
 
 ?>

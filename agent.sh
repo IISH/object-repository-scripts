@@ -26,7 +26,8 @@ if [ "$scope" = "$HOSTNAME" ] || [ "$scope" = "all" ] ; then
         $CMD > $log 2>&1 &
     else
         brokerURL=$brokerURL:8161
-        wget --post-data "body=$1 $scope" $brokerURL/demo/message/Connection?type=topic
+        wget -O tmp.txt --post-data "body=$1 $scope" $brokerURL/demo/message/Connection?type=topic
+        rm tmp.txt
     fi
 else
     echo "Invalid command: $scope"

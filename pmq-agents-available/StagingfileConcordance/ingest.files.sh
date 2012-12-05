@@ -4,34 +4,39 @@
 #
 # Produce validation
 # Add Instruction
-# Prepare a mets document
-#
-# We offer the files in the current folder
-# We move the mets into a separate folder
 #
 scripts=$scripts
 validation=$validation
 metsmaker=$metsmaker
-ftpUser=$ftpUser
-ftpPassword=$ftpPassword
+lftpUser=$lftpUser
+lftpPassword=$lftpPassword
 fileSet=$fileSet
 na=$na
 prefix=$prefix
 log=$log
 cf=$cf
+ftpScript=$fileSet/$prefix.lftp
 
 echo "Upload files...">>$log
-    lftp -f /opt/lftp.txt $ftpUser $ftpPassword $fileSet $prefix.files
+    cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
+    echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
+    echo "mirror --reverse --continue --verbose --exclude-glob $prefix.* $fileSet $prefix.files">>$ftpScript
+    echo "quit">>$ftpScript
+    lftp -f $ftpScript>>$log
 
 echo "Create instruction for our files">>$log
-    php csv.php -f $cf -p PID -m master -access restricted -contentType image\tiff
+    php csv.php -f $cf -p PID -m master -access restricted -contentType image\tiff>>$log
     if [ ! -f $fileSet/instruction.xml ] ; then
         echo "Instruction not found.">>$log
         exit -1
     fi
 
 echo "Upload remaining instruction...">>$log
-    lftp -f /opt/lftp.txt $ftpUser $ftpPassword $fileSet $prefix.files
+    cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
+    echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
+    echo "put -c -O $prefix.files $fileSet/instruction.xml">>$ftpScript
+    echo "quit">>$ftpScript
+    lftp -f $ftpScript>>$log
 
 echo $(date)>>$log
 echo "Done files update.">>$log

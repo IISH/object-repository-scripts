@@ -6,23 +6,21 @@
 # Add Instruction
 # Prepare a mets document
 #
-# We offer the files in the current folder
-# We move the mets into a separate folder
-#
 scripts=$scripts
 validation=$validation
 metsmaker=$metsmaker
-ftpUser=$ftpUser
-ftpPassword=$ftpPassword
-fileSet=$fileSet.mets
+lftpUser=$lftpUser
+lftpPassword=$lftpPassword
+fileSet=$fileSet
 na=$na
 prefix=$prefix
 log=$log
 cf=$cf
+ftpScript=$fileSet/$prefix.lftp
 
 echo "Create METS">>$log
     mkdir -p $fileSet
-    java -cp $metsmaker org.iisg.visualmets.metsmaker.MetsMakerConsole -inputFile $cf -outputFolder $fileSet -proxy "http://hdl.handle.net/" -pidColumn PID -na $na
+    java -cp $metsmaker org.iisg.visualmets.metsmaker.MetsMakerConsole -inputFile $cf -outputFolder $fileSet -proxy "http://hdl.handle.net/" -pidColumn PID -na $na>>$log
     mets=$fileSet/$prefix.mets.csv
     echo "master,PID">$mets
     for file in $fileSet/*.xml
@@ -33,7 +31,11 @@ echo "Create METS">>$log
     done
 
 echo "Upload mets documents...">>$log
-    lftp -f /opt/lftp.txt $ftpUser $ftpPassword $fileSet $prefix.mets
+    cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
+    echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
+    echo "mirror --reverse --continue --verbose --exclude-glob $prefix.* $fileSet $prefix.mets">>$ftpScript
+    echo "quit">>$ftpScript
+    lftp -f $ftpScript>>$log
 
 echo "Create instruction for METS">>$log
     php $scripts/pmq-agents-available/StagingfileConcordance/csv.php -f $mets -p PID -m master -access metadata -contentType text\xml
@@ -43,4 +45,8 @@ echo "Create instruction for METS">>$log
     fi
 
 echo "Upload remaining instruction...">>$log
-    lftp -f /opt/lftp.txt $ftpUser $ftpPassword $fileSet $prefix.mets
+    cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
+    echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
+    echo "put -c -O $prefix.files $fileSet/instruction.xml">>$ftpScript
+    echo "quit">>$ftpScript
+    lftp -f $ftpScript>>$log
