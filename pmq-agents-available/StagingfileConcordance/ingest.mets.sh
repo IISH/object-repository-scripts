@@ -17,25 +17,25 @@ prefix=$prefix
 log=$log
 cf=$cf
 ftpScript=$fileSet/$prefix.lftp
+fileSetMets=$fileSet.mets
 
 echo "Create METS">>$log
-    mkdir -p $fileSet
     java -cp $metsmaker org.iisg.visualmets.metsmaker.MetsMakerConsole -inputFile $cf -outputFolder $fileSet -proxy "http://hdl.handle.net/" -pidColumn PID -na $na>>$log
     mets=$fileSet/$prefix.mets.csv
     echo "master,PID">$mets
     for file in $fileSet/*.xml
     do
-        filename=$(basename "$file")
-        pid=$na/${filename%.*}
-        echo "/$prefix/$filename,$pid">>$mets
+        if [ -f $file ] ; then
+            filename=$(basename "$file")
+            pid=$na/${filename%.*}
+            echo "/$prefix.mets/$filename,$pid">>$mets
+        fi
     done
 
-echo "Upload mets documents...">>$log
-    cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
-    echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
-    echo "mirror --reverse --continue --verbose --exclude-glob $prefix.* $fileSet $prefix.mets">>$ftpScript
-    echo "quit">>$ftpScript
-    lftp -f $ftpScript>>$log
+echo "Move mets files to $fileSet.mets"
+    mkdir -p $fileSetMets
+    rm $fileSetMets/*
+    mv $fileSet/$prefix.*.xml $fileSetMets/
 
 echo "Create instruction for METS">>$log
     php $scripts/pmq-agents-available/StagingfileConcordance/csv.php -f $mets -p PID -m master -access metadata -contentType text\xml
@@ -43,10 +43,29 @@ echo "Create instruction for METS">>$log
         echo "Instruction not found.">>$log
         exit -1
     fi
+    mv $fileSet/instruction.xml $fileSetMets/
+
+echo "Upload mets documents...">>$log
+    cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
+    echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
+    echo "mirror --reverse --continue --verbose --exclude-glob instruction.xml $fileSetMets $prefix.mets">>$ftpScript
+    echo "quit">>$ftpScript
+    to=10
+    for i in {1..$to}
+    do
+        echo "Ftp files... attempt $i of $to">>$log
+        lftp -f $ftpScript>>$log
+        rc=$?
+        if [[ $rc == 0 ]] ; then
+            break
+        fi
+    done
+    rm $ftpScript
+
 
 echo "Upload remaining instruction...">>$log
     cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
     echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
-    echo "put -c -O $prefix.files $fileSet/instruction.xml">>$ftpScript
+    echo "put -c -O $prefix.mets $fileSetMets/instruction.xml">>$ftpScript
     echo "quit">>$ftpScript
     lftp -f $ftpScript>>$log

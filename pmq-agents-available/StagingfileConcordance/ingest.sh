@@ -19,6 +19,3 @@ if [ ! -f $cf ] ; then
     echo "Is the dataset validated ?">>$log
     exit -1
 fi
-
-source $scripts/pmq-agents-available/StagingfileConcordance/ingest.files.sh
-source $scripts/pmq-agents-available/StagingfileConcordance/ingest.mets.sh

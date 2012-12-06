@@ -11,9 +11,9 @@ db=$db
 
 # Prepare a list of all records without geo code
 # returns _id and IP
-for i in {0..10000} # Do not overdo it... 10000 views
+for i in {0..1000} # Do not overdo it... 1000 views
 do
-    ip=$(mongo $db --quiet --eval "var doc=db.siteusage.findOne( {c:{\$exists:false}} ); if ( doc ) { print(doc.ip) } else {print('')}")
+    ip=$(mongo localhost:27018/$db --quiet --eval "var doc=db.siteusage.findOne( {c:{\$exists:false}} ); if ( doc ) { print(doc.ip) } else {print('')}")
     if [ "$ip" == "" ] ; then
         break
     fi
@@ -24,6 +24,6 @@ do
     # Cut to "GeoIP Country Edition: NL". A value of 'IP' would mean unknown.
     u="db.siteusage.update( {\$and: [ { ip : '$ip' }, {c:{\$exists:false}} ]}, {\$set:{c:'$c'}}, true, true )"
     echo "Update for $u"
-    mongo $db --eval "$u"
+    mongo localhost:27018/$db --eval "$u"
 
 done

@@ -22,7 +22,17 @@ echo "Upload files...">>$log
     echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
     echo "mirror --reverse --continue --verbose --exclude-glob $prefix.* $fileSet $prefix.files">>$ftpScript
     echo "quit">>$ftpScript
-    lftp -f $ftpScript>>$log
+    to=10
+    for i in {1..$to}
+    do
+        echo "Ftp files... attempt $i of $to">>$log
+        lftp -f $ftpScript>>$log
+        rc=$?
+        if [[ $rc == 0 ]] ; then
+            break
+        fi
+    done
+    rm $ftpScript
 
 echo "Create instruction for our files">>$log
     php csv.php -f $cf -p PID -m master -access restricted -contentType image\tiff>>$log
@@ -37,6 +47,9 @@ echo "Upload remaining instruction...">>$log
     echo "put -c -O $prefix.files $fileSet/instruction.xml">>$ftpScript
     echo "quit">>$ftpScript
     lftp -f $ftpScript>>$log
+    rm $ftpScript
 
 echo $(date)>>$log
 echo "Done files update.">>$log
+
+rm $fileSet/instruction.xml

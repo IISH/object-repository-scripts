@@ -20,19 +20,8 @@ do
     do
         echo "Mongodump on $db.$c"
         mongodump -d $db -c $c
+        mongodump -d $db -c siteusage
     done
-done
-
-# Siteusage statistics
-for db in ${dbs[*]}
-do
-    echo "Siteusage IP for $db"
-    source $scripts/shared/siteusage.sh
-    rc=$?
-    if [[ $rc != 0 ]] ; then
-        echo "The siteusage.sh procedure did not return a clean exit code."
-        exit $rc
-    fi
 done
 
 # Produce labels
@@ -49,8 +38,12 @@ mongorestore --dbpath=/data/db
 
 # Siteusage statistics
 service mongodb start
+
 for db in ${dbs[*]}
 do
+    echo "Siteusage IP for $db"
+    source $scripts/shared/siteusage.sh
+
     echo "Siteusage mapreduce for $db"
     mongo localhost:27018/$db --eval "var pid=null" $scripts/shared/siteusage.js
 done

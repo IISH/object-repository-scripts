@@ -63,10 +63,6 @@ while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $location = $data[$index_master];
     $file = $basename . $location;
     $md5 = md5_file($file);
-    $md5file = $file . '.md5';
-    $md5handle = fopen($md5file, 'w') or die("Cannot open file $md5file\n");
-    fwrite($md5handle, $md5 . '  ' . $file);
-    fclose($md5handle);
 
     // Any alternative contentType or Access ?
     $access = getCustom(pathinfo($file, PATHINFO_DIRNAME) . '/.access.txt');
