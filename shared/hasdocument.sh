@@ -10,7 +10,9 @@ pid=$pid
 scripts=$scripts
 replaceExistingDerivatives=$replaceExistingDerivatives
 
-if [ "$replaceExistingDerivatives" == "false" ]; then
+if [ "$replaceExistingDerivatives" == "true" ]; then
+    echo "Replace existing derivatives"
+else
     hasdocument=$(mongo $db --quiet --eval "var bucket='$bucket';var pid='$pid'" $scripts/shared/hasdocument.js)
     if [ "$hasdocument" == "true" ] ; then
         echo "The file in $bucket with $pid exists. Hence we stop processing here."
