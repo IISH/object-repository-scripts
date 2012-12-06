@@ -45,7 +45,8 @@ fi
 if [[ ${content:0:1} == "{" ]]; then
     content=$(php $scripts/shared/utf8_encode.php -i "$content")
 else
-    content=""
+    # invalid response... no json
+    content="null"
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shards=$shards
