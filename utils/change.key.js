@@ -73,6 +73,7 @@ function changeKeys(master) {
     master._id = new_id;
     files.save(master);
     assert(writeOk(db), "files.save(master)");
+    assert(db.master.files.findOne({_id:new_id}, {_id:1}), "Could not find the new document with _id: " + new_id);
 }
 
 function writeOk(db) {

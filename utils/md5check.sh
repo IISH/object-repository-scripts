@@ -16,7 +16,6 @@
 # 6. if one out of the two hosts mismatch: take the chunk that has a match and update the faulty host: primary or secondary
 # 7. if both mismatch print the problem chunk.
 
-shards=$shards
 db=$db
 bucket=master
 

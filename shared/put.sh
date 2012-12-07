@@ -69,7 +69,7 @@ fi
         exit $rc
     fi
 
- mongo $db --quiet --eval "\
+mongo $db --quiet --eval "\
     var access='$access'; \
     var content=$content; \
     var filesDB='$db'; \
@@ -85,11 +85,30 @@ fi
     var contentType='$contentType'; \
     " $scripts/shared/put.js
 
-
+# toDo: make sure the content type is a proper json field... so we can remove this quick fix.
+rc=$?
+if [[ $rc != 0 ]] ; then
+    mongo $db --quiet --eval "\
+        var access='$access'; \
+        var content=null; \
+        var filesDB='$db'; \
+        var na='$na'; \
+        var fileSet='$fileSet'; \
+        var label='$label'; \
+        var length=$length; \
+        var md5='$md5'; \
+        var ns='$bucket'; \
+        var pid='$pid'; \
+        var lid='$lid'; \
+        var resolverBaseUrl='$resolverBaseUrl'; \
+        var contentType='$contentType'; \
+        " $scripts/shared/put.js
     rc=$?
     if [[ $rc != 0 ]] ; then
+        echo  "Failed to save metadata. Even tried twice."
         exit $rc
     fi
+fi
 
     mongo $db --quiet --eval "\
         var ns='$bucket'; \

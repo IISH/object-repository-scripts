@@ -320,15 +320,15 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     var host = null;// Verify the shard candidate belongs to an active primary... otherwise choose another.
     try {
         host = (db.getName() == 'test') ? {serverStatus:function () {
-            return {repl:{ismaster:true, secondary:false}}
-        }} : connect(shard.p + '/test');
+            return {repl:{ismaster:false,secondary:true}}
+        }} : connect(shard.s + '/test');
     } catch (e) {
         continue;
     }
 
     var repl = host.serverStatus().repl;
     assert(repl, 'Host is not a replicaset: ' + shard);
-    if (repl.ismaster && !repl.secondary) {
+    if (repl.secondary && !repl.ismaster) {
         do {
             shardkey = shard.minKey + Math.round(Math.random() * interval);
         } while (shardkey == 0 || db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:1}));
