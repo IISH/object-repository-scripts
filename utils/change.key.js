@@ -54,6 +54,12 @@ function changeKeys(master) {
         throw "The operation should be undone by removing all files_id:" + new_id + " from " + chunks.getName();
     }
 
+    if (moved == 0) {
+        print("Warning: The chunks collection contains zero chunks for " + old_id);
+        print('The master should be resubmitted: ' + pid);
+        return;
+    }
+
     assert(writeOk(db), "Error after batch files_id update");
 
     // In some cases the documents are still being processed... hence we retry after 60 seconds.

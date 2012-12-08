@@ -8,7 +8,7 @@ scripts=$scripts
 bucket="level3"
 source $scripts/shared/parameters.sh
 source $scripts/shared/delete.sh
-source $scripts/shared/hasdocument.sh
+# Custom derivative material is always ingested
 source $scripts/shared/find.derivative.sh
 
 exit $?

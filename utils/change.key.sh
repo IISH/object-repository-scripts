@@ -20,5 +20,3 @@ if [[ $rc != 0 ]] ; then
     echo "mongo command did not return a clean exit value."
     exit $rc
 fi
-
-sleep 1
