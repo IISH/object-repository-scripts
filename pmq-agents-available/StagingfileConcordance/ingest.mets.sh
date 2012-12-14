@@ -16,8 +16,8 @@ na=$na
 prefix=$prefix
 log=$log
 cf=$cf
-ftpScript=$fileSet/$prefix.lftp
-fileSetMets=$fileSet.mets
+ftpScript=$ftpScript
+fileSetMets=$fileSetMets
 
 echo "Create METS">>$log
     java -cp $metsmaker org.iisg.visualmets.metsmaker.MetsMakerConsole -inputFile $cf -outputFolder $fileSet -proxy "http://hdl.handle.net/" -pidColumn PID -na $na>>$log
@@ -49,6 +49,7 @@ echo "Upload mets documents...">>$log
     cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
     echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
     echo "mirror --reverse --continue --verbose --exclude-glob instruction.xml $fileSetMets $prefix.mets">>$ftpScript
+    echo "mv Jpeg .level1"
     echo "quit">>$ftpScript
     to=10
     for i in {1..$to}
