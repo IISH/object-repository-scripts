@@ -7,7 +7,7 @@ pid=$2
 
 new_id=$(mongo $db --quiet --eval "var bucket='$bucket'; var shards=$shards" $scripts/shared/shardkey.js)
 if [[ $new_id == 0 ]] ; then
-    echo "Shardkey is zero."
+    echo "Shardkey is zero." >> change.key.log
     exit -1
 fi
 
@@ -17,6 +17,6 @@ mongo $db --quiet --eval "$evl" $scripts/utils/change.key.js >> change.key.log
 
 rc=$?
 if [[ $rc != 0 ]] ; then
-    echo "mongo command did not return a clean exit value."
+    echo "mongo command did not return a clean exit value." >> change.key.log
     exit $rc
 fi

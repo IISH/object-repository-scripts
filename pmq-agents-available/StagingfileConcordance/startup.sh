@@ -6,6 +6,7 @@
 
 mnt=$mnt
 scripts=$scripts
+mailTo=$(cat $mnt/mail.txt)
 
 for d in $mnt/*
 do

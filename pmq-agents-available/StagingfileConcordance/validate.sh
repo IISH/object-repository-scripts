@@ -16,6 +16,7 @@ report=$fileSet/$prefix.report.txt
 log=$fileSet/$prefix.log
 cf=$fileSet/$prefix.concordanceValidWithPID.csv
 na=$na
+mailTo=$mailTo
 
 echo $(date)>$log
 echo "Start validation">>$log
