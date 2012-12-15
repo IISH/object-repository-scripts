@@ -26,6 +26,7 @@ mongo $db --quiet --eval "$evl" $scripts/utils/change.key.js >> change.key.log
 
 rc=$?
 if [[ $rc != 0 ]] ; then
+    echo "$(date)"
     echo "mongo command did not return a clean exit value." >> change.key.log
     exit $rc
 fi
