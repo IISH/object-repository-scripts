@@ -204,6 +204,7 @@ function metadata(document) {
     if (content) m.content = content;
 
     files.save(document);
+    assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not update metadata.");
     print('Update metadata ' + files.getName() + ' ' + document.metadata.pid);
     printjson(document);
 }

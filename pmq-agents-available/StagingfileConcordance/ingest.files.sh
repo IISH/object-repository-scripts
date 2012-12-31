@@ -18,6 +18,8 @@ cf=$cf
 ftpScript=$ftpScript
 fileSetMets=$fileSetMets
 
+find $fileSet -type f -name "Thumbs.db" -exec rm -f {} \;
+find $fileSet -type f -name "Thumbs.db.md5" -exec rm -f {} \;
 
 echo "Upload files...">>$log
     mv $fileSet/Jpeg $fileSet/.level1

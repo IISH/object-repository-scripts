@@ -1,32 +1,26 @@
 /**
  * shards.js
  *
- * Generates shard ranges for the chunks collection based on the predefined and static shardkey and shard name.
+ * See if the position of the documents are indeed in the expected range.
  */
 
-assert(db.getName() == 'config', "The database must be the config database: 'mongo host/config'");
 assert(db, "Need a database name: var db='name here'");
-assert(bucket, 'Must have a bucket namespace defined: var bucket="?.chunks"');
-assert(bucket.indexOf('.chunks') > 0, 'Must have a bucket namespace defined: var bucket="?.chunks"');
+assert(ns, 'Must have a bucket namespace defined: var bucket="?.chunks"');
+assert(ns.indexOf('.chunks') > 0, 'Must have a bucket namespace defined: var bucket="?.chunks"');
 assert(shards, 'Must have a list of shard min keys defined: var shards="shards"');
 
-var ns = db + '.' + bucket;
-var lastmodEpoch = new ObjectId();
+var interval = 1431655765; // interval of a shard. The keys of a shard have range: [shard.minKey, shard.minKey+interval]
 
-var length = Object.keySet(shards).length;
-for (var i = 0; i < length; i++) {
+for (shardId in shards) {
+    if (shards.hasOwnProperty(shardId)) {
+        var shard = shards[shardId];
+        var secondary = connect(shard.s + '/' + db);
+        secondary.getMongo().setSlaveOk();
 
-    var shardId = Object.keySet(shards)[i];
+        var collection = secondary.getCollection(ns);
+        var countActual = collection.count();
+        var countShouldHave = collection.count({files_id:{$gte:shard.minKey}, files_id:{$lt:shard.minKey + interval}});
 
-    var chunk = {
-        _id:ns + '-files_id_' + (i == 0) ? 'MinKey' : shards[shardId].minKey + '.0',
-        "lastmod":Timestamp(1000, i),
-        "lastmodEpoch":lastmodEpoch,
-        "ns":ns,
-        "min":(i == 0) ? { $minKey:1 } : shards[shardId].minKey + '.0',
-        "max":(i == length - 1) ? { $maxKey:1 } : shards[Object.keySet(shards)[i + i]].minKey + '.0',
-        "shard":shardId
-    };
-
-    db.chunks.save(chunk);
+        print(shard.s + '\\' + db + ' ' + ns + ' ' + countActual + ' ' + countShouldHave + ' ' + (countActual == countShouldHave));
+    }
 }

@@ -11,8 +11,8 @@ dbs=$dbs
 
 for db in ${dbs[*]}
 do
-    for c in level3.files level2.files level1.files master.files
+    for ns in level3.chunks level2.chunks level1.chunks master.chunks
     do
-        mongo config --quiet --eval "var shards=$shards; var db='$db'; var bucket='$c'" $scripts/utils/shards.js
+        mongo test --quiet --eval "var shards=$shards; var db='$db'; var ns='$ns'" $scripts/utils/shards.js
     done
 done

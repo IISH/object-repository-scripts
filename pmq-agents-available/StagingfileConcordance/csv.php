@@ -62,7 +62,12 @@ while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $pid = $data[$index_pid];
     $location = $data[$index_master];
     $file = $basename . $location;
-    $md5 = md5_file($file);
+    $filename = pathinfo($location, PATHINFO_FILENAME);
+
+    // First look for a md5 in a conventional place
+    $md5FromFile = $fileSet . "/.Checksum/" . $filename;
+    $md5 = getCustom($md5FromFile);
+    if ($md5 == null) $md5 = md5_file($file);
 
     // Any alternative contentType or Access ?
     $access = getCustom(pathinfo($file, PATHINFO_DIRNAME) . '/.access.txt');

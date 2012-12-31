@@ -9,35 +9,17 @@
  */
 
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
+assert(_id, "Must have _id name: var _id='[_id]'");
 assert(ns, "Must have collection name: var ns='[ns]'");
 
-print("Begin check FSGrid collection " + collection);
-var namespace = collection.substring(0, index);
-var filesCollection = db.getCollection(ns + '.files');
-var chunksCollection = db.getCollection(ns + '.chunks');
+var doc = db.getCollection(ns + '.files').findOne({ _id:_id}, {length:1, chunkSize:1});
+assert(doc, "Cannot find document with _id " + _id);
 
+var nc = Math.ceil(doc.length / doc.chunkSize);
 var count = 0;
-var errors = 0;
+var chunksCollection = db.getCollection(ns + '.chunks');
+for (var n = 0; n < nc; n++) {
+    if (chunksCollection.find({files_id:_id, n:n}, {_id:1})) count++;
+}
 
-filesCollection.find().forEach(function (file) {
-    count++;
-    //print(c + ". Check document " + file._id);
-    var nc = Math.ceil(file.length / file.chunkSize);
-    var chunks = chunksCollection.count({files_id:file._id});
-
-    if (chunks != nc) {
-        errors++;
-        print(errors + ". _id:" + file._id + ",pid:" + file.metadata.pid + " found " + chunks + " chunks but expected " + nc);
-        // find any gaps...
-        for (var n = 0; n < nc; n++) {
-            var chunk = chunksCollection.find({files_id:file._id, n:n}, {data:0});
-            if (chunk.count == 0) {
-                print("Chunk missing! n=" + n);
-            }
-            if (chunk.count > 1) {
-                print("Found " + chunk.count + " chunks while there ought to be one only for n=" + n);
-            }
-        }
-    }
-})
-print("Checked documents: " + count);
+print(_id + ' ' + nc + ' ' + count + ' ' + count == ns);

@@ -311,6 +311,7 @@ function getShardCandidate() {
     }
 }
 
+var new_id = 0;
 for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     var candidate = getShardCandidate();
     assert(candidate, 'No candidate shard found');
@@ -330,10 +331,10 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     assert(repl, 'Host is not a replicaset: ' + shard);
     if (repl.secondary && !repl.ismaster) {
         do {
-            shardkey = shard.minKey + Math.round(Math.random() * interval);
-        } while (shardkey == 0 || db.getCollection(bucket + '.files').findOne({_id:shardkey}, {_id:1}));
+            new_id = shard.minKey + Math.round(Math.random() * interval);
+        } while (new_id == 0 || db.getCollection(bucket + '.files').findOne({_id:new_id}, {_id:1}));
         break;
     }
 }
 
-print(shardkey);
+print(new_id);
