@@ -18,7 +18,7 @@ if [ -f "$sourceFile" ]; then
     echo "Found custom file: $sourceFile"
     contentType=$(php $scripts/shared/extension2contenttype.php -t $scripts/shared/contenttype.txt -l $sourceFile)
     l=$sourceFile
-    md5=$(md5sum $l | cut -d ' ' -f 1)
+    md5=$(md5sum "$l" | cut -d ' ' -f 1)
     remove="yes"
     source $scripts/shared/put.sh
 fi

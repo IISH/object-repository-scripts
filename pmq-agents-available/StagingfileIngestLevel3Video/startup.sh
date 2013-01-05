@@ -73,7 +73,7 @@ else
 fi
 rm $tmp
 
-md5=$(md5sum $l | cut -d ' ' -f 1)
+md5=$(md5sum "$l" | cut -d ' ' -f 1)
 echo "$md5  $l" > "$l.md5"
 length=$(stat -c%s "$l")
 remove="yes"

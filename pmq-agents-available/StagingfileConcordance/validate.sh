@@ -56,7 +56,7 @@ do
             md5=${md5:0:32}
             md5file=$checksumTo/$filename.md5
             if [ ! -f $md5file ] ; then
-                md5sum $filename > $checksumTo/$filename.md5
+                md5sum "$filename" > $checksumTo/$filename.md5
             fi
             md5Check=$(cat $md5file | cut -d ' ' -f 1)
             if [ "$md5" == "$md5Check" ] ; then
