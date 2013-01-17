@@ -7,7 +7,7 @@
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
 assert(na, "Need a naming authority");
 assert(fileSet, "Must have a fileSet: var fileSet='?'");
-assert(keepLocationWhenRecreate, "Must have a keepLocationWhenRecreate value: var keepLocationWhenRecreate=true or false");
+assert(keepLocationWhenRecreate !== undefined, "Must have a keepLocationWhenRecreate value: var keepLocationWhenRecreate=true or false");
 
 var sa = db.getMongo().getDB("sa");
 var instruction = sa.instruction.findOne({fileSet:fileSet});
@@ -32,5 +32,5 @@ printjson(d);
     if ( keepLocationWhenRecreate ) document.location=fileSet + '/' + d.filename;
     if (d.metadata.lid) document.lid = d.metadata.lid;
 
-    sa.stagingfile.save(document);
+    sa.stagingfile.update({'metadata.pid':d.metadata.pid},document);
 });

@@ -42,6 +42,12 @@ fi
 if [ "$derivative" == "video" ] ; then
     content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
+if [ "$contentType" == "text/xml" ] | [ "$contentType" == "application/xml" ] ; then
+    content=$(php $scripts/shared/mets.php -l "$l")
+    if [ "$content" == "true" ] ; then
+        content="{ns:'http://www.loc.gov/METS/'}"
+    fi
+fi
 if [[ ${content:0:1} == "{" ]]; then
     content=$(php $scripts/shared/utf8_encode.php -i "$content")
 else
