@@ -53,7 +53,7 @@ else
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shards=$shards
-    shardKey=$(timeout 60 mongo $db --quiet --eval "var bucket='$bucket'; var shards=$shards" $scripts/shared/shardkey.js)
+    shardKey=$(timeout 60 mongo $db --quiet --eval "var dependencies='$scripts/shared/randomseed.js'; var bucket='$bucket'; var shards=$shards" $scripts/shared/shardkey.js)
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
     if [ -z "$is_numeric" ] ; then
         shardKey=0
