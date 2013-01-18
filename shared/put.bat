@@ -8,7 +8,7 @@ Rem
         exit -1
     )
 
-    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var bucket='%bucket%'; var shards=%shards%" %scripts%\shared\shardkey.js
+    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var dependencies='%scripts%\\shared\\randomseed.js'; var bucket='%bucket%'; var shards=%shards%" %scripts%\shared\shardkey.js
     call %scripts%\shared\set.bat is_numeric php -r "print(is_numeric('%shardKey%'));"
     if NOT DEFINED is_numeric (
         set shardKey=0
@@ -20,7 +20,7 @@ Rem
     )
 
     Rem Upload our file.
-    java -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
+    java -DWriteConcern FSYNC_SAFE -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
 
     set rc=%errorlevel%
     if %rc% neq 0 exit %rc%
