@@ -12,11 +12,9 @@ assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
 assert(shards, 'Must have a list of shard min keys defined: var shards="shards"');
 
 
-
 var slice = 1.5; // List cannot contain any more than a round [total shard number] / [slice]
 var interval = 1431655765; // interval of a shard. The keys of a shard have range: [shard.minKey, shard.minKey+interval]
 var total = 10; // Total number of candidate keys per shard for this bucket. Number of keys produced will be [total shard number] / [slice] * total
-
 
 
 /**
@@ -93,10 +91,14 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     var shard = shards[candidate];
     assert(shard, 'ShardId not found: ' + candidate.s);
 
+    // Is the shard available ?
+    var expired = new Date(new Date().getTime() + 86400000); // 24 hours
+    if (db.candidate.findOne({_id:candidate + "_" + bucket, d:{$lt:expired}})) continue;
+
     var host = null;// Verify the shard candidate belongs to an active primary... otherwise choose another.
     try {
         host = (db.getName() == 'test') ? {serverStatus:function () {
-            return {repl:{ismaster:false,secondary:true}}
+            return {repl:{ismaster:false, secondary:true}}
         }} : connect(shard.s + '/test');
     } catch (e) {
         continue;
