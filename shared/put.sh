@@ -42,11 +42,8 @@ fi
 if [ "$derivative" == "video" ] ; then
     content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
-if [ "$contentType" == "text/xml" ] | [ "$contentType" == "application/xml" ] ; then
-    content=$(php $scripts/shared/mets.php -l "$l")
-    if [ "$content" == "true" ] ; then
-        content="{ns:'http://www.loc.gov/METS/'}"
-    fi
+if [ "$contentType" == "text/xml" ] || [ "$contentType" == "application/xml" ] ; then
+    content=$(php $scripts/shared/identify_xmlns.php -l "$l")
 fi
 if [[ ${content:0:1} == "{" ]]; then
     content=$(php $scripts/shared/utf8_encode.php -i "$content")
@@ -66,9 +63,15 @@ fi
         exit -1
     fi
 
-    # Upload our file.
+    # Upload our file. For masters we increase the write concern
+    # FSYNC_SAFE   = Exceptions are raised for network issues, and server errors; the write operation waits for the server to flush the data to disk
+    # REPLICA_SAFE = Exceptions are raised for network issues, and server errors; waits for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
-    java -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
+    writeConcern="FSYNC_SAFE"
+    if [ "$bucket" == "master" ] ; then
+        writeConcern="REPLICA_SAFE"
+    fi
+    java -DWriteConcern $writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
 
     if [[ $rc != 0 ]] ; then
@@ -116,6 +119,7 @@ if [[ $rc != 0 ]] ; then
     fi
 fi
 
+    # With the fs
     mongo $db --quiet --eval "\
         var ns='$bucket'; \
         var md5='$md5'; \

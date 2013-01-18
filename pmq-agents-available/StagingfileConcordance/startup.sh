@@ -8,22 +8,25 @@ mnt=$mnt
 scripts=$scripts
 mailTo=$(cat $mnt/mail.txt)
 
-for d in $mnt/*
+for project in $mnt/*
 do
-    if [ -d $d ] ; then
-        for fileSet in $d/*
-        do
-            if [ -d $fileSet ] ; then
-                na=$(basename $fileSet)
-                if [ -f $fileSet/validate.txt ] || [ -f $fileSet/valideer.txt ] ; then
-                    rm -f $fileSet/vali*
-                    $scripts/pmq-agents-available/StagingfileConcordance/validate.sh -na $na -fileSet $fileSet
+    for d in $project/*
+    do
+        if [ -d $d ] ; then
+            for fileSet in $d/*
+            do
+                if [ -d $fileSet ] ; then
+                    na=$(basename $fileSet)
+                    if [ -f $fileSet/validate.txt ] || [ -f $fileSet/valideer.txt ] ; then
+                        rm -f $fileSet/vali*
+                        $scripts/pmq-agents-available/StagingfileConcordance/validate.sh -na $na -fileSet $fileSet
+                    fi
+                    if [ -f $fileSet/ingest.txt ] ; then
+                        rm -f $fileSet/ingest.txt
+                        $scripts/pmq-agents-available/StagingfileConcordance/ingest.sh -na $na -fileSet $fileSet
+                    fi
                 fi
-                if [ -f $fileSet/ingest.txt ] ; then
-                    rm -f $fileSet/ingest.txt
-                    $scripts/pmq-agents-available/StagingfileConcordance/ingest.sh -na $na -fileSet $fileSet
-                fi
-            fi
-        done
-    fi
+            done
+        fi
+    done
 done
