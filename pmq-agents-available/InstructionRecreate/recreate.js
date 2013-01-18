@@ -13,6 +13,9 @@ var sa = db.getMongo().getDB("sa");
 var instruction = sa.instruction.findOne({fileSet:fileSet});
 assert(instruction, "The instruction is absent and must be created first.");
 
+sa.stagingfile.remove({fileSet:fileSet});
+assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not remove old instruction.");
+
 db.master.files.find({'metadata.fileSet':fileSet}, {'metadata.content':0}).forEach(function (d) {
 printjson(d);
     var document = {
@@ -32,5 +35,5 @@ printjson(d);
     if ( keepLocationWhenRecreate ) document.location=fileSet + '/' + d.filename;
     if (d.metadata.lid) document.lid = d.metadata.lid;
 
-    sa.stagingfile.update({'metadata.pid':d.metadata.pid},document);
+    sa.stagingfile.save(document);
 });
