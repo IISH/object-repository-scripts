@@ -71,7 +71,7 @@ fi
     if [ "$bucket" == "master" ] ; then
         writeConcern="REPLICA_SAFE"
     fi
-    java -jar $orfiles -DWriteConcern=$writeConcern -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
+    java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
 
     if [[ $rc != 0 ]] ; then
