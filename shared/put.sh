@@ -64,8 +64,8 @@ fi
     fi
 
     # Upload our file. For masters we increase the write concern
-    # FSYNC_SAFE   = Exceptions are raised for network issues, and server errors; the write operation waits for the server to flush the data to disk
-    # REPLICA_SAFE = Exceptions are raised for network issues, and server errors; waits for at least 2 servers for the write operation
+    # FSYNC_SAFE   = The write operation waits for the server to flush the data to disk
+    # REPLICA_SAFE = Waits for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
     writeConcern="FSYNC_SAFE"
     if [ "$bucket" == "master" ] ; then
