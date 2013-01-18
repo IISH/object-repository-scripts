@@ -69,7 +69,7 @@ fi
     echo "Shardkey: $shardKey"
     writeConcern="FSYNC_SAFE"
     if [ "$bucket" == "master" ] ; then
-        writeConcern="REPLICA_SAFE"
+        writeConcern="REPLICAS_SAFE"
     fi
     java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?

@@ -24,7 +24,11 @@ Rem
     java -DWriteConcern=FSYNC_SAFE -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
 
     set rc=%errorlevel%
-    if %rc% neq 0 exit %rc%
+    if %rc% neq 0 (
+        del "%l%"
+        del "%l%.md5"
+        exit %rc%
+    )
 
     Rem assemble a batch script for the metadata update:
     set batch=%temp%\%identifier%.content.bat
@@ -36,14 +40,15 @@ Rem
     call %batch%
     del %batch%
 
+    del "%l%"
+    del "%l%.md5"
+
     set rc=%errorlevel%
-    if NOT %rc% == 0 exit %rc%
+    if %rc% neq 0 exit %rc%
 
     mongo %db% --quiet --eval "var ns='%bucket%'; var md5='%md5%'; var length=%length%; var pid = '%pid%';" %scripts%\shared\integrity.js
 
     set rc=%errorlevel%
     if %rc% neq 0 exit %rc%
 
-    del "%l%"
-    del "%l%.md5"
     exit 0
