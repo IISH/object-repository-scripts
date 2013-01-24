@@ -92,8 +92,8 @@ fi
 
 # Sometimes the original files was a multipart file. We correct this here.
 # The derivative script has added a jpg extension to the targetFile, which we take over here.
-targetFile="$targetFile.jpg"
 mpf=$targetFile-0.jpg
+targetFile="$targetFile.jpg"
 if [ -f $mpf ] ; then
     mv -f $mpf $targetFile
     rm $tmp/$md5.$bucket-*
