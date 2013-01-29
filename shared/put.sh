@@ -71,10 +71,10 @@ fi
     if [ "$bucket" == "master" ] ; then
         writeConcern="REPLICAS_SAFE"
     fi
-    mongo $db --quiet --eval "var locked=true; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
+    mongo $db --quiet --eval "var reserve=true; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
     java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
-    mongo $db --quiet --eval "var locked=false; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
+    mongo $db --quiet --eval "var reserve=false; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
 
     if [[ $rc != 0 ]] ; then
         exit $rc

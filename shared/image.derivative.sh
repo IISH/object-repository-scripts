@@ -90,7 +90,7 @@ else
 	exit 240
 fi
 
-# Sometimes the original files was a multipart file. We correct this here.
+# Sometimes the original files was a multipaged file. We correct this here.
 # The derivative script has added a jpg extension to the targetFile, which we take over here.
 mpf=$targetFile-0.jpg
 targetFile="$targetFile.jpg"

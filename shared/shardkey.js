@@ -92,10 +92,10 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     assert(shard, 'ShardId not found: ' + candidate.s);
 
     // Is the shard available ?
-    var expired = new Date(new Date().getTime() + 86400000); // 24 hours
-    if (db.candidate.findOne({_id:candidate + "_" + bucket, d:{$lt:expired}})) continue;
+    var expired = new Date(new Date().getTime() - 172800000); // 48 hours
+    if (db.candidate.findOne({_id:candidate + "_" + bucket, d:{$gt:expired}})) continue;
 
-    var host = null;// Verify the shard candidate belongs to an active primary... otherwise choose another.
+    var host = null;// Verify the shard candidate has  an active (replicating) secondary... otherwise choose another.
     try {
         host = (db.getName() == 'test') ? {serverStatus:function () {
             return {repl:{ismaster:false, secondary:true}}
