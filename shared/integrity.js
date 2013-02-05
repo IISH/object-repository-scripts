@@ -8,7 +8,6 @@
  **/
 
 assert(ns, "Must have ns (bucket) as parameter.");
-assert(length, "Must have length as parameter.");
 assert(md5, "Must have md5 as parameter.");
 assert(pid, "Must have pid as parameter.");
 
@@ -16,14 +15,15 @@ assert(pid, "Must have pid as parameter.");
 md5 = "00000000000000000000000000000000" + md5;
 md5 = md5.substring(md5.length - 32);
 
-var query = {'metadata.pid':pid, md5:md5, length:length};
+var query = {'metadata.pid':pid, md5:md5};
 var filesCollection = db.getCollection(ns + '.files');
 var file = filesCollection.findOne(query);
-assert(file, "Did not find a file with the expected md5 and length)");
+assert(file, "Did not find a file with the expected md5");
+assert(file.length, "Did not find a file with the expected length element");
 
 
 // Paranoid check each chunk
-var nc = Math.ceil(length / file.chunkSize);
+var nc = Math.ceil(file.length / file.chunkSize);
 var chunkCollection = db.getCollection(ns + '.chunks');
 for (var n = 0; n <= nc; n++) {
     var chunk = chunkCollection.findOne({files_id:file._id, n:n}, {data:0});
