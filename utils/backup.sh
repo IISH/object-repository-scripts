@@ -32,6 +32,16 @@ do
         function(d){db.label.update({_id:d.metadata.label},{\$inc:{size:1}}, true, false)})"
 done
 
+# Produce virtual file system
+for db in ${dbs[*]}
+do
+    mongo $db --eval "db.vfs.remove();"
+    mongo $db --eval "var na='/' + db.getName().substring(3) + '/'; \
+        db.master.files.find({'metadata.fileSet':{\$exists:true}},{'metadata.fileSet':1}).forEach( \
+        function(d){var i=d.metadata.fileSet.indexOf(na)+na.length; i=d.metadata.fileSet.indexOf('/', na); \
+        var fileSet=d.metadata.fileSet.substring(i - 1);db.vfs.update({_id:fileSet},{\$inc:{size:1}}, true, false)})"
+done
+
 #For speed store the information into a temporary database where we will do our mapreduce tasks
 rm /data/db/*
 mongorestore --dbpath=/data/db

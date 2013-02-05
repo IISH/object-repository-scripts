@@ -80,6 +80,7 @@ fi
         exit $rc
     fi
 
+dirName=$(dirname "$l")
 mongo $db --quiet --eval "\
     var access='$access'; \
     var content=$content; \
@@ -92,6 +93,7 @@ mongo $db --quiet --eval "\
     var ns='$bucket'; \
     var pid='$pid'; \
     var lid='$lid'; \
+    var l='$dirName'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     var contentType='$contentType'; \
     " $scripts/shared/put.js
@@ -111,6 +113,7 @@ if [[ $rc != 0 ]] ; then
         var ns='$bucket'; \
         var pid='$pid'; \
         var lid='$lid'; \
+        var l='$dirName'; \
         var resolverBaseUrl='$resolverBaseUrl'; \
         var contentType='$contentType'; \
         " $scripts/shared/put.js

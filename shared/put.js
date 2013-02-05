@@ -91,95 +91,10 @@
  * Then this scripts is run to update the metadata.
  /**
 
- /**
- * updateCollections
- *
- * Systemic change of master and all derivatives by replacing the old metadata.pid with a new metadata.pid.
- * This method should be called when an identical master is offered with a new metadata.pid.
- *
- * This method cannot possibly be trickered by a derivative update.
- *
- * @param oldPid
- */
-
-// First a normalization. The md5 in the mongodb collection is always 32 characters in length
-md5 = "00000000000000000000000000000000" + md5;
-md5 = md5.substring(md5.length - 32);
-
-
-function updateCollections(oldPid) {
-
-    print('Systemic identifier shift from ' + oldPid + ' to ' + pid);
-    if (ns != 'master') {
-        throw "Only an action intended for a master.files collection is allowed to reset all pids.";
-    }
-    var collectionNames = db.getCollectionNames();
-    var length = collectionNames.length;
-    var now = new Date();
-    for (var i = 0; i < length; i++) {
-        var collectionName = collectionNames[i];
-        if (collectionName.lastIndexOf(".files") != -1) {
-            print('updateCollections ' + collectionName + '.' + oldPid + ' to ' + pid);
-            db.getCollection(collectionName).update({'metadata.pid':oldPid}, {
-                $set:{
-                    'metadata.pid':pid,
-                    'metadata.lastUploadDate':now
-                },
-                $inc:{'metadata.timesUpdated':1}
-            }, false, false);
-        }
-    }
-}
-
-/**
- * removeDocuments
- *
- * Remove the document and all other documents associated with the pid value
- */
-function removeDocuments(master) {
-
-    if (ns != 'master') {
-        throw "Only an action intended for a master.files collection is allowed to remove all associate files.";
-    }
-
-    var collectionNames = db.getCollectionNames();
-    var length = collectionNames.length;
-    for (var i = 0; i < length; i++) {
-        var collectionName = collectionNames[i];
-        var index = collectionName.lastIndexOf(".files");
-        if (index != -1) {
-            var namespace = collectionName.substring(0, index);
-            var collection = db.getCollection(namespace + '.files');
-            var document = (ns == namespace) ? master : collection.findOne({'metadata.pid':pid});
-            if (document) {
-                var files_id = document._id;
-                print("Removing from " + namespace + '.' + pid);
-                collection.remove({_id:files_id});
-                db.getCollection(namespace + '.chunks').remove({files_id:files_id});
-            }
-        }
-    }
-}
-
-/**
- * removeDocument
- *
- * Removes a document and it's chunks
- *
- * @param document
- */
-function removeDocument(document) {
-
-    var files_id = document._id;
-    print("Removing duplicate PIDs from " + ns + " with pid " + pid + " and _id " + files_id);
-    files.remove({_id:files_id});
-    db.getCollection(ns + '.chunks').remove({files_id:files_id});
-}
-
 /**
  * setMetadata
  *
- * When we save a new master file, we will set initial m.
+ * When we save a new file, we will set initial m.
  * For an update, we will update accordingly.
  *
  * For derivatives, we just copy parts of it into the metadata element FROM the master.
@@ -194,6 +109,7 @@ function metadata(document) {
     m.fileSet = fileSet;
     m.pid = pid;
     if (lid) m.lid = lid;
+    m.l = l;
     m.access = access;
     m.label = label;
     m.resolverBaseUrl = resolverBaseUrl;
