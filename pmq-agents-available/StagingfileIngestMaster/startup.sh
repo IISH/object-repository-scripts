@@ -41,12 +41,15 @@ else
     countOne=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').find($query).count()")
     if [ $countOne == 1 ] ; then
 	    echo "File metadata updated."
+	    # Update the other buckets with the given access
+        for c in level3.files level2.files level1.files
+        do
+            mongo $db --quiet --eval "db.$c.update({'metadata.pid':'$pid'}, {\$set:{'metadata.access':'$access'}}, false, false)"
+        done
 	    exit 0
     fi
     echo "The expected updated elements cannot be found with the query $query"
     exit -1
 fi
-
-
 
 exit $?

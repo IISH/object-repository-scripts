@@ -17,7 +17,6 @@ sa.stagingfile.remove({fileSet:fileSet});
 assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not remove old instruction.");
 
 db.master.files.find({'metadata.fileSet':fileSet}, {'metadata.content':0}).forEach(function (d) {
-printjson(d);
     var document = {
         na:na,
         access:d.access,
