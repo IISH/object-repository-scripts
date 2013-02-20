@@ -96,6 +96,8 @@ mongo $db --quiet --eval "\
     var l='$dirName'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     var contentType='$contentType'; \
+    var seq=$seq; \
+    var objid='$objid'; \
     " $scripts/shared/put.js
 
 # toDo: make sure the content type is a proper json field... so we can remove this quick fix.

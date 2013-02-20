@@ -112,6 +112,8 @@ function metadata(document) {
     m.l = l;
     m.access = access;
     m.label = label;
+    m.objid = objid;
+    m.seq = seq;
     m.resolverBaseUrl = resolverBaseUrl;
     m.timesUpdated = ( m.timesUpdated == undefined ) ? 0 : m.timesUpdated + 1;
     m.firstUploadDate = ( m.firstUploadDate == undefined ) ? now : m.firstUploadDate;
