@@ -11,6 +11,8 @@ if [ "$action" == "delete" ] ; then
     exit 0
 fi
 
+item=$(db.master.files.findOne( { \$or: [ {'metadata.label':'$label'} , {'metadata.pid':'$pid'} ] } );
+
 for sourceBucket in level2 level1 master
 do
 	echo "sourceBucket='$sourceBucket'"

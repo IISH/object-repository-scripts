@@ -20,19 +20,41 @@ db.master.files.find({'metadata.fileSet':fileSet}, {'metadata.content':0}).forEa
     var document = {
         na:na,
         access:d.access,
-            contentType:d.contentType,
-            md5:d.md5,
-            length:d.length,
-            pid:d.metadata.pid,
-            fileSet:fileSet,
-            version : NumberLong(0),
-        _class : 'org.objectrepository.instruction.StagingfileType'
+        contentType:d.contentType,
+        md5:d.md5,
+        length:d.length,
+        pid:d.metadata.pid,
+        fileSet:fileSet,
+        version:NumberLong(0),
+        _class:'org.objectrepository.instruction.StagingfileType'
     };
 
-    if ( instruction.access == document.access ) delete document.access;
-    if ( instruction.contentType == document.contentType ) delete document.contentType;
-    if ( keepLocationWhenRecreate ) document.location=fileSet + '/' + d.filename;
+    if (instruction.access == document.access) delete document.access;
+    if (instruction.contentType == document.contentType) delete document.contentType;
+    if (keepLocationWhenRecreate) document.location = merge(fileSet, d.metadata.l) + '/' + d.filename;
     if (d.metadata.lid) document.lid = d.metadata.lid;
 
     sa.stagingfile.save(document);
 });
+
+
+/**
+ * merge
+ *
+ * Combine the fileSet and location element
+ * Just like the ingest, the last folder of the fileSet and first folder of the location are the same.
+ * We merge this here
+ *
+ * @param fileSet
+ * @param l location
+ */
+var f = function merge(fileSet, l) {
+    if (l) {
+        var i = fileSet.lastIndexOf('/');
+        var last = fileSet.substring(i);
+        i = l.indexOf('/', 1);
+        var first = l.substring(0, i);
+        if (last == first) return fileSet + l.substring(i);
+    }
+    return fileSet;
+}
