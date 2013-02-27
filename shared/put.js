@@ -125,8 +125,8 @@ function metadata(document) {
     m.l = l;
     m.access = access;
     m.label = label;
-    if (objid && objid.length() != 0) m.objid = objid;
-    if (seq != 0) m.seq = seq;
+    m.objid = objid;
+    m.seq = seq;
     m.resolverBaseUrl = resolverBaseUrl;
     m.timesUpdated = ( m.timesUpdated == undefined ) ? 0 : m.timesUpdated + 1;
     m.firstUploadDate = ( m.firstUploadDate == undefined ) ? now : m.firstUploadDate;
