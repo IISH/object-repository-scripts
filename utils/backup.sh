@@ -35,9 +35,14 @@ done
 # Produce virtual file system
 for db in ${dbs[*]}
 do
-   # mongo $db --eval "db.vfs.remove();"
-   # mongo $db --eval $scripts/vfs.js
+    for c in master level1 level2 level3
+    do
+        mongo $db --eval "db.vfs.remove();"
+        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
+    done
 done
+
+exit 0
 
 # Create site usage
 for db in ${dbs[*]}

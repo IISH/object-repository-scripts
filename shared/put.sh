@@ -80,7 +80,6 @@ fi
         exit $rc
     fi
 
-dirName=$(dirname "$l")
 mongo $db --quiet --eval "\
     var access='$access'; \
     var content=$content; \
@@ -93,10 +92,10 @@ mongo $db --quiet --eval "\
     var ns='$bucket'; \
     var pid='$pid'; \
     var lid='$lid'; \
-    var l='$dirName'; \
+    var l='$instruction_location'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     var contentType='$contentType'; \
-    var seq=$seq; \
+    var seq=0$seq; \
     var objid='$objid'; \
     " $scripts/shared/put.js
 
@@ -115,9 +114,11 @@ if [[ $rc != 0 ]] ; then
         var ns='$bucket'; \
         var pid='$pid'; \
         var lid='$lid'; \
-        var l='$dirName'; \
+        var l='$instruction_location'; \
         var resolverBaseUrl='$resolverBaseUrl'; \
         var contentType='$contentType'; \
+        var seq=0$seq; \
+        var objid='$objid'; \
         " $scripts/shared/put.js
     rc=$?
     if [[ $rc != 0 ]] ; then
@@ -126,13 +127,12 @@ if [[ $rc != 0 ]] ; then
     fi
 fi
 
-    # With the fs
-    mongo $db --quiet --eval "\
-        var ns='$bucket'; \
-        var md5='$md5'; \
-        var length=$length; \
-        var pid = '$pid'; \
-        ''" $scripts/shared/integrity.js
+    # With the fs... this check is really not necessary then using REPLICA_SAFE
+    # mongo $db --quiet --eval "\
+    #    var ns='$bucket'; \
+    #    var md5='$md5'; \
+    #    var pid = '$pid'; \
+    #    ''" $scripts/shared/integrity.js
 
     rc=$?
     if [[ $rc != 0 ]] ; then
@@ -141,6 +141,7 @@ fi
 
     # Add to the statistics
     # mongo $db --quiet --eval "var pid = '$pid';var ns='$bucket';" $scripts/shared/statistics.js
+    mongo $db --quiet --eval "var pid='$pid';var ns='$bucket'" $scripts/shared/vfs.js
 
     remove=$remove
     if [ "$remove" == "yes" ] ; then

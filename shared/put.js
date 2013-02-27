@@ -12,7 +12,7 @@
  **/
 
 /**
- * Our model is the default GridFS with a namespace and its two buckets.
+ * Our model is the default GridFS collection with a namespace and its two buckets: files and chunks.
  * http://www.mongodb.org/display/DOCS/GridFS+Specification
  *
  * [ns].files:
@@ -91,7 +91,7 @@
  * Then this scripts is run to update the metadata.
  /**
 
-/**
+ /**
  * setMetadata
  *
  * When we save a new file, we will set initial m.
@@ -99,6 +99,19 @@
  *
  * For derivatives, we just copy parts of it into the metadata element FROM the master.
  */
+
+// First a normalization. The md5 in the mongodb collection is always 32 characters in length
+md5 = "00000000000000000000000000000000" + md5;
+md5 = md5.substring(md5.length - 32);
+
+function appendExtension(filename, contentType) {
+    var i = contentType.indexOf('/');
+    var extension = (i == -1) ? 'bin' : contentType.substring(i + 1);
+    i = filename.lastIndexOf('.');
+    var f = (i == -1) ? filename : filename.substring(0, i);
+    return f + '.' + extension;
+}
+
 function metadata(document) {
 
     var now = new Date();
@@ -112,14 +125,25 @@ function metadata(document) {
     m.l = l;
     m.access = access;
     m.label = label;
-    m.objid = objid;
-    m.seq = seq;
+    if (objid && objid.length() != 0) m.objid = objid;
+    if (seq != 0) m.seq = seq;
     m.resolverBaseUrl = resolverBaseUrl;
     m.timesUpdated = ( m.timesUpdated == undefined ) ? 0 : m.timesUpdated + 1;
     m.firstUploadDate = ( m.firstUploadDate == undefined ) ? now : m.firstUploadDate;
     m.lastUploadDate = now;
     m.timesAccessed = ( m.timesAccessed == undefined ) ? 0 : m.timesAccessed;
     if (content) m.content = content;
+
+    if (ns == 'master') { // Ensure the master filename has an extension
+        if (document.filename.indexOf(".") == -1) document.filename = appendExtension(document.filename, contentType);
+    } else {// Ensure the derivative has an extension
+        var master = db.master.files.findOne(query, {filename:1, 'metadata.l':1, 'metadata.objid':1, 'metadata.seq':1, 'metadata.access':1});
+        document.filename = appendExtension(master.filename, contentType);
+        m.l = master.metadata.l;
+        m.access = master.metadata.access;
+        if (master.metadata.objid) m.objid = master.metadata.objid;
+        if (master.metadata.seq) m.seq = master.metadata.seq;
+    }
 
     files.save(document);
     assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not update metadata.");

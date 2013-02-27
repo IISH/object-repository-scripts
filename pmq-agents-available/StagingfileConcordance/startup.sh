@@ -13,10 +13,10 @@ do
     for d in $project/*
     do
         if [ -d $d ] ; then
+            na=$(basename $d)
             for fileSet in $d/*
             do
                 if [ -d $fileSet ] ; then
-                    na=$(basename $fileSet)
                     if [ -f $fileSet/validate.txt ] || [ -f $fileSet/valideer.txt ] ; then
                         rm -f $fileSet/vali*
                         $scripts/pmq-agents-available/StagingfileConcordance/validate.sh -na $na -fileSet $fileSet

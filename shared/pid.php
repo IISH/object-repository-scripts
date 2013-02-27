@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * pid.php
+ *
+ * Find the pid value from the response we got.
+ */
+
 // l = file location; p=pid
 $options = getopt("l:");
 $l = $options['l'];

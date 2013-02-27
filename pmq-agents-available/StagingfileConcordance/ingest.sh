@@ -23,4 +23,4 @@ if [ ! -f $cf ] ; then
 fi
 
 source $scripts/pmq-agents-available/StagingfileConcordance/ingest.files.sh
-source $scripts/pmq-agents-available/StagingfileConcordance/ingest.mets.sh
+#source $scripts/pmq-agents-available/StagingfileConcordance/ingest.mets.sh

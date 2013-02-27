@@ -17,8 +17,7 @@ var admin = db.getMongo().getDB("admin");
 admin.runCommand("flushRouterConfig");
 admin.runCommand({ enablesharding:db.getName() });
 
-// The shard key is a 64 bit integer.
-// The default shard range is 1/3 of a 32 integer ( purely an arbitrary and part legacy choice )
+// The shard key is a Javascript number
 
 
 var buckets = ['master', 'level1', 'level2', 'level3'];
@@ -30,6 +29,7 @@ for (var i = 0; i < buckets.length; i++) {
     db.getCollection(collChunks).ensureIndex({files_id:1, n:1}, {unique:true});
     db.getCollection(collFiles).ensureIndex({'metadata.pid':1}, {unique:true});
     db.getCollection(collFiles).ensureIndex({'metadata.label':1}, {unique:false});
+    db.getCollection(collFiles).ensureIndex({'metadata.objid':1}, {unique:false});
 
     // Shard collection
     var shardThis = db.getName() + "." + collChunks;

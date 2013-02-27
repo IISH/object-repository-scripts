@@ -42,11 +42,13 @@ fi
 # Some normalizations
 # As the location in the supplied stagingfile is not absolute, but taken from the point of view of a ftp
 # home directory, we need to make it absolute.
+# We keep the original instruction/stagingfile/location element as instruction_location to add to the metadata
 #
 # Example:      FileSet =       /a/b/c/d
 #               location =      /d/e/f
 # must be       location =      /a/b/c/d/e/f
 if [ ! -z "$location" ]; then
+    instruction_location=$(dirname $location)
 	location=$(dirname $fileSet)$location
 	if [ -z "$l" ]; then
         	l=$location
