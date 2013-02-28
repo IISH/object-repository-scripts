@@ -6,17 +6,17 @@
 
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
 assert(na, "Need a naming authority");
-assert(fileSet, "Must have a fileSet: var fileSet='?'");
+assert(label, "Must have a label: var label='?'");
 assert(keepLocationWhenRecreate !== undefined, "Must have a keepLocationWhenRecreate value: var keepLocationWhenRecreate=true or false");
 
 var sa = db.getMongo().getDB("sa");
-var instruction = sa.instruction.findOne({fileSet:fileSet});
+var instruction = sa.instruction.findOne({label:label});
 assert(instruction, "The instruction is absent and must be created first.");
 
-sa.stagingfile.remove({fileSet:fileSet});
+sa.stagingfile.remove({label:label});
 assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not remove old instruction.");
 
-db.master.files.find({'metadata.fileSet':fileSet}, {'metadata.content':0}).forEach(function (d) {
+db.master.files.find({'metadata.label':label}, {'metadata.content':0}).forEach(function (d) {
     var document = {
         na:na,
         access:d.access,
@@ -24,14 +24,14 @@ db.master.files.find({'metadata.fileSet':fileSet}, {'metadata.content':0}).forEa
         md5:d.md5,
         length:d.length,
         pid:d.metadata.pid,
-        fileSet:fileSet,
+        fileSet:d.metadata.fileSet,
         version:NumberLong(0),
         _class:'org.objectrepository.instruction.StagingfileType'
     };
 
     if (instruction.access == document.access) delete document.access;
     if (instruction.contentType == document.contentType) delete document.contentType;
-    if (keepLocationWhenRecreate) document.location = merge(fileSet, d.metadata.l) + '/' + d.filename;
+    if (keepLocationWhenRecreate) document.location = merge(d.metadata.fileSet, d.metadata.l) + '/' + d.filename;
     if (d.metadata.lid) document.lid = d.metadata.lid;
 
     sa.stagingfile.save(document);
