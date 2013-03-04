@@ -2,7 +2,7 @@
 #
 # /InstructionRecreate/startup.sh
 #
-# Creating an instruction based on a fileSet
+# Creating an instruction based on a label
 
 scripts=$scripts
 source $scripts/shared/parameters.sh
@@ -15,7 +15,7 @@ if [ ! "$keepLocationWhenRecreate" == "true" ] ; then
     keepLocationWhenRecreate="false"
 fi
 
-mongo $db --quiet --eval "var na='$na'; var label='$label'; var keepLocationWhenRecreate=$keepLocationWhenRecreate" $scripts/pmq-agents-available/InstructionRecreate/recreate.js
+mongo $db --quiet --eval "var na='$na'; var id='$id'; var keepLocationWhenRecreate=$keepLocationWhenRecreate" $scripts/pmq-agents-available/InstructionRecreate/recreate.js
 
 rc=$?
 if [[ $rc != 0 ]] ; then

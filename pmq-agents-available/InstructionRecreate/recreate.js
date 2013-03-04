@@ -6,17 +6,19 @@
 
 assert(db.getName() != 'test', "The database is the test database. Startup specifying a production database: 'mongo host/database'");
 assert(na, "Need a naming authority");
-assert(label, "Must have a label: var label='?'");
+assert(id, "Must have a id: var id='?'");
 assert(keepLocationWhenRecreate !== undefined, "Must have a keepLocationWhenRecreate value: var keepLocationWhenRecreate=true or false");
 
 var sa = db.getMongo().getDB("sa");
-var instruction = sa.instruction.findOne({label:label});
+var instruction = sa.instruction.findOne({_id:id});
 assert(instruction, "The instruction is absent and must be created first.");
+assert(instruction.fileSet, "The instruction has not fileSet.");
+assert(instruction.label, "The instruction has no label.");
 
-sa.stagingfile.remove({label:label});
+sa.stagingfile.remove({fileSet:instruction.fileSet});
 assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not remove old instruction.");
 
-db.master.files.find({'metadata.label':label}, {'metadata.content':0}).forEach(function (d) {
+db.master.files.find({'metadata.label':instruction.label}, {'metadata.content':0}).forEach(function (d) {
     var document = {
         na:na,
         access:d.access,
