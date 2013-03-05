@@ -48,7 +48,11 @@ fi
 #               location =      /d/e/f
 # must be       location =      /a/b/c/d/e/f
 if [ ! -z "$location" ]; then
-    instruction_location=$(dirname $location)
+
+    if [ -z "$instruction_location" ]; then
+        instruction_location=$(dirname $location)
+    fi
+
 	location=$(dirname $fileSet)$location
 	if [ -z "$l" ]; then
         	l=$location
