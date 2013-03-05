@@ -16,8 +16,8 @@ item=$(db.master.files.findOne( { \$or: [ {'metadata.label':'$label'} , {'metada
 for sourceBucket in level2 level1 master
 do
 	echo "sourceBucket='$sourceBucket'"
-	sourceFile=$(mongo $db --quiet --eval "var doc=db.$sourceBucket.files.findOne({'metadata.pid','metadata.seq':{\$gt:0}},contentType:/^image/}); \
-	     if ( doc ) {var objid=(doc.metadata.objid) ? doc.metadata.objid : '$label';  print('$tmp/$na/' + objid + '_' + doc.metadata.seq + '_' +  doc.filename)}")
+	sourceFile=$(mongo $db --quiet --eval "function format(d){var seq='0000'+d;return seq.substring(seq.length-4)};var doc=db.$sourceBucket.files.findOne({'metadata.pid':$pid,'metadata.seq':{\$gt:0},'metadata.objid':{\$exists:true},contentType:/^image/}); \
+	     if ( doc ) print('$tmp/$na/' + doc.metadata.objid + '_' + format(doc.metadata.seq) + '_' +  doc.filename)")
     if [ ! -z "$sourceFile" ]; then
         echo "sourceFile=$sourceFile"
         if [ -f "$sourceFile" ]; then
@@ -34,4 +34,13 @@ do
     fi
 done
 
-# If we downloaded all images we will produce the PDFs
+# Once we have downloaded all images we will produce the PDF
+folder=$(dirname $sourceFile)
+countFiles=$(find $folder -type f | wc -l)
+countSAFiles=0
+if [ "$countFiles" == "$countSAFiles" ] ; then
+    exit 245
+fi
+
+echo "$countFiles of $countSAFiles are available to produce a pfd... skipping"
+exit 0
