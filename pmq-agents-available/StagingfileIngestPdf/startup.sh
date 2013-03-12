@@ -3,6 +3,9 @@
 # /StagingfileIngestPdf/startup.sh
 #
 # The convert script to create a pdf document, once all material is completed.
+#
+# We can only proceed as long as the files have an objid and have completed their workflow cycle.
+# This will inevitable make this procedure workflow aware.
 
 scripts=$scripts
 source $scripts/shared/parameters.sh
@@ -11,36 +14,31 @@ if [ "$action" == "delete" ] ; then
     exit 0
 fi
 
-item=$(db.master.files.findOne( { \$or: [ {'metadata.label':'$label'} , {'metadata.pid':'$pid'} ] } );
-
-for sourceBucket in level2 level1 master
-do
-	echo "sourceBucket='$sourceBucket'"
-	sourceFile=$(mongo $db --quiet --eval "function format(d){var seq='0000'+d;return seq.substring(seq.length-4)};var doc=db.$sourceBucket.files.findOne({'metadata.pid':$pid,'metadata.seq':{\$gt:0},'metadata.objid':{\$exists:true},contentType:/^image/}); \
-	     if ( doc ) print('$tmp/$na/' + doc.metadata.objid + '_' + format(doc.metadata.seq) + '_' +  doc.filename)")
-    if [ ! -z "$sourceFile" ]; then
-        echo "sourceFile=$sourceFile"
-        if [ -f "$sourceFile" ]; then
-	        echo "Using existing cached file on $sourceFile"
-	        break
-        else
-	        l=$sourceFile
-	        source $scripts/shared/get.sh
-	        if [ -f "$sourceFile" ] ; then
-	            echo "Using db file on $sourceFile"
-	            break
-	        fi
-	    fi
-    fi
-done
-
-# Once we have downloaded all images we will produce the PDF
-folder=$(dirname $sourceFile)
-countFiles=$(find $folder -type f | wc -l)
-countSAFiles=0
-if [ "$countFiles" == "$countSAFiles" ] ; then
+if [ -z "$objid" ] ; then
+    echo "No objid.... exiting"
     exit 245
 fi
+
+# Are there any task still staged related to the objid, save this one ?
+# StatusCode ought to be 850 (problems) or 900
+# That means if this really is the last tasks
+count=$(mongo sa --eval "db.stagingfile.count({fileSet: '$fileSet', objid:'$objid', workflow: { /
+    \$elemMatch: {n:0, statusCode: {\$lt: 900}}}})")
+if [ $count != 1 ] ; then
+    echo "Workflow not yet ready to produce a pdf."
+    exit 245
+fi
+
+# Determine the level we can use to produce a pfd of. Return the highest seq value.
+for sourceBucket in level2 level1 master
+do
+	seqMax=$(mongo $db --quiet --eval "var doc=db.master.files.find( {'metadata.objid':'10622/ARCH02550.1031', /
+	    contentType:/^image\//}).limit(1).sort({'metadata.seq':-1})[0];if (doc) print(doc.metadata.seq);")
+    if [ ! -z "$seqMax" ]; then
+        echo "Using sourceBucket=$sourceBucket. Expecting $seqMax files"
+	    break
+    fi
+done
 
 echo "$countFiles of $countSAFiles are available to produce a pfd... skipping"
 exit 0

@@ -125,8 +125,9 @@ function metadata(document) {
     m.l = l;
     m.access = access;
     m.label = label;
-    m.objid = objid;
     m.seq = seq;
+    if ( objid && objid.length != 0) m.objid = objid;
+
     m.resolverBaseUrl = resolverBaseUrl;
     m.timesUpdated = ( m.timesUpdated == undefined ) ? 0 : m.timesUpdated + 1;
     m.firstUploadDate = ( m.firstUploadDate == undefined ) ? now : m.firstUploadDate;
@@ -136,11 +137,12 @@ function metadata(document) {
 
     if (ns == 'master') { // Ensure the master filename has an extension
         if (document.filename.indexOf(".") == -1) document.filename = appendExtension(document.filename, contentType);
-    } else {// Ensure the derivative has an extension
-        var master = db.master.files.findOne(query, {filename:1, 'metadata.l':1, 'metadata.objid':1, 'metadata.seq':1, 'metadata.access':1});
+    } else {// Ensure the derivative has an extension and inherits the master properties
+        var master = db.master.files.findOne(query, {filename:1, 'metadata.label':1, 'metadata.l':1, 'metadata.objid':1, 'metadata.seq':1, 'metadata.access':1});
         document.filename = appendExtension(master.filename, contentType);
         m.l = master.metadata.l;
         m.access = master.metadata.access;
+        m.label = master.metadata.label;
         if (master.metadata.objid) m.objid = master.metadata.objid;
         if (master.metadata.seq) m.seq = master.metadata.seq;
     }

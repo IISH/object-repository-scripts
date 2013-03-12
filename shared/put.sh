@@ -67,10 +67,7 @@ fi
     # FSYNC_SAFE   = The write operation waits for the server to flush the data to disk
     # REPLICA_SAFE = Waits for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
-    writeConcern="FSYNC_SAFE"
-    if [ "$bucket" == "master" ] ; then
-        writeConcern="REPLICAS_SAFE"
-    fi
+    writeConcern="REPLICAS_SAFE"
     mongo $db --quiet --eval "var reserve=true; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
     java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?

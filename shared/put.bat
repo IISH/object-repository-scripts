@@ -21,7 +21,7 @@ Rem
     )
 
     Rem Upload our file.
-    java -DWriteConcern=FSYNC_SAFE -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
+    java -DWriteConcern=REPLICAS_SAFE -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
 
     set rc=%errorlevel%
     if %rc% neq 0 (
