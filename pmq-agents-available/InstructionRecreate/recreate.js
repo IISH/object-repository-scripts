@@ -26,6 +26,8 @@ db.master.files.find({'metadata.label':instruction.label}, {'metadata.content':0
         md5:d.md5,
         length:d.length,
         pid:d.metadata.pid,
+        seq:d.metadata.seq,
+        objid:d.metadata.objid,
         fileSet:d.metadata.fileSet,
         version:NumberLong(0),
         _class:'org.objectrepository.instruction.StagingfileType'
@@ -33,6 +35,7 @@ db.master.files.find({'metadata.label':instruction.label}, {'metadata.content':0
 
     if (instruction.access == document.access) delete document.access;
     if (instruction.contentType == document.contentType) delete document.contentType;
+    if (instruction.objid == document.objid) delete document.objid;
     if (keepLocationWhenRecreate) document.location = merge(d.metadata.fileSet, d.metadata.l) + '/' + d.filename;
     if (d.metadata.lid) document.lid = d.metadata.lid;
 
