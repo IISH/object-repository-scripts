@@ -126,7 +126,7 @@ function metadata(document) {
     m.access = access;
     m.label = label;
     m.seq = seq;
-    if ( objid && objid.length != 0) m.objid = objid;
+    if (objid && objid.length != 0) m.objid = objid;
 
     m.resolverBaseUrl = resolverBaseUrl;
     m.timesUpdated = ( m.timesUpdated == undefined ) ? 0 : m.timesUpdated + 1;
