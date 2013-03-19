@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# /StagingfileIngestPdf/startup.sh
+# /StagingfileBindObjid/startup.sh
 #
 # The convert script to create a pdf document, once all material is completed.
 #
@@ -21,9 +21,9 @@ fi
 
 # Are there any task still staged related to the objid, save this one ?
 # StatusCode ought to be 850 (problems) or 900
-# That means if this really is the last tasks
+# That means if this really is the last task
 count=$(mongo sa --eval "db.stagingfile.count({fileSet: '$fileSet', objid:'$objid', workflow: { /
-    \$elemMatch: {n:0, statusCode: {\$lt: 900}}}})")
+    \$elemMatch: {n:0, 'StagingfileIngestObjid', statusCode: {\$lt: 900}}}})")
 if [ $count != 1 ] ; then
     echo "Workflow not yet ready to produce a pdf."
     exit 245
