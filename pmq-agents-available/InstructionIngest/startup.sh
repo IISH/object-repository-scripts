@@ -27,13 +27,17 @@ fi
 mongo sa --quiet --eval "db.getCollection('stagingfile').update({fileSet:'$fileSet', 'workflow.name':'Start'}, \
     {\$set:{'workflow.\$.start':new Date(), 'workflow.\$.end':new Date()}}, \
     false, true);db.runCommand({getlasterror:1, w:'majority'})"
+rc=$?
+if [[ $rc != 0 ]] ; then
+    exit $rc
+fi
 
 # Now kickstart the message queue
-brokerURL=$brokerURL:8161
-queue=$fileset/queue.sh
-$(mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet'},{identifier:1}).forEach( \
+broker=$brokerURL:8161
+queue=$fileSet/queue.sh
+mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet'},{workflow:1}).forEach( \
     function(d){ \
-         print('wget -O /tmp/tmp.txt --post-data ""body='+d.identifier+')"" $brokerURL/demo/message/status')\
+         print('wget -O /tmp/tmp.txt --post-data body='+d.workflow[0].identifier+' $broker/demo/message/status?type=queue')\
          } )" > $queue
 
 chmod 744 $queue
