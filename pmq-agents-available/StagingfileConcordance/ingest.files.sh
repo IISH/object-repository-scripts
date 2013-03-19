@@ -41,7 +41,7 @@ echo "Upload files...">>$log
     rm $ftpScript
 
 echo "Create instruction for our files">>$log
-    php $scripts/pmq-agents-available/StagingfileConcordance/csv.php -f $cf -p PID -m master -access restricted -contentType image\tiff
+    php $scripts/pmq-agents-available/StagingfileConcordance/csv.php -f $cf -n $na -p PID -m master -access restricted -contentType image\tiff
     if [ ! -f $fileSet/instruction.xml ] ; then
         echo "Instruction not found.">>$log
         exit -1

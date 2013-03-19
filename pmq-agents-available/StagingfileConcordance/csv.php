@@ -37,7 +37,7 @@ if (isset($options['s'])) {
     }
 }
 
-$objidKey = "objnr";
+$objidKey = "ID";
 if (isset($options['o'])) {
     $objidKey = $options['o'];
 }
