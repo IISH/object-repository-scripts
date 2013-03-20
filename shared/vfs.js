@@ -22,11 +22,6 @@ assert(ns, "Need a namespace\\bucket.");
 var pid = ( pid === undefined ) ? null : pid;
 var date = ( date === undefined ) ? null : date;
 
-
-if (!date && !pid) {
-    print('Clearing vfs');
-    db.vfs.remove();
-}
 print('Create vfs for ' + db.getName() + '.' + ns);
 
 var datestamp_pattern = /\/\d{4}-\d{2}-\d{2}\//;

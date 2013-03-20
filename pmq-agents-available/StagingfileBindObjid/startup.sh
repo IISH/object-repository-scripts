@@ -2,10 +2,9 @@
 #
 # /StagingfileBindObjid/startup.sh
 #
-# The convert script to create a pdf document, once all material is completed.
+# The convert script to bind the mets obj document
 #
-# We can only proceed as long as the files have an objid and have completed their workflow cycle.
-# This will inevitable make this procedure workflow aware.
+# We bind the main PID: objid with the 'master' ( mets xml )
 
 scripts=$scripts
 source $scripts/shared/parameters.sh
