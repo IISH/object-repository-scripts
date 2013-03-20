@@ -84,7 +84,7 @@ while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $pid = $data[$index_pid];
     $location = $data[$index_master];
     $seq = ($index_seq == -1) ? 0 : $data[$index_seq];
-    $objid = ($index_objid == -1) ? null : $na . "/" . $data[$index_objid];
+    $objid = ($index_objid == -1) ? null : $na . "/" . pathinfo($fileSet, PATHINFO_FILENAME) . "." . $data[$index_objid];
     $file = $basename . $location;
     $filename = pathinfo($location, PATHINFO_FILENAME);
 
