@@ -58,9 +58,13 @@ wget -O $file --header="Content-Type: text/xml" \
 
 pidCheck=$(php $scripts/shared/pid.php -l $file)
 rm $file
-if [ "${pidCheck}" != "${pid^^}" ] ; then
-    echo "Pid not returned by webservice"
-    exit -1
+if [ "$action" == "delete" ] ; then
+    echo "No check for pid deletion"
+else
+    if [ "${pidCheck}" != "${pid^^}" ] ; then
+        echo "Pid not returned by webservice"
+        exit -1
+    fi
 fi
 
 mongo $db --quiet --eval "db.getCollection('master.files').update( {'metadata.pid':'$pid'}, {\$set:{'metadata.pidType':'or'}}, true, false )"
