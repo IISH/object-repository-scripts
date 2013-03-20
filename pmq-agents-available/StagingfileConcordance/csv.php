@@ -9,7 +9,7 @@
 
 ini_set('auto_detect_line_endings', 1);
 
-$options = getopt("f:p:m:s:o:n:", array("access:", "contentType:"));
+$options = getopt("f:p:m:s:o:n:h:");
 
 if (!isset($options['f'])) {
     exit("file -f is not set\n");
@@ -21,6 +21,11 @@ $fileSet = pathinfo($f, PATHINFO_DIRNAME);
 $pidKey = "PID";
 if (isset($options['p'])) {
     $pidKey = $options['p'];
+}
+
+$headers = "access='restricted' contentType='image/tiff'";
+if (isset($options['h'])) {
+    $headers = $options['h'];
 }
 
 $masterKey = "master";
@@ -47,15 +52,7 @@ $fh = fopen($instruction, 'w') or die("Cannot open file $instruction\n");
 
 fwrite($fh, "<?xml version='1.0' encoding='UTF-8'?>\n");
 fwrite($fh, "<!-- Instruction created on " . date("D M j G:i:s T Y") . " -->\n");
-fwrite($fh, "<instruction xmlns='http://objectrepository.org/instruction/1.0/'");
-foreach ($options as $key => $value) {
-    fwrite($fh, " ");
-    fwrite($fh, $key);
-    fwrite($fh, "=");
-    fwrite($fh, "'");
-    fwrite($fh, $value);
-    fwrite($fh, "'");
-}
+fwrite($fh, "<instruction xmlns='http://objectrepository.org/instruction/1.0/' " . $headers);
 fwrite($fh, ">\n");
 
 $handle = fopen($f, "r");
@@ -83,7 +80,7 @@ $basename = pathinfo($fileSet, PATHINFO_DIRNAME);
 while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     $pid = $data[$index_pid];
     $location = $data[$index_master];
-    $seq = ($index_seq == -1) ? 0 : $data[$index_seq];
+    $seq = ($index_seq == -1) ? null : $data[$index_seq];
     $objid = ($index_objid == -1) ? null : $na . "/" . pathinfo($fileSet, PATHINFO_FILENAME) . "." . $data[$index_objid];
     $file = $basename . $location;
     $filename = pathinfo($location, PATHINFO_FILENAME);
@@ -104,7 +101,7 @@ while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
     fwrite($fh, "        <md5>" . $md5 . "</md5>\n");
     if ($access) fwrite($fh, "        <access>" . $access . "</access>\n");
     if ($contentType) fwrite($fh, "        <contentType>" . $access . "</contentType>\n");
-    if ($seq != 0) fwrite($fh, "        <seq>" . $seq . "</seq>\n");
+    if ($seq) fwrite($fh, "        <seq>" . $seq . "</seq>\n");
     if ($objid) fwrite($fh, "        <objid>" . $objid . "</objid>\n");
     fwrite($fh, "    </stagingfile>\n");
 }
