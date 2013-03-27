@@ -15,7 +15,7 @@ fi
 fileSet=$fileSet
 count=$(mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet', \
     \$or:[{'workflow.n':{\$exists:false}},{'workflow.n':0,'workflow.name':{\$ne:'Start'}}]}).count()")
-if [ $count != 0 ] ; then
+if [[ $count != 0 ]] ; then
     echo "$count declared files do not have the expected 'Start' task: $fileSet"
     echo "Undo any tasks"
     mongo sa --quiet --eval "db.getCollection('stagingfile').update({fileSet:'$fileSet'}, \
@@ -24,24 +24,14 @@ if [ $count != 0 ] ; then
 fi
 
 # The application does not set the start and end dates correctly. Hence we set that here.
-mongo sa --quiet --eval "db.getCollection('stagingfile').update({fileSet:'$fileSet', 'workflow.name':'Start'}, \
-    {\$set:{'workflow.\$.start':new Date(), 'workflow.\$.end':new Date()}}, \
-    false, true);db.runCommand({getlasterror:1, w:'majority'})"
+# We set the end date in the past so the workflow controller will pick up on it.
+lasterror=$(mongo sa --quiet --eval "db.getCollection('stagingfile').update({fileSet:'$fileSet', 'workflow.name':'Start'}, \
+    {\$set:{'workflow.\$.start':new Date(), 'workflow.\$.end':new Date(0)}}, \
+    false, true);db.runCommand({getlasterror:1, w:'majority'}).err")
 rc=$?
 if [[ $rc != 0 ]] ; then
+    echo $lasterror
     exit $rc
 fi
-
-# Now kickstart the message queue
-broker=$brokerURL:8161
-queue=$fileSet/queue.sh
-mongo sa --quiet --eval "db.getCollection('stagingfile').find({fileSet:'$fileSet'},{workflow:1}).forEach( \
-    function(d){ \
-         print('wget -O /tmp/tmp.txt --post-data body='+d.workflow[0].identifier+' $broker/demo/message/status?type=queue')\
-         } )" > $queue
-
-chmod 744 $queue
-source $queue
-rm $queue
 
 exit 0
