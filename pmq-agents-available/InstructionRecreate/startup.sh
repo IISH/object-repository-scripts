@@ -9,13 +9,9 @@ source $scripts/shared/parameters.sh
 db=$db
 na=$na
 fileSet=$fileSet
-keepLocationWhenRecreate=$keepLocationWhenRecreate
+id=$id
 
-if [ ! "$keepLocationWhenRecreate" == "true" ] ; then
-    keepLocationWhenRecreate="false"
-fi
-
-mongo $db --quiet --eval "var na='$na'; var id='$id'; var keepLocationWhenRecreate=$keepLocationWhenRecreate" $scripts/pmq-agents-available/InstructionRecreate/recreate.js
+mongo $db --quiet --eval "var na='$na'; var id='$id';" $scripts/pmq-agents-available/InstructionRecreate/recreate.js
 
 rc=$?
 if [[ $rc != 0 ]] ; then

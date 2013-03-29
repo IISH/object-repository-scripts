@@ -18,6 +18,7 @@ lid=$lid
 pidwebserviceKey=$pidwebserviceKey
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 objid=$objid
+pdfLevel=$pdfLevel
 
 if [ -z "$objid" ] ; then
     echo "No objid.... exiting"
@@ -45,7 +46,7 @@ else
                             <pid:location weight='1' href='$resolveUrl/mets/$objid'/> \
                             <pid:location weight='0' href='$resolveUrl/file/mets/$objid' view='master'/> \
                             <pid:location weight='0' href='$resolveUrl/file/mets/$objid' view='mets'/> \
-                            <pid:location weight='0' href='$resolveUrl/file/pdf/$objid' view='pdf'/> \
+                            <pid:location weight='0' href='$resolveUrl/file/pdf/$objid/$pdfLevel' view='pdf'/> \
                             <pid:location weight='0' href='$resolveUrl/file/level1/$pid' view='level1'/> \
                             <pid:location weight='0' href='$resolveUrl/file/level2/$pid' view='level2'/> \
                             <pid:location weight='0' href='$resolveUrl/file/level3/$pid' view='level3'/> \
