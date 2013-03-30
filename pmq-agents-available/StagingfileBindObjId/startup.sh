@@ -44,9 +44,9 @@ else
                     <pid:pid>$objid</pid:pid> \
                         <pid:locAtt> \
                             <pid:location weight='1' href='$resolveUrl/mets/$objid'/> \
-                            <pid:location weight='0' href='$resolveUrl/file/mets/$objid' view='master'/> \
-                            <pid:location weight='0' href='$resolveUrl/file/mets/$objid' view='mets'/> \
-                            <pid:location weight='0' href='$resolveUrl/file/pdf/$objid/$pdfLevel' view='pdf'/> \
+                            <pid:location weight='0' href='$resolveUrl/mets/$objid' view='master'/> \
+                            <pid:location weight='0' href='$resolveUrl/mets/$objid' view='mets'/> \
+                            <pid:location weight='0' href='$resolveUrl/pdf/$objid/$pdfLevel' view='pdf'/> \
                             <pid:location weight='0' href='$resolveUrl/file/level1/$pid' view='level1'/> \
                             <pid:location weight='0' href='$resolveUrl/file/level2/$pid' view='level2'/> \
                             <pid:location weight='0' href='$resolveUrl/file/level3/$pid' view='level3'/> \
