@@ -1,6 +1,7 @@
 # IDE #
 *.ipr
 *.iws
+*.iml
 .idea
 target
 out
