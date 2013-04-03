@@ -13,6 +13,10 @@ dbs=$dbs
 # Backup the config server database
 mongodump -d config
 
+# Backup the stagingarea and user base
+mongodump -d sa
+mongodump -d security
+
 #backup the fsGrid metadata
 for db in ${dbs[*]}
 do
@@ -35,7 +39,7 @@ done
 # Produce virtual file system
 for db in ${dbs[*]}
 do
-    mongo $db --eval "db.vfs.remove();"
+    mongo $db --eval "db.vfs.remove({na:/^\/${db:3}\//});"
     for c in master level1 level2 level3
     do
         mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
