@@ -9,8 +9,6 @@ scripts=$scripts
 source $scripts/shared/parameters.sh
 derivative=$derivative
 
-source $scripts/shared/generic.derivative.sh
-
 # If we are here in this script, it is because there was no custom derivative provided.
 file="$scripts/shared/$derivative.derivative.sh"
 if [ -f "$file" ] ; then

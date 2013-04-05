@@ -1,5 +1,11 @@
 /**
- freeshard.js
+ reserveshard.js
+
+ Before we write; we reserve this shard for ourselves ( the client ). This will lessen the change of other clients using
+ the same shard as well to write to.
+
+ and after we have written to the shard, we release the reservation.
+
  **/
 
 assert(reserve !== undefined, 'Must have a reserve status: var reserve=true or false');
