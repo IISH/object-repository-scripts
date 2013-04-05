@@ -7,7 +7,7 @@
 scripts=$scripts
 contentType=$contentType
 derivative=$derivative
-if [ "$contentType" == "applcation/pdf" ] ; then
+if [ "$contentType" == "application/pdf" ] ; then
     source $scripts/shared/image.derivative.sh
 fi
 
