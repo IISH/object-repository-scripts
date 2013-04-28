@@ -65,7 +65,7 @@ fi
 
     # Upload our file. For masters we increase the write concern
     # FSYNC_SAFE   = The write operation waits for the server to flush the data to disk
-    # REPLICA_SAFE = Waits for at least 2 servers for the write operation
+    # REPLICAS_SAFE = Waits for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
     writeConcern="REPLICAS_SAFE"
     mongo $db --quiet --eval "var reserve=true; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
@@ -124,12 +124,13 @@ if [[ $rc != 0 ]] ; then
     fi
 fi
 
-    # With the fs... this check is really not necessary then using REPLICA_SAFE
-    # mongo $db --quiet --eval "\
-    #    var ns='$bucket'; \
-    #    var md5='$md5'; \
-    #    var pid = '$pid'; \
-    #    ''" $scripts/shared/integrity.js
+    # With the fs... this check is really not necessary then using REPLICAS_SAFE
+    mongo $db --quiet --eval "\
+       var ns='$bucket'; \
+       var md5='$md5'; \
+       var pid = '$pid'; \
+       var paranoid = false ; \
+       " $scripts/shared/integrity.js
 
     rc=$?
     if [[ $rc != 0 ]] ; then
