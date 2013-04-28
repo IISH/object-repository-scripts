@@ -39,6 +39,11 @@ if [ -z "$sa_path" ] ; then
     exit -1
 fi
 
+if [ ! -d "$sa_path" ] ; then
+    echo "Path sa_path '$sa_path' not found."
+    exit -1
+fi
+
 # Some normalizations
 # As the location in the supplied stagingfile is not absolute, but taken from the point of view of a ftp
 # home directory, we need to make it absolute.

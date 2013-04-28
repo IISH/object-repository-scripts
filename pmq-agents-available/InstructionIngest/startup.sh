@@ -7,6 +7,8 @@ source $scripts/shared/instruction.sh
 
 rc=$?
 if [[ $rc != 0 ]] ; then
+    mongo sa --quiet --eval "db.getCollection('stagingfile').update({fileSet:'$fileSet'}, \
+        {\$unset:{workflow:1}}, false, true)"
     exit $rc
 fi
 
