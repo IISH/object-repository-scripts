@@ -10,7 +10,7 @@
 assert(ns, "Must have ns (bucket) as parameter.");
 assert(md5, "Must have md5 as parameter.");
 assert(pid, "Must have pid as parameter.");
-assert(paranoid, "Must have paranoid as parameter.");
+assert(paranoid !== null, "Must have paranoid as parameter.");
 
 // First a normalization. The md5 in the mongodb collection is always 32 characters in length
 md5 = "00000000000000000000000000000000" + md5;
