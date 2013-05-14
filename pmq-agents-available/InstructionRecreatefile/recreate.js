@@ -12,14 +12,12 @@ var sa = db.getMongo().getDB("sa");
 var instruction = sa.instruction.findOne(ObjectId(id));
 assert(instruction, "The instruction is absent and must be created first.");
 assert(instruction.fileSet, "The instruction has not fileSet.");
-assert(instruction.workflow.size() !=0, "The instruction has no workflow element.");
-assert(instruction.workflow[0].info, "The instruction has no info.");
-var pid = instruction.workflow[0].info ;
+assert(instruction.resubmitPid, "The instruction has no resubmitPid element.");
 
-sa.stagingfile.remove({pid:pid});
+sa.stagingfile.remove({pid:instruction.resubmitPid});
 assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not remove old instruction.");
 
-db.master.files.find({'metadata.pid':pid}, {'metadata.content':0}).forEach(function (d) {
+db.master.files.find({'metadata.pid':instruction.resubmitPid}, {'metadata.content':0}).forEach(function (d) {
     var document = {
         na:na,
         access:d.access,
