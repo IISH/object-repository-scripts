@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# /InstructionRecreatefile/startup.sh
+# /InstructionRecreate/startup.sh
 #
-# Creating a fileset based on an existing instruction
+# Creating an instruction based on a pid value in the workflow task info field.
 
 scripts=$scripts
 source $scripts/shared/parameters.sh
@@ -11,7 +11,7 @@ na=$na
 fileSet=$fileSet
 id=$id
 
-mongo $db --quiet --eval "var id='$id';" $scripts/pmq-agents-available/InstructionRecreatefile/recreate.js
+mongo $db --quiet --eval "var na='$na'; var id='$id';" $scripts/pmq-agents-available/InstructionRecreatefile/recreate.js
 
 rc=$?
 if [[ $rc != 0 ]] ; then
