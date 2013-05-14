@@ -120,12 +120,17 @@ function reduce(key, values) {
     print("Collection: " + collection);
     if (pid) {
         assert(ns, "When a PID value is defined, we must have a bucket value: var ns='ns'");
-        var query = {'metadata.pid':pid};
-        db.getCollection(ns + '.files').mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}, query:query });
+        var query = {'metadata.pid': pid};
+        db.getCollection(ns + '.files').mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query });
     } else {
-        db.master.files.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit}});
-        db.level1.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
-        db.level2.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
-        db.level3.files.mapReduce(map, reduce, { out:{reduce:collection}, scope:{unit:unit}});
+
+        var last = db.getCollection(bucket).find().sort({uploadDate: -1}).limit(1);
+        if (last == null) last = {uploadDate: new Date(0)};
+        var query = {uploadDate: {$gte: last.uploadDate}};
+
+        db.master.files.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query});
+        db.level1.files.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query});
+        db.level2.files.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query});
+        db.level3.files.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query});
     }
 });
