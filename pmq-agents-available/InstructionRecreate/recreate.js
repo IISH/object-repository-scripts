@@ -27,7 +27,7 @@ db.master.files.find({'metadata.label':instruction.label}, {'metadata.content':0
         pid:d.metadata.pid,
         seq:d.metadata.seq,
         objid:d.metadata.objid,
-        fileSet:d.metadata.fileSet,
+        fileSet:instruction.fileSet,
         version:NumberLong(0),
         _class:'org.objectrepository.instruction.StagingfileType'
     };
