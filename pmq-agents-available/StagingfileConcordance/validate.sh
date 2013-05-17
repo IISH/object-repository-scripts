@@ -11,18 +11,18 @@ validation=$validation
 metsmaker=$metsmaker
 fileSet=$fileSet
 source $scripts/shared/parameters.sh
-prefix=$(basename $fileSet)
-report=$fileSet/$prefix.report.txt
-log=$fileSet/$prefix.log
-cf=$fileSet/$prefix.concordanceValidWithPID.csv
+archiveID=$(basename $fileSet)
+report=$fileSet/$archiveID.report.txt
+log=$fileSet/$archiveID.log
+cf=$fileSet/$archiveID.concordanceValidWithPID.csv
 na=$na
 mailTo=$mailTo
 
 echo $(date)>$log
 echo "Start validation">>$log
 
-echo "Validation for $prefix\nStarted on $(date)\n\n" > $report
-java -Xms512m -Xmx512m -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet ${fileSet%/*} -prefix $prefix -na $na >> $report
+echo "Validation for $archiveID\nStarted on $(date)\n\n" > $report
+java -Xms512m -Xmx512m -cp $validation org.objectrepository.validation.ConcordanceMain -fileSet ${fileSet%/*} -archiveID $archiveID -na $na >> $report
 mv $fileSet/concordanceValidWithPID.csv $cf
 if [ ! -f $cf ] ; then
     echo "Unable to find $cf">>$log

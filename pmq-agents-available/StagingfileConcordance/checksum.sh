@@ -3,9 +3,9 @@
 scripts=$scripts
 source $scripts/shared/parameters.sh
 fileSet=$fileSet
-prefix=$(basename $fileSet)
-report=$fileSet/$prefix.report.checksum.txt
-log=$fileSet/$prefix.log
+archiveID=$(basename $fileSet)
+report=$fileSet/$archiveID.report.checksum.txt
+log=$fileSet/$archiveID.log
 
 # Remove DOS \r
 file=$fileSet/checksum.md5

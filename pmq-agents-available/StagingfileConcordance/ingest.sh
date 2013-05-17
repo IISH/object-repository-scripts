@@ -8,14 +8,14 @@
 scripts=$scripts
 source $scripts/shared/parameters.sh
 fileSet=$fileSet
-prefix=$(basename $fileSet)
-ftpScript=$fileSet/$prefix.lftp
+archiveID=$(basename $fileSet)
+ftpScript=$fileSet/$archiveID.lftp
 fileSetMets=$fileSet.mets
-log=$fileSet/$prefix.log
+log=$fileSet/$archiveID.log
 echo $(date)>$log
 echo "Start preparing ingest...">>$log
 
-cf=$fileSet/$prefix.concordanceValidWithPID.csv
+cf=$fileSet/$archiveID.concordanceValidWithPID.csv
 if [ ! -f $cf ] ; then
     echo "Error... did not find $cf">>$log
     echo "Is the dataset validated ?">>$log
@@ -23,4 +23,5 @@ if [ ! -f $cf ] ; then
 fi
 
 source $scripts/pmq-agents-available/StagingfileConcordance/ingest.files.sh
+source $scripts/pmq-agents-available/StagingfileConcordance/ingest.pids.sh
 #source $scripts/pmq-agents-available/StagingfileConcordance/ingest.mets.sh

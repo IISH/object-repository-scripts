@@ -12,7 +12,7 @@ lftpUser=$lftpUser
 lftpPassword=$lftpPassword
 fileSet=$fileSet
 na=$na
-prefix=$prefix
+archiveID=$archiveID
 log=$log
 cf=$cf
 ftpScript=$ftpScript
@@ -25,7 +25,7 @@ echo "Upload files...">>$log
     mv $fileSet/Jpeg $fileSet/.level1
     cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
     echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
-    echo "mirror --reverse --continue --verbose --exclude-glob $prefix.* $fileSet $prefix">>$ftpScript
+    echo "mirror --reverse --continue --verbose --exclude-glob $archiveID.* $fileSet $archiveID">>$ftpScript
     echo "quit">>$ftpScript
     to=10
     for i in {1..$to}
@@ -50,7 +50,7 @@ echo "Create instruction for our files">>$log
 echo "Upload remaining instruction...">>$log
     cp $scripts/pmq-agents-available/StagingfileConcordance/lftp.conf $ftpScript
     echo "lftp -e open -u $lftpUser,$lftpPassword -p 21 stagingarea.objectrepository.org">>$ftpScript
-    echo "put -c -O $prefix $fileSet/instruction.xml">>$ftpScript
+    echo "put -c -O $archiveID $fileSet/instruction.xml">>$ftpScript
     echo "quit">>$ftpScript
     lftp -f $ftpScript>>$log
     rm $ftpScript
