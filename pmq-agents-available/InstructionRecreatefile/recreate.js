@@ -27,6 +27,8 @@ db.master.files.find({'metadata.pid':instruction.resubmitPid}, {'metadata.conten
         pid:d.metadata.pid,
         seq:d.metadata.seq,
         objid:d.metadata.objid,
+        embargo:d.metadata.embargo,
+        embargoAccess:d.metadata.embargoAccess,
         fileSet:d.metadata.fileSet,
         version:NumberLong(0),
         _class:'org.objectrepository.instruction.StagingfileType'
@@ -34,6 +36,8 @@ db.master.files.find({'metadata.pid':instruction.resubmitPid}, {'metadata.conten
     if (instruction.access == document.access) delete document.access;
     if (instruction.contentType == document.contentType) delete document.contentType;
     if (instruction.objid == document.objid) delete document.objid;
+    if (instruction.embargo == document.embargo) delete document.embargo;
+    if (instruction.embargoAccess == document.embargoAccess) delete document.embargoAcces;
     document.location = d.metadata.l + '/' + d.filename;
     if (d.metadata.lid) document.lid = d.metadata.lid;
 

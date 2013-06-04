@@ -92,7 +92,7 @@ mongo $db --quiet --eval "\
     var l='$instruction_location'; \
     var resolverBaseUrl='$resolverBaseUrl'; \
     var contentType='$contentType'; \
-    var seq=0$seq; \
+    var seq=Number('0$seq'); \
     var objid='$objid'; \
     var embargo='$embargo'; \
     var embargoAccess='$embargoAccess'; \
@@ -116,7 +116,7 @@ if [[ $rc != 0 ]] ; then
         var l='$instruction_location'; \
         var resolverBaseUrl='$resolverBaseUrl'; \
         var contentType='$contentType'; \
-        var seq=0$seq; \
+        var seq=Number('0$seq'); \
         var objid='$objid'; \
         var embargo='$embargo'; \
         var embargoAccess='$embargoAccess'; \
