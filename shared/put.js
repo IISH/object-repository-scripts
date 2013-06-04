@@ -127,6 +127,8 @@ function metadata(document) {
     m.label = label;
     m.seq = seq;
     if (objid && objid.length != 0) m.objid = objid;
+    if (embargo && embargo.length == 10) m.embargo = embargo;
+    if (embargoAccess && embargoAccess.length != 0) m.embargoAccess = embargoAccess;
 
     m.resolverBaseUrl = resolverBaseUrl;
     m.timesUpdated = ( m.timesUpdated == undefined ) ? 0 : m.timesUpdated + 1;
@@ -138,12 +140,12 @@ function metadata(document) {
     if (ns == 'master') { // Ensure the master filename has an extension
         if (document.filename.indexOf(".") == -1) document.filename = appendExtension(document.filename, contentType);
     } else {// Ensure the derivative has an extension and inherits the master properties
-        var master = db.master.files.findOne(query, {filename:1, 'metadata.pidType':1, 'metadata.label':1, 'metadata.l':1, 'metadata.objid':1, 'metadata.seq':1, 'metadata.access':1});
+        var master = db.master.files.findOne(query, {'metadata.content':0});
         document.filename = appendExtension(master.filename, contentType);
         m.l = master.metadata.l;
         m.access = master.metadata.access;
-        m.embargo = master.metadata.embargo;
-        m.embargoAccess = master.metadata.embargoAccess;
+        if (master.metadata.embargo) m.embargo = master.metadata.embargo;
+        if (master.metadata.embargoAccess) m.embargoAccess = master.metadata.embargoAccess;
         m.pidType = master.metadata.pidType;
         m.label = master.metadata.label;
         if (master.metadata.objid) m.objid = master.metadata.objid;
@@ -151,13 +153,13 @@ function metadata(document) {
     }
 
     files.save(document);
-    assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not update metadata.");
+    assert(db.runCommand({getlasterror: 1, w: "majority"}).err == null, "Could not update metadata.");
     print('Update metadata ' + files.getName() + ' ' + document.metadata.pid);
     printjson(document);
 }
 
 var files = db.getCollection(ns + '.files');
-var query = {'metadata.pid':pid};
+var query = {'metadata.pid': pid};
 var document = files.findOne(query);
 assert(document.md5 == md5 && document.length == length, "Length and md5 do not match !");
 metadata(document);

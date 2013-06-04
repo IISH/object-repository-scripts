@@ -94,6 +94,8 @@ mongo $db --quiet --eval "\
     var contentType='$contentType'; \
     var seq=0$seq; \
     var objid='$objid'; \
+    var embargo='$embargo'; \
+    var embargoAccess='$embargoAccess'; \
     " $scripts/shared/put.js
 
 # toDo: make sure the content type is a proper json field... so we can remove this quick fix.
@@ -116,6 +118,8 @@ if [[ $rc != 0 ]] ; then
         var contentType='$contentType'; \
         var seq=0$seq; \
         var objid='$objid'; \
+        var embargo='$embargo'; \
+        var embargoAccess='$embargoAccess'; \
         " $scripts/shared/put.js
     rc=$?
     if [[ $rc != 0 ]] ; then
