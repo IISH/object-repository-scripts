@@ -142,6 +142,8 @@ function metadata(document) {
         document.filename = appendExtension(master.filename, contentType);
         m.l = master.metadata.l;
         m.access = master.metadata.access;
+        m.embargo = master.metadata.embargo;
+        m.embargoAccess = master.metadata.embargoAccess;
         m.pidType = master.metadata.pidType;
         m.label = master.metadata.label;
         if (master.metadata.objid) m.objid = master.metadata.objid;

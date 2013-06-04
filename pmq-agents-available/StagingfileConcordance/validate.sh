@@ -14,6 +14,7 @@ source $scripts/shared/parameters.sh
 archiveID=$(basename $fileSet)
 report=$fileSet/$archiveID.report.txt
 log=$fileSet/$archiveID.log
+log=$fileSet/$archiveID.log
 cf=$fileSet/$archiveID.concordanceValidWithPID.csv
 na=$na
 mailTo=$mailTo

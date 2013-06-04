@@ -29,7 +29,7 @@ if [ -f "$l" ] ; then
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
     query="{'metadata.pid':'$pid'}"
-    update="{'metadata.access':'$access',contentType:'$contentType','metadata.label':'$label'}"
+    update="{'metadata.access':'$access','metadata.embargo':'$embargo','metadata.embargoAccess':'$embargoAccess',contentType:'$contentType','metadata.label':'$label'}"
     mongo $db --quiet --eval "db.getCollection('$bucket.files').update($query,{\$set:$update}, false, false);''"
     rc=$?
     if [[ $rc != 0 ]] ; then
