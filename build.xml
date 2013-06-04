@@ -21,7 +21,7 @@
         <mkdir dir="${dest.opt}/pmq-agents-enabled"/>
         <delete dir="${tmp}"/>
         <mkdir dir="${tmp}"/>
-        <get src="${bamboo}/OR-ADMIN/${build}/artifact/JOB1/admin.war/object-repository-admin-1.2.war" dest="${tmp}/object-repository-admin.war"/>
+        <get src="${bamboo}/OR-ADMIN/${build}/artifact/JOB1/admin.war/object-repository-admin-1.3.war" dest="${tmp}/object-repository-admin.war"/>
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/pmq-agent/pmq-agent-${version}.jar" dest="${tmp}/pmq-agent.jar"/>
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/orfiles/orfiles-${version}.jar" dest="${tmp}/orfiles.jar"/>
         <get src="${bamboo}/OR-SERVICENODES/${build}/artifact/JOB1/instruction-manager/instruction-manager-${version}.jar" dest="${tmp}/instruction-manager.jar"/>
