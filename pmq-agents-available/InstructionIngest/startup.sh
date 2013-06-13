@@ -2,6 +2,9 @@
 #
 # /InstructionIngest/startup.sh
 
+scripts=$scripts
+source $scripts/shared/parameters.sh
+
 q="fileSet:'$fileSet'"
 count=$(mongo sa --quiet --eval "db.stagingfile.count({$q, workflow:{\$elemMatch:{n:0, name:'InstructionValidated', statusCode:{\$lt:800}}}})")
 if [[ $count != 0 ]] ; then
