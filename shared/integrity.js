@@ -24,16 +24,8 @@ assert(file.length, "Did not find a file with the expected length element");
 
 var nc = Math.ceil(file.length / file.chunkSize);
 var chunkCollection = db.getCollection(ns + '.chunks');
-var count = chunkCollection.count({files_id: file._id});
+var count = chunkCollection.count({files_id: file._id, data:{$exists:true}});
 assert(count == nc, "Counted " + count + ' chunks, but expected ' + nc);
-
-// Paranoid check each chunk. This way we do not look at an index.
-if (paranoid) {
-    for (var n = 0; n < nc; n++) {
-        var chunk = chunkCollection.findOne({files_id: file._id, n: n}, {data: 0});
-        assert(chunk, "There are chunks missing ! Chunk n:" + n);
-    }
-}
 
 
 

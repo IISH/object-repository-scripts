@@ -46,7 +46,11 @@ Rem
     set rc=%errorlevel%
     if %rc% neq 0 exit %rc%
 
-    Rem mongo %db% --quiet --eval "var ns='%bucket%'; var md5='%md5%'; var length=%length%; var pid = '%pid%';" %scripts%\shared\integrity.js
+    mongo %db% --quiet --eval "var ns='%bucket%'; var md5='%md5%'; var length=%length%; var pid = '%pid%';" %scripts%\shared\integrity.js
+    set rc=%errorlevel%
+    if %rc% neq 0 (
+        exit %rc%
+    )
 
     mongo %db% --quiet --eval "var pid='%pid%';var ns='%bucket%'" %scripts%\shared\vfs.js
 
