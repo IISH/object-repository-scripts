@@ -65,12 +65,16 @@ function findLevel($fileSet, $location, $bucket, $filename)
             }
         }
 
-        $files = rglob($fileSet . $insert, $filename . ".*");
+        $files = rglob(escape($fileSet . $insert), escape($filename) . ".*");
         if (sizeof($files) != 0) return $files[0];
-        $files = rglob($fileSet . $substitute, $filename . ".*");
+        $files = rglob(escape($fileSet . $substitute), escape($filename) . ".*");
         if (sizeof($files) != 0) return $files[0];
     }
     return NULL;
+}
+
+function escape($text){
+    return preg_replace('/(\*|\?|\[)/', '[$1]', $text);
 }
 
 
@@ -86,6 +90,7 @@ function rglob($sDir, $sPattern, $nFlags = NULL)
     // Get the list of all matching files currently in the
     // directory.
     $filter = "$sDir/$sPattern";
+    echo "\nFilter=$filter\n";
     return glob($filter, $nFlags);
 }
 
