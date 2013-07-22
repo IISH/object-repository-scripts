@@ -90,7 +90,6 @@ function rglob($sDir, $sPattern, $nFlags = NULL)
     // Get the list of all matching files currently in the
     // directory.
     $filter = "$sDir/$sPattern";
-    echo "\nFilter=$filter\n";
     return glob($filter, $nFlags);
 }
 
