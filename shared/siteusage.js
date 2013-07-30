@@ -7,6 +7,8 @@
 
 function map() {
 
+    if (!this.downloadDate) return;
+
     /* use a function for the exact format desired... */
     function ISODateString(d) {
         function pad(n) {
@@ -95,6 +97,7 @@ function map() {
             break;
     }
     var value = {};
+    value["i"] = this._id;
     value[ this.bucket] = 1;
     var c = (this.c === undefined) ? 'IP' : this.c;
     value[c + "." + this.bucket] = 1;
@@ -104,17 +107,26 @@ function map() {
 
 function reduce(k, values) {
     var reducto = {};
+    var _id = null;
     values.forEach(function (value) {
         for (var key in value) {
-            if (value.hasOwnProperty(key)) reducto[key] = (reducto[key] === undefined) ? value[key] : reducto[key] + value[key];
+            if (value.hasOwnProperty(key)) {
+                if (key == "i") {
+                    reducto['i'] = _id = ( _id == null || _id < value['i']) ? value['i'] : _id;
+                } else
+                    reducto[key] = (reducto[key] === undefined) ? value[key] : reducto[key] + value[key];
+            }
         }
     });
     return reducto;
 }
 
-['year', 'month', 'week', 'day'].forEach(function (unit) {
+['year', 'month', 'day'].forEach(function (unit) {
     var collection = unit + ".siteusage.statistics";
-    print("Collection: " + collection);
-    db.siteusage.mapReduce(map, reduce, { out:{replace:collection}, scope:{unit:unit},
-        query:{downloadDate:{$exists:true}} });
+    var from = db.getCollection(collection).find().sort({_id: -1}).limit(1);
+    var query = (from.length() == 0) ? {} : {_id: {$gte: from}};
+    print('Running mapreduce on collection ' + collection + '  with query:');
+    printjson(query);
+    db.siteusage.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit},
+        query: query });
 });

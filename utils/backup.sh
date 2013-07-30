@@ -36,31 +36,29 @@ do
         function(d){db.label.update({_id:d.metadata.label},{\$inc:{size:1}}, true, false)})"
 done
 
-# Produce virtual file system
-for db in ${dbs[*]}
-do
-    mongo $db --eval "db.vfs.remove({na:/^\/${db:3}\//});"
-    for c in master level1 level2 level3
-    do
-        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
-    done
-done
-
-exit 0
-
-# Create site usage
-for db in ${dbs[*]}
-do
-    echo "Siteusage IP for $db"
-    source $scripts/shared/siteusage.sh
-
-    echo "Siteusage mapreduce for $db"
-    mongo $db --eval "var pid=null" $scripts/shared/siteusage.js
-done
-
 # Calculate storage statistics
 for db in ${dbs[*]}
 do
     echo "Storage statistics for $db"
-    mongo $db --eval "var pid=null" $scripts/shared/statistics.js
+    mongo $db $scripts/shared/statistics.js
 done
+
+# Create site usage
+#for db in ${dbs[*]}
+#do
+#    echo "Siteusage IP for $db"
+#    source $scripts/shared/siteusage.sh
+#
+#    echo "Siteusage mapreduce for $db"
+#    mongo $db $scripts/shared/siteusage.js
+#done
+
+# Produce virtual file system
+#for db in ${dbs[*]}
+#do
+#    mongo $db --eval "db.vfs.remove({na:/^\/${db:3}\//});"
+#    for c in master level1 level2 level3
+#    do
+#        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
+#    done
+#done

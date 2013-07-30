@@ -87,7 +87,7 @@ function map() {
                 key = d.substring(0, 10);
                 break;
             case 'week':
-                var onejan = new Date(this.uploadDate.getUTCFullYear(), 0, 1);
+                var onejan = new ISODate(this.uploadDate.getUTCFullYear()+"-01-01") ;
                 var week = Math.ceil((((this.uploadDate - onejan) / 86400000) + onejan.getDay() + 1) / 7);
                 var fwoy = firstDayOfWeek(week, this.uploadDate.getFullYear());
                 key = ISODateString(new Date(fwoy)).substring(0, 10);
@@ -95,9 +95,10 @@ function map() {
         }
         var value = {};
         value[ "files.count"] = 1;
+        value[ "uploadDate." + ns] = this.uploadDate;
         value[ "files.length"] = this.length;
-        value[ "files.count." + this.metadata.bucket] = 1;
-        value[ "files.length." + this.metadata.bucket] = this.length;
+        value[ "files.count." + ns] = 1;
+        value[ "files.length." + ns] = this.length;
         value[ "access.count." + this.metadata.access] = 1;
         value[ "contentType.count." + this.contentType] = 1;
         emit(new ISODate(key), value);
@@ -106,25 +107,34 @@ function map() {
 
 function reduce(key, values) {
     var reducto = {};
+    var uploadDate = new Date(0);
     values.forEach(function (value) {
         for (var k in value) {
-            if (value.hasOwnProperty(k))
-                reducto[k] = (reducto[k] === undefined) ? value[k] : reducto[k] + value[k];
+            if (value.hasOwnProperty(k)) {
+                if (k == 'uploadDate.'+ns)
+                    reducto[k] = uploadDate = ( value[k] > uploadDate ) ? value[k] : uploadDate;
+                else
+                    reducto[k] = (reducto[k] === undefined) ? value[k] : reducto[k] + value[k];
+            }
         }
     });
     return reducto;
 }
 
-['year', 'month', 'week', 'day'].forEach(function (unit) {
+['year', 'month', 'day'].forEach(function (unit) {
     var collection = unit + ".storage.statistics";
-    print("Collection: " + collection);
-
     ['master', 'level1', 'level2', 'level3'].forEach(function (ns) {
         var bucket = ns + '.files';
-        var last = db.getCollection(bucket).find().sort({uploadDate: -1}).limit(1);
-        if (last == null) last = {uploadDate: new Date(0)};
-        var query = {uploadDate: {$gte: last.uploadDate}};
-        print('Running mapreduce on collection ' + bucket + ' with query ' + printjson(query));
-        db.getCollection(bucket).mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query});
+        var uploadDate_key = 'uploadDate.' + ns ;
+        var from = db.getCollection(collection).find().sort({_id:-1}).limit(1);
+        if (from.length() == 0 || from[0].value[uploadDate_key] === undefined) {
+            var value = {value:{}};
+            value.value[uploadDate_key] = new Date(0) ;
+            from = [value];
+        }
+        var query = {uploadDate: {$gte: from[0].value[uploadDate_key]}};
+        print('Running mapreduce on collection ' + collection + ' on bucket ' + bucket + ' with query:') ;
+        printjson(query) ;
+        db.getCollection(bucket).mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit, ns:ns}, query:query});
     });
 });
