@@ -23,5 +23,5 @@ do
     c=${r:23:2}
 
     # Cut to "GeoIP Country Edition: NL". A value of 'IP' would mean unknown.
-    mongo $db --eval "db.siteusage.update( {ip : '$ip' }, {\$set:{c:'$c'}}, true, true );db.runCommand({getlasterror: 1, j: true}).err"
+    mongo $db --eval "db.siteusage.update( {c:{\$exists:false}, ip : '$ip' }, {\$set:{c:'$c'}}, true, true );printjson(db.runCommand({getlasterror: 1, j: true}))"
 done
