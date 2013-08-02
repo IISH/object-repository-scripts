@@ -51,12 +51,12 @@ do
 done
 
 # Produce virtual file system
-for db in ${dbs[*]}
-do
-    mongo $db --eval "db.vfs.remove({_id:'\/${db:3}'});"
-    mongo $db --eval "db.vfs.remove({_id:/^\/${db:3}\//});db.runCommand({getlasterror: 1, j: 1})"
-    for c in master level1 level2 level3
-    do
-        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
-    done
-done
+#for db in ${dbs[*]}
+#do
+#    mongo $db --eval "db.vfs.remove({_id:'\/${db:3}'});"
+#    mongo $db --eval "db.vfs.remove({_id:/^\/${db:3}\//});db.runCommand({getlasterror: 1, j: 1})"
+#    for c in master level1 level2 level3
+#    do
+#        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
+#    done
+#done
