@@ -122,7 +122,7 @@ function reduce(key, values) {
 }
 
 ['year', 'month', 'day'].forEach(function (unit) {
-    var collection = unit + ".storage.statistics";
+    var collection = "statistics.storage." + unit;
     ['master', 'level1', 'level2', 'level3'].forEach(function (ns) {
         var bucket = ns + '.files';
         var uploadDate_key = 'uploadDate.' + ns ;

@@ -40,25 +40,23 @@ done
 for db in ${dbs[*]}
 do
     echo "Storage statistics for $db"
-    mongo $db $scripts/shared/statistics.js
+    mongo $db $scripts/shared/storage.js
 done
 
 # Create site usage
-#for db in ${dbs[*]}
-#do
-#    echo "Siteusage IP for $db"
-#    source $scripts/shared/siteusage.sh
-#
-#    echo "Siteusage mapreduce for $db"
-#    mongo $db $scripts/shared/siteusage.js
-#done
+for db in ${dbs[*]}
+do
+    echo "Siteusage IP for $db"
+    source $scripts/shared/siteusage.sh $db
+done
 
 # Produce virtual file system
-#for db in ${dbs[*]}
-#do
-#    mongo $db --eval "db.vfs.remove({na:/^\/${db:3}\//});"
-#    for c in master level1 level2 level3
-#    do
-#        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
-#    done
-#done
+for db in ${dbs[*]}
+do
+    mongo $db --eval "db.vfs.remove({_id:'\/${db:3}'});"
+    mongo $db --eval "db.vfs.remove({_id:/^\/${db:3}\//});db.runCommand({getlasterror: 1, j: 1})"
+    for c in master level1 level2 level3
+    do
+        mongo $db --eval "var ns='$c'; var pid=null" $scripts/shared/vfs.js
+    done
+done

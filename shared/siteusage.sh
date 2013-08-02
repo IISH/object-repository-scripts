@@ -25,3 +25,5 @@ do
     # Cut to "GeoIP Country Edition: NL". A value of 'IP' would mean unknown.
     mongo $db --eval "db.siteusage.update( {c:'??', ip : '$ip' }, {\$set:{c:'$c'}}, true, true );printjson(db.runCommand({getlasterror: 1, w: 'majority'}))"
 done
+
+mongo $db $scripts/shared/siteusage.js

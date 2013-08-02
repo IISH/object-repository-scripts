@@ -122,11 +122,10 @@ function reduce(k, values) {
 }
 
 ['year', 'month', 'day'].forEach(function (unit) {
-    var collection = unit + ".siteusage.statistics";
+    var collection =  "statistics.siteusage." + unit;
     var from = db.getCollection(collection).find().sort({_id: -1}).limit(1);
-    var query = (from.length() == 0) ? {} : {_id: {$gte: from}};
+    var query = (from.length() == 0) ? {} : {_id: {$gte: from[0].value.i}};
     print('Running mapreduce on collection ' + collection + '  with query:');
     printjson(query);
-    db.siteusage.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit},
-        query: query });
+    db.siteusage.mapReduce(map, reduce, { out: {reduce: collection}, scope: {unit: unit}, query: query });
 });
