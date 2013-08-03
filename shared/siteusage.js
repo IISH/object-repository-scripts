@@ -7,7 +7,7 @@
 
 function map() {
 
-    if (!this.downloadDate) return;
+    if (!this.downloadDate || this.c == '??') return;
 
     /* use a function for the exact format desired... */
     function ISODateString(d) {
