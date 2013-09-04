@@ -124,7 +124,7 @@ function reduce(key, values) {
     return reducto;
 }
 
-['year', 'month', 'day'].forEach(function (unit) {
+['all', 'year', 'month', 'day'].forEach(function (unit) {
     var collection = "statistics.storage." + unit;
     ['master', 'level1', 'level2', 'level3'].forEach(function (ns) {
         var bucket = ns + '.files';
