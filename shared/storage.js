@@ -76,6 +76,9 @@ function map() {
         var d = ISODateString(this.uploadDate);
         var key = null;
         switch (unit) {  // unit is a scope variable
+            case 'all':
+                key = "1970-01-01" ;
+                break;
             case 'year':
                 key = d.substring(0, 4) + "-01-01";
                 break;

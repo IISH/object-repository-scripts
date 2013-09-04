@@ -79,6 +79,9 @@ function map() {
     var d = ISODateString(this.downloadDate);
     var key = null;
     switch (unit) {  // unit is a scope variable
+        case 'all':
+            key = "1970-01-01" ;
+            break;
         case 'year':
             key = d.substring(0, 4) + "-01-01";
             break;
@@ -121,7 +124,7 @@ function reduce(k, values) {
     return reducto;
 }
 
-['year', 'month', 'day'].forEach(function (unit) {
+['all', 'year', 'month', 'day'].forEach(function (unit) {
     var collection =  "statistics.siteusage." + unit;
     var from = db.getCollection(collection).find().sort({_id: -1}).limit(1);
     var query = (from.length() == 0) ? {} : {_id: {$gte: from[0].value.i}};
