@@ -22,6 +22,7 @@
 
 assert(db.getName().substring(0, 3) == "or_", "Need to be run on a database with name: or_[na]");
 assert(ns, "Need a namespace\\bucket.");
+var log = ( log === undefined ) ? null : log;
 var pid = ( pid === undefined ) ? null : pid;
 var date = ( date === undefined ) ? null : date;
 
@@ -29,31 +30,70 @@ print('Create vfs for ' + db.getName() + '.' + ns);
 var datestamp_pattern = /\/\d{4}-\d{2}-\d{2}\//;
 var na = '/' + db.getName().substring(3) + '/';
 
-var policies = [];db.getMongo().getDB('sa')['policy'].find({na:na}).forEach( function(d){ policies[d.access]=d } );
-function access(a){
-    policies.forEach(function(d){
-           if (d.access == a )
-               d.buckets.forEach(function(b){
-                   if (b.bucket == ns) return b.access[0] ;
-               })
-    }) ;
-    return 'c' ;
+var query = ( pid ) ? {'metadata.pid': pid} : (date) ? {uploadDate: {$gt: ISODate(date)}} : {};
+
+function update(d, name, access) {
+    d.n = name;
+    if (access) {
+        if (!d.a)
+            d.a = [access];
+        else if (d.a.indexOf(access) == -1)
+            d.a.push(access);
+    }
+
+    return d;
 }
 
-var query = ( pid ) ? {'metadata.pid':pid} : (date) ? {uploadDate:{$gt:ISODate(date)}} : {};
-db.getCollection(ns + '.files').find(query, {'metadata.pid':1, 'metadata.l':1, filename:1, length:1, uploadDate:1, 'metadata.access':1}).forEach(
+var count = 0;
+db.getCollection(ns + '.files').find(
+    query,
+    {'metadata.pid': 1, 'metadata.objid': 1, 'metadata.l': 1, filename: 1, length: 1, uploadDate: 1, 'metadata.access': 1}).sort({'metadata.objid': 1})
+    .addOption(DBQuery.Option.noTimeout)
+    .forEach(
     function (d) {
         if (d.metadata.l) {
+            count++;
             var l = na + ns + d.metadata.l.replace(d.metadata.l.match(datestamp_pattern), '/');
             var parent = l;
-            while ((i = parent.lastIndexOf("/")) > 0) {
+            while ((i = parent.lastIndexOf('/')) > 0) {
                 var child = parent;
                 parent = parent.substring(0, i);
                 var n = child.substring(i + 1);
-                if (child == l)            // file
-                    db.vfs.update({_id:child}, {$addToSet:{f:{n:d.filename, p:d.metadata.pid, l:d.length, t:d.uploadDate.getTime(), a:d.metadata.access[0]}}}, true, false);
+                if (log) print('Set parent ' + parent + ' and child ' + n);
+
+                // file
+                if (child == l) {
+                    var _f = {n: d.filename, p: d.metadata.pid, l: d.length, t: d.uploadDate.getTime(), a: d.metadata.access};
+                    if (d.metadata.objid) _f.o = d.metadata.objid;
+                    db.vfs.update({_id: child}, {$addToSet: {f: _f}}, true, false);
+                }
+
                 // folder
-                db.vfs.update({_id:parent}, {$addToSet:{d:{n:n}}}, true, false);
+                var doc = db.vfs.findOne({_id: parent});
+                if (doc && doc.length) {
+                    for (D = 0; D <= doc.d.length; D++) {
+                        if (D == doc.d.length) {
+                            if (log) print(count + ' new sub directory ' + n + ' in parent ' + parent + ' in ' + l);
+                            doc.d.push(update({}, n, d.metadata.access));
+                            db.vfs.save(doc);
+                            break;
+                        }
+                        else if (doc.d[D].n == n) {
+                            if (!doc.d[D].a || doc.d[D].a.indexOf(d.metadata.access) == -1) {
+                                update(doc.d[D], n, d.metadata.access);
+                                if (log) print(count + ' existing sub directory ' + n + ' in parent ' + parent + ' in ' + l);
+                                db.vfs.save(doc);
+                            }
+                            break;
+                        }
+                    }
+                }
+                else {
+                    if (log) print(count + ' new directory ' + parent);
+                    db.vfs.save({_id: parent, d: [
+                        update({}, n, d.metadata.access)
+                    ]});
+                }
             }
         }
     }
