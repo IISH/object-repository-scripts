@@ -53,9 +53,11 @@ done
 # Produce virtual file system
 #for db in ${dbs[*]}
 #do
-#    mongo $db --eval "db.vfs.remove(); db.runCommand({getlasterror:1, w:'majority'})"
+#    mongo $db --eval "db.vfs.drop(); printjson(db.runCommand({getlasterror:1, w:'majority'}))"
 #    for c in master level1 level2 level3
 #    do
 #        mongo $db --eval "var ns='$c';" $scripts/shared/vfs.js
 #    done
+#    mongo $db --eval "db.vfs.ensureIndex({'f.p':1})"
+#    mongo $db --eval "db.vfs.ensureIndex({'f.o':1})"
 #done

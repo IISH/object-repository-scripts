@@ -32,7 +32,7 @@ var na = '/' + db.getName().substring(3) + '/';
 
 var query = ( pid ) ? {'metadata.pid': pid} : (date) ? {uploadDate: {$gt: ISODate(date)}} : {};
 
-function update(d, name, access) {
+function update(d, name, access, uploadDate) {
     d.n = name;
     if (access) {
         if (!d.a)
@@ -40,6 +40,7 @@ function update(d, name, access) {
         else if (d.a.indexOf(access) == -1)
             d.a.push(access);
     }
+    d.t = ( d.t && d.t > uploadDate) ? d.t : uploadDate;
 
     return d;
 }
@@ -51,8 +52,8 @@ db.getCollection(ns + '.files').find(
     .addOption(DBQuery.Option.noTimeout)
     .forEach(
     function (d) {
-        if (d.metadata.l) {
-            count++;
+        if (d.metadata.l && d.metadata.pid) {
+            print(++count + '. ' + ns + ' ' + d.metadata.pid);
             var l = na + ns + d.metadata.l.replace(d.metadata.l.match(datestamp_pattern), '/');
             var parent = l;
             while ((i = parent.lastIndexOf('/')) > 0) {
@@ -70,17 +71,17 @@ db.getCollection(ns + '.files').find(
 
                 // folder
                 var doc = db.vfs.findOne({_id: parent});
-                if (doc && doc.length) {
+                if (doc) {
                     for (D = 0; D <= doc.d.length; D++) {
                         if (D == doc.d.length) {
                             if (log) print(count + ' new sub directory ' + n + ' in parent ' + parent + ' in ' + l);
-                            doc.d.push(update({}, n, d.metadata.access));
+                            doc.d.push(update({}, n, d.metadata.access, d.uploadDate.getTime()));
                             db.vfs.save(doc);
                             break;
                         }
                         else if (doc.d[D].n == n) {
                             if (!doc.d[D].a || doc.d[D].a.indexOf(d.metadata.access) == -1) {
-                                update(doc.d[D], n, d.metadata.access);
+                                update(doc.d[D], n, d.metadata.access, d.uploadDate.getTime());
                                 if (log) print(count + ' existing sub directory ' + n + ' in parent ' + parent + ' in ' + l);
                                 db.vfs.save(doc);
                             }
@@ -91,7 +92,7 @@ db.getCollection(ns + '.files').find(
                 else {
                     if (log) print(count + ' new directory ' + parent);
                     db.vfs.save({_id: parent, d: [
-                        update({}, n, d.metadata.access)
+                        update({}, n, d.metadata.access, d.uploadDate.getTime())
                     ]});
                 }
             }
