@@ -11,7 +11,7 @@ db=$1
 
 # Prepare a list of all records without geo code
 # returns _id and IP
-while [ true ] ;
+for i in {0..1000} ;
 do
     ip=$(mongo $db --quiet --eval "var doc=db.siteusage.findOne( {c:'??'} ); if ( doc ) { print(doc.ip) } else {print('')}")
     if [ -z "$ip" ] ; then
