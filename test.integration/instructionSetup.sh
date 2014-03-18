@@ -30,8 +30,9 @@ mongo sa --quiet --eval "db.getCollection('instruction').remove($query)"
 
 for bucket in "master" "level1" "level2" "level3"
 do
-        mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
-        mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
+    echo
+       # mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
+       # mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
 done
 
 query="{fileSet:'$fileSet'}"

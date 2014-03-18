@@ -28,8 +28,8 @@ fi
 
 for bucket in "master" "level1" "level2" "level3"
 do
-	mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
-	mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
+	# mongo $db --quiet --eval "db.getCollection('$bucket.files').remove()"
+	# mongo $db --quiet --eval "db.getCollection('$bucket.chunks').remove()"
 done
 
 for bucket in "master" "level1" "level2" "level3"

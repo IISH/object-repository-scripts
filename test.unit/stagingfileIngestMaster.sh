@@ -17,8 +17,8 @@ testTotal=50
 testCounter=0
 
 
-mongo or_$na --quiet --eval "db.getCollection('master.files').remove()"
-mongo or_$na --quiet --eval "db.getCollection('master.chunks').remove()"
+# mongo or_$na --quiet --eval "db.getCollection('master.files').remove()"
+# mongo or_$na --quiet --eval "db.getCollection('master.chunks').remove()"
 
 
 # What we expect is to find our files in the database

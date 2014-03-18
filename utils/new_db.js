@@ -31,7 +31,6 @@ for (var i = 0; i < buckets.length; i++) {
     db.getCollection(collFiles).ensureIndex({'metadata.objid':1,'metadata.seq':1}, {unique:false});
 
     // Shard collections
-    //shard(db.getName() + '.' + collFiles, '_id');
     shard(db.getName() + '.' + collChunks, 'files_id');
 }
 
@@ -43,7 +42,7 @@ function shard(shardcollection, shardKey) {
     key[shardKey] = 1 ;
     admin.runCommand({ shardcollection:shardcollection, key:key, unique:false});
 
-    // Pre splitting the chunks over the shard.
+    // Pre splitting the chunks.
     for (var shardId in shards) {
         if (shards.hasOwnProperty(shardId)) {
             var shard = shards[shardId];
@@ -52,6 +51,7 @@ function shard(shardcollection, shardKey) {
         }
     }
 
+    // Move the chunk range from the primary shard to the targeted shards.
     for (shardId in shards) {
         if (shards.hasOwnProperty(shardId)) {
             shard = shards[shardId];
