@@ -29,7 +29,28 @@ if [ -f "$l" ] ; then
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
     query="{'metadata.pid':'$pid'}"
-    update="{'metadata.access':'$access','metadata.embargo':'$embargo','metadata.embargoAccess':'$embargoAccess',contentType:'$contentType','metadata.label':'$label'}"
+    update=""
+    for key in access embargo embargoAccess contentType label objid seq
+    do
+        value=$(eval "echo \$${key}")
+        if [ -z "$value" ] ; then
+            echo "$key not set... it will not be updated."
+        else
+            if [ "$value" -eq "$value" ] 2>/dev/null; then
+                update="${update}'metadata.${key}':${value},"
+            else
+                update="${update}'metadata.${key}':'${value}',"
+            fi
+        fi
+    done
+
+    if [ -z "$update" ] ; then
+        echo "Nothing to update."
+        exit 245
+    fi
+
+    # remove the last comma and enclose with {}
+    update="{${update%?}}"
     mongo $db --quiet --eval "db.getCollection('$bucket.files').update($query,{\$set:$update}, false, false);''"
     rc=$?
     if [[ $rc != 0 ]] ; then
@@ -44,12 +65,12 @@ else
 	    # Update the other buckets with the given access
         for c in level3.files level2.files level1.files
         do
-            mongo $db --quiet --eval "db.$c.update({'metadata.pid':'$pid'}, {\$set:{'metadata.access':'$access'}}, false, false)"
+            mongo $db --quiet --eval "db.$c.update({'metadata.pid':'$pid'}, {\$set:$update}, false, false)"
         done
 	    exit 0
     fi
     echo "The expected updated elements cannot be found with the query $query"
-    exit -1
+    exit 245
 fi
 
 exit $?

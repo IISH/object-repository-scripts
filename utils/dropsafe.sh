@@ -26,7 +26,7 @@
 #   $1 = safety percentage ( default 90 )
 #
 # Environment:
-#  dbs defined as a string of spaced separated mongodb names.
+#  dbs environmental variable. Defined as a string of spaced separated mongodb database names.
 #
 # Author: Lucien van Wouw <lwo@iisg.nl>
 
@@ -40,14 +40,17 @@ DBS=$dbs
 
 function drop_safe() {
 
-    count_primary   =?
-    count_secondary =?
-    ratio           =?
+    count_primary=0
+    count_secondary=0
+    ratio=0
 
     replicaset_primary=$(mongo test --eval "rs.status().members.forEach(function(d){ if ( d.state == 1 ) print(d.name)})")
     rc=$?
+    replicaset_primary=localhost
+    rc=0
     if [[ $rc != 0 ]] || [[ -z "$replicaset_primary" ]]; then
-        echo "${DATESTAMP}: Unable to get a replica status" >> $LOG
+        echo $replicaset_primary >> $LOG
+        echo "${DATESTAMP}: Unable to get a primary." >> $LOG
     else
         # Create site usage
         for db in ${DBS[*]}
@@ -60,14 +63,14 @@ function drop_safe() {
                     f=/opt/$db.$collection
                     query="db['${collection}'].count()"
 
-                    # Get the count from the remote primary
-                    count_primary=$(timeout 10 mongo $replicaset_primary/$db --eval ${query})
+                    # Get the count from the primary
+                    count_primary=$(timeout 10 mongo $replicaset_primary/$db --quiet --eval "${query}")
                     rc=$?
                     if [[ $rc != 0 ]] || [[ -z "$count_primary" ]]; then
                         echo "${DATESTAMP} Error ${rc} P:error for ${f}" >> $LOG
                     else
                         # Get the count from this secondary
-                        count_secondary=$(timeout 10 mongo $db --eval "rs.slaveOk(); ${query}")
+                        count_secondary=$(timeout 10 mongo $db --quiet --eval "rs.slaveOk(); ${query}")
                         rc=$?
                         if [[ $rc != 0 ]] || [[ -z "$count_secondary" ]]; then
                             echo "${DATESTAMP} Error ${rc} P:${count_primary} S:error for ${f}" >> $LOG
@@ -87,7 +90,7 @@ function drop_safe() {
                     fi
 
                     #  Log all
-                    echo "${DATESTAMP} P:${count_primary} S:{count_secondary} safety line: ${safety_line_percent} measured ratio:${ratio}" >> $LOG
+                    echo "${DATESTAMP} q:${db}.${query} P:${count_primary} S:${count_secondary} safety line: ${safety_line_percent} measured ratio:${ratio}" >> $LOG
 
                 done
             done
