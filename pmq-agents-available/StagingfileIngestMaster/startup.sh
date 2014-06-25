@@ -36,15 +36,15 @@ else
         if [ -z "$value" ] ; then
             echo "$key not set... it will not be updated."
         else
-            if [ "$value" -eq "$value" ] 2>/dev/null; then
-                # This is an integer
-                update="${update}'metadata.${key}':${value},"
+            if [ $value == "null" ] || [ $value == "NULL" ] || [ $value == 0 ] ; then
+                # This element should not be set.
+                echo "Not setting element ${key}"
             else
-                if [ $value == "_DONT_SET" ] ; then
-                    # This element should not be set.
-                    echo "Not setting element ${key}"
+                if [ "$value" -eq "$value" ] 2>/dev/null; then
+                    # This is an integer
+                    update="${update}'metadata.${key}':${value},"
                 else
-                    update="${update}'metadata.${key}':'${value}',"
+                        update="${update}'metadata.${key}':'${value}',"
                 fi
             fi
         fi
