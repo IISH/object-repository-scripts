@@ -36,15 +36,15 @@ else
         if [ -z "$value" ] ; then
             echo "$key not set... it will not be updated."
         else
-            if [ $value == "null" ] || [ $value == "NULL" ] || [ $value == 0 ] ; then
-                # This element should not be set.
+            if [[ "$value" == "null" ]] || [[ "$value" == "NULL" ]] || [[ "$value" == 0 ]] ; then
+                # This element should not be set but kept.
                 echo "Not setting element ${key}"
             else
                 if [ "$value" -eq "$value" ] 2>/dev/null; then
                     # This is an integer
                     update="${update}'metadata.${key}':${value},"
                 else
-                        update="${update}'metadata.${key}':'${value}',"
+                    update="${update}'metadata.${key}':'${value}',"
                 fi
             fi
         fi
@@ -68,7 +68,7 @@ else
     countOne=$(mongo $db --quiet --eval "db.getCollection('$bucket.files').find($query).count()")
     if [ $countOne == 1 ] ; then
 	    echo "File metadata updated."
-	    # Update the other buckets with the given access
+	    # Update the other buckets.
         for c in level3.files level2.files level1.files
         do
             mongo $db --quiet --eval "db.$c.update({'metadata.pid':'$pid'}, {\$set:$update}, false, false)"
