@@ -47,7 +47,7 @@ done
 for db in ${dbs[*]}
 do
     echo "Siteusage IP for $db"
-    source $scripts/shared/siteusage.sh $db
+    #source $scripts/shared/siteusage.sh $db
 done
 
 # Produce virtual file system
