@@ -6,9 +6,9 @@
  * Purpose:
  * - prevent unnecessary file PUTs when the file's md5 and length are identical to a GridFS file.
  * - update metadata.pid during PID replacements
- * - removed documents when new filecontent is offered
+ * - remove documents when new filecontent is offered
  *
- * PUT actions will be the responsibility for mongofiles and cannot be performed by this script.
+ * PUT actions will be the responsibility of mongofiles and cannot be performed by this script.
  **/
 
 /**
@@ -49,7 +49,6 @@
  *
  * To conclude: the basis of our model is the default FSGrid with the [ns].files and [ns].chunks collections.
  * Key values: [ns].files._id (one) -- (many) [ns].chunks.files_id
- * metadata element is 'new' and not supported by the out of the box mongofiles utility.
  *
  * About the 'metadata' field:
  * In the [ns].files we will store the metadata element containing administrative and content metadata about
@@ -82,7 +81,7 @@
  *  master.files
  *
  *  the master.files document is authoritative when it comes to 'access' settings: it is a String type.
- *  The similar setting in the derivative documents should be regarded as a DBRef to the master.
+ *  The similar setting in the derivative documents should be regarded as having the same effect as a DBRef to the master.
  **/
 
 /**
