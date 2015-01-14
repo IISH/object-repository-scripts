@@ -23,8 +23,7 @@ do
     for c in level3.files level2.files level1.files master.files
     do
         echo "Mongodump on $db.$c"
-        mongodump -d $db -c $c
-        mongodump -d $db -c siteusage
+
     done
 done
 

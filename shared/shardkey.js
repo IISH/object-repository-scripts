@@ -9,11 +9,11 @@
 
 load(dependencies);
 assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
-assert(shards, 'Must have a list of shard min keys defined: var shards="shards"');
-
+var shards = db.candidate.findOne({_id:'shards'});
+assert(shards, 'Must have a list of shard min keys defined');
+delete shards._id;
 
 var slice = 1.5; // List cannot contain any more than a round [total shard number] / [slice]
-var interval = 1431655765; // interval of a shard. The keys of a shard have range: [shard.minKey, shard.minKey+interval]
 var total = 10; // Total number of candidate keys per shard for this bucket. Number of keys produced will be [total shard number] / [slice] * total
 
 
@@ -90,12 +90,15 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     assert(candidate, 'No candidate shard found');
     var shard = shards[candidate];
     assert(shard, 'ShardId not found: ' + candidate.s);
+    assert(shard.minKey, 'Missing minKey');
+    assert(shard.interval, 'Missing interval');
+    assert(shard.s, 'Replica secondary host definition missing');
 
     // Is the shard available ?
-    var expired = new Date(new Date().getTime() - 172800000); // 48 hours
+    var expired = new Date(new Date().getTime() - 3600000); // 1 hour
     if (db.candidate.findOne({_id:candidate + "_" + bucket, d:{$gt:expired}})) continue;
 
-    var host = null;// Verify the shard candidate has  an active (replicating) secondary... otherwise choose another.
+    var host = null; // Verify the shard candidate has an active (replicating) secondary... otherwise choose another.
     try {
         host = (db.getName() == 'test') ? {serverStatus:function () {
             return {repl:{ismaster:false, secondary:true}}
@@ -108,7 +111,7 @@ for (var i = 0; i < total; i++) { // We try the [total] amount of times.
     assert(repl, 'Host is not a replicaset: ' + shard);
     if (repl.secondary && !repl.ismaster) {
         do {
-            new_id = shard.minKey + Math.round(Math.random() * interval);
+            new_id = shard.minKey + Math.round(Math.random() * shard.interval);
         } while (new_id == 0 || db.getCollection(bucket + '.files').findOne({_id:new_id}, {_id:1}));
         break;
     }
