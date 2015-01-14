@@ -52,8 +52,7 @@ else
     content="null"
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
-    shards=$shards
-    shardKey=$(timeout 60 mongo $db --quiet --eval "var dependencies='$scripts/shared/randomseed.js'; var bucket='$bucket'; var shards=$shards" $scripts/shared/shardkey.js)
+    shardKey=$(timeout 60 mongo $db --quiet --eval "var dependencies='$scripts/shared/randomseed.js'; var bucket='$bucket'" $scripts/shared/shardkey.js)
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
     if [ -z "$is_numeric" ] ; then
         shardKey=0
@@ -68,10 +67,10 @@ fi
     # REPLICAS_SAFE = Waits for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
     writeConcern="REPLICAS_SAFE"
-    mongo $db --quiet --eval "var reserve=true; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
+    mongo $db --quiet --eval "var reserve=true; var bucket='$bucket'; var shardKey=$shardKey" $scripts/shared/reserveshard.js
     java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
-    mongo $db --quiet --eval "var reserve=false; var bucket='$bucket'; var shards=$shards; var shardKey=$shardKey" $scripts/shared/reserveshard.js
+    mongo $db --quiet --eval "var reserve=false; var bucket='$bucket'; var shardKey=$shardKey" $scripts/shared/reserveshard.js
 
     if [[ $rc != 0 ]] ; then
         exit $rc
