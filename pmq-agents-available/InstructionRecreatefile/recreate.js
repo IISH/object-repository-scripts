@@ -15,7 +15,7 @@ assert(instruction.fileSet, "The instruction has not fileSet.");
 assert(instruction.resubmitPid, "The instruction has no resubmitPid element.");
 
 sa.stagingfile.remove({pid:instruction.resubmitPid});
-assert(db.runCommand({getlasterror:1, w:"majority"}).err == null, "Could not remove old instruction.");
+assert(db.runCommand({getlasterror:1, w:'2'}).err == null, "Could not remove old instruction.");
 
 db.master.files.find({'metadata.pid':instruction.resubmitPid}, {'metadata.content':0}).forEach(function (d) {
     var document = {

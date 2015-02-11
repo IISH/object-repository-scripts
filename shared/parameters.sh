@@ -55,10 +55,10 @@ fi
 if [ ! -z "$location" ]; then
 
     if [ -z "$instruction_location" ]; then
-        instruction_location=$(dirname $location)
+        instruction_location=$(dirname "$location")
     fi
 
-	location=$(dirname $fileSet)$location
+	location=$(dirname "$fileSet")$location
 	if [ -z "$l" ]; then
         	l=$location
 	fi

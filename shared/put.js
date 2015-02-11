@@ -152,7 +152,7 @@ function metadata(document) {
     }
 
     files.save(document);
-    assert(db.runCommand({getlasterror: 1, w: "majority"}).err == null, "Could not update metadata.");
+    assert(db.runCommand({getlasterror: 1, w: '2'}).err == null, "Could not update metadata.");
     print('Update metadata ' + files.getName() + ' ' + document.metadata.pid);
     printjson(document);
 }

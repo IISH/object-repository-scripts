@@ -20,7 +20,7 @@ lasterror=$(mongo sa --quiet --eval "db.stagingfile.update({$q}, \
         attempts:1, limit:3, exitValue:2147483647, info:'Starting InstructionIngest' \
         }]}}, \
         false, true); \
-        db.runCommand({getlasterror:1, w:'majority'}).err")
+        db.runCommand({getlasterror:1, w:'2'}).err")
 rc=$?
 if [[ $rc != 0 ]] ; then
     echo $lasterror

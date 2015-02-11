@@ -68,7 +68,7 @@ db.getCollection(ns + '.files').find(
                     var _f = {n: d.filename, p: d.metadata.pid, l: d.length, t: d.uploadDate.getTime(), a: d.metadata.access};
                     if (d.metadata.objid) _f.o = d.metadata.objid;
                     db.vfs.update({_id: child}, {$addToSet: {f: _f}}, true, false);
-                    if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: "majority"}).err == null, "Could not update vfs.");
+                    if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: '2'}).err == null, "Could not update vfs.");
                 }
 
                 // folder
@@ -79,7 +79,7 @@ db.getCollection(ns + '.files').find(
                             if (log) print(count + ' new sub directory ' + n + ' in parent ' + parent + ' in ' + l);
                             doc.d.push(update({}, n, d.metadata.access, d.uploadDate.getTime()));
                             db.vfs.save(doc);
-                            if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: "majority"}).err == null, "Could not update vfs.");
+                            if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: '2'}).err == null, "Could not update vfs.");
                             break;
                         }
                         else if (doc.d[D].n == n) {
@@ -87,7 +87,7 @@ db.getCollection(ns + '.files').find(
                                 update(doc.d[D], n, d.metadata.access, d.uploadDate.getTime());
                                 if (log) print(count + ' existing sub directory ' + n + ' in parent ' + parent + ' in ' + l);
                                 db.vfs.save(doc);
-                                if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: "majority"}).err == null, "Could not update vfs.");
+                                if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: '2'}).err == null, "Could not update vfs.");
                             }
                             break;
                         }
@@ -98,7 +98,7 @@ db.getCollection(ns + '.files').find(
                     db.vfs.save({_id: parent, d: [
                         update({}, n, d.metadata.access, d.uploadDate.getTime())
                     ]});
-                    if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: "majority"}).err == null, "Could not update vfs.");
+                    if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: '2'}).err == null, "Could not update vfs.");
                 }
             }
         }
