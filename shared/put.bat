@@ -10,7 +10,7 @@ Rem
 
     set shardKey=0
     call %scripts%\shared\set.bat dependencies php -r "print( str_replace('\\','\\\\', '%scripts%\shared\randomseed.js') );"
-    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var dependencies='%dependencies%'; var bucket='%bucket%'; var remote_db='%REMOTE_DB%'; var file_size=%length%;" %scripts%\shared\shardkey.js
+    call %scripts%\shared\set.bat shardKey mongo %db% --quiet --eval "var dependencies='%dependencies%'; var bucket='%bucket%'; var remote_db='%DB_SHARD%'; var file_size=%length%;" %scripts%\shared\shardkey.js
     call %scripts%\shared\set.bat is_numeric php -r "print(is_numeric('%shardKey%'));"
     if NOT DEFINED is_numeric (
         set shardKey=0

@@ -30,13 +30,14 @@
 
 load(dependencies);
 assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
-assert(remote_db, 'Must have the remote_db: var remote_db=\'host:port\' that stores the available shards.');
+assert(db_shard, 'Must have the db_shard: var db_shard=\'host:port\' that stores the available shards.');
 assert(file_size, 'Must have the file_size: var file_size = 12345');
+assert(file_size > 0, 'A file cannot be zero in length.');
 
 
 var HOST_DB_NAME = 'shard';
 var HOST_DB_CANDIDATE = 'candidate';
-var HOST_DB_KEYS = 'shardkey'; // a capped collection
+var HOST_DB_KEYS = 'key'; // a capped collection
 var GiB = 1073741824;
 
 // CANDIDATE_LIMIT: the number of candidate shards to retrieve
@@ -52,13 +53,13 @@ Math.seedrandom(ObjectId().valueOf());
 /**
  * listCandidates
  *
- * Retrieve the candidates with the highest available storage that cover 10 times the file size.
+ * Retrieve the candidates with the highest available storage that have enough room for the file.
  */
 function listCandidates() {
 
     var expired = new Date(new Date().getTime() - CANDIDATE_EXPIRED);
     var file_size_GiB = Math.ceil(file_size / GiB);
-    var db_shard = connect(remote_db + '/' + HOST_DB_NAME);
+    var db_shard = connect(db_shard + '/' + HOST_DB_NAME);
     return db_shard[HOST_DB_CANDIDATE].find({active: true, usable: {$gt: file_size_GiB}, date: {$gt: expired}})
         .sort({usable: -1}).limit(CANDIDATE_LIMIT);
 }
@@ -89,7 +90,7 @@ function getShardKey() {
     var shardKey = (chunks.length()) ? chunks[0].files_id : candidate.minkey;
 
     // We try this for ten times just in case we have a orphan metadata record in the bucket.files collection.
-    var db_shard = connect(remote_db + '/' + HOST_DB_NAME);
+    var db_shard = connect(db_shard + '/' + HOST_DB_NAME);
     for (var i = 0; i < 10; i++) {
         shardKey++;
         var unique_id = db.name + '_' + bucket + '_' + shardKey;
