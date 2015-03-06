@@ -33,7 +33,7 @@ assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
 assert(db_shard, 'Must have the db_shard: var db_shard=\'host:port\' that stores the available shards.');
 assert(file_size, 'Must have the file_size: var file_size = 12345');
 assert(file_size > 0, 'A file cannot be zero in length.');
-var debug = (debug !== undef);
+var debug = (debug !== undefined);
 
 
 var HOST_DB_NAME = 'shard';
@@ -88,7 +88,7 @@ function getCandidate() {
  */
 function getShardKey() {
     var candidate = getCandidate();
-    var remote_host = connect(candidate.host + '/' + db.name);
+    var remote_host = connect(candidate.host + '/' + db.getName());
     var chunks = remote_host[bucket + '.chunks'].find({n: 0}, {files_id: 1}).sort({files_id: -1}).limit(1);
     var shardKey = (chunks.length()) ? chunks[0].files_id : candidate.minkey;
 
@@ -96,7 +96,7 @@ function getShardKey() {
     var db_shard_connection = connect(db_shard + '/' + HOST_DB_NAME);
     for (var i = 0; i < 10; i++) {
         shardKey++;
-        var unique_id = db.name + '_' + bucket + '_' + shardKey;
+        var unique_id = db.getName() + '_' + bucket + '_' + shardKey;
         db_shard_connection[HOST_DB_KEYS].insert({_id: unique_id});
         var writeResult = db.runCommand({getlasterror: 1});
         if (writeResult.err == null && db[bucket + '.files'].findOne({_id: shardKey}, {_id: 1}) == null)
