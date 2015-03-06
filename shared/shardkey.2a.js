@@ -72,7 +72,7 @@ function listCandidates() {
 function getCandidate() {
     var candidates = listCandidates(file_size);
     var length = candidates.length();
-    assert(length > 0, 'No suitable candidates found. The replica sets may all be unavailable. Or the file may be larger than the usable storage and cannot be stored.');
+    assert(length, 'No suitable candidates found. The replica sets may all be unavailable. Or the file may be larger than the usable storage and cannot be stored.');
     return candidates[Math.floor(Math.random() * length)];
 }
 
