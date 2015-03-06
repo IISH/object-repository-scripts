@@ -88,7 +88,7 @@ function getCandidate() {
  */
 function getShardKey() {
     var candidate = getCandidate();
-    var remote_host = connect(candidate.host + '/' + db.getName());
+    var remote_host = connect(candidate._id + '/' + db.getName());
     var chunks = remote_host[bucket + '.chunks'].find({n: 0}, {files_id: 1}).sort({files_id: -1}).limit(1);
     var shardKey = (chunks.length()) ? chunks[0].files_id : candidate.minkey;
 
@@ -98,7 +98,7 @@ function getShardKey() {
         shardKey++;
         var unique_id = db.getName() + '_' + bucket + '_' + shardKey;
         db_shard_connection[HOST_DB_KEYS].insert({_id: unique_id});
-        var writeResult = db.runCommand({getlasterror: 1});
+        var writeResult = db_shard_connection.runCommand({getlasterror: 1});
         if (writeResult.err == null && db[bucket + '.files'].findOne({_id: shardKey}, {_id: 1}) == null)
             return shardKey;
     }
