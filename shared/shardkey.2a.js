@@ -10,6 +10,7 @@
      active: true if this primary ay receive data,
      setName: the replica set name,
      minkey: minkey,
+     sequential: true for incremental keys; or false when random,
      used:storage used,
      avail: storage available,
      usable: storage usable,
@@ -22,12 +23,13 @@
  - the file size in GiB is a value lower than the candidate's 'usable' value.
 
  A candidate is then taken from the list ad random.
- The shard's host is contacted to determine the chunk with the highest files_id in use and this value is incremented by one.
+ The shard's host is contacted to determine the chunk with the highest files_id in use and this value is either
+ incremented by one ( when sequential is true ) or choosen ad random.
  If no chunks are found, the minkey value is used and incremented by one.
 
  A final check is to see if the shardkey is unique and not used by other clients by:
-  - inserting the name_bucket_shardkey in a capped collection ( db.createCollection( 'key', { capped: true, size: 4096 } )
-  - and when no duplicate error is thrown the bucket.files collection is queried for the shard key
+ - inserting the name_bucket_shardkey in a capped collection ( db.createCollection( 'key', { capped: true, size: 4096 } )
+ - and when no duplicate error is thrown the bucket.files collection is queried for the shard key
 
 
  **/
@@ -49,6 +51,9 @@ var CANDIDATE_LIMIT = 20;
 
 // CANDIDATE_EXPIRED: the moment the candidate should and should not be included in the find.
 var CANDIDATE_EXPIRED = 70000; // 90 seconds
+
+// RETRY_SHARDKEY: the number of attempts to find a shardkey by incrementing the rejected shardkey by one.
+var RETRY_SHARDKEY = 10;
 
 
 Math.seedrandom(ObjectId().valueOf());
@@ -95,9 +100,15 @@ function getShardKey() {
     var chunks = remote_host[bucket + '.chunks'].find({n: 0}, {files_id: 1}).sort({files_id: -1}).limit(1);
     var shardKey = (chunks.length()) ? chunks[0].files_id : candidate.minkey;
 
+    if (candidate.sequential == false) { // Legacy. The old shards choose their keys ad random.
+        var interval = shardKey - candidate.minkey - RETRY_SHARDKEY;
+        assert(interval > 0, 'The interval cannot be less than one.');
+        shardKey = candidate.minkey + Math.floor(Math.random() * interval);
+    }
+
     // We try this for ten times just in case we have a orphan metadata record in the bucket.files collection.
     var db_shard_connection = connect(db_shard + '/' + HOST_DB_NAME);
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < RETRY_SHARDKEY; i++) {
         shardKey++;
         var unique_id = db.getName() + '_' + bucket + '_' + shardKey;
         db_shard_connection[HOST_DB_KEYS].insert({_id: unique_id});
