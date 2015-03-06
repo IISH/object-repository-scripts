@@ -1,5 +1,5 @@
 /**
- shardkey.js
+ shardkey.2a.js
 
  Returns a shardkey for a shard with a preference for the highest available storage.
 
@@ -22,9 +22,13 @@
  - the file size in GiB is a value lower than the candidate's 'usable' value.
 
  A candidate is then taken from the list ad random.
- The shard's host is contacted to determine the highest files_id in use and this value is incremented by one.
+ The shard's host is contacted to determine the chunk with the highest files_id in use and this value is incremented by one.
+ If no chunks are found, the minkey value is used and incremented by one.
 
- A final check is to see if the shardkey is unique and not used by other clients.
+ A final check is to see if the shardkey is unique and not used by other clients by:
+  - inserting the name_bucket_shardkey in a capped collection ( db.createCollection( 'key', { capped: true, size: 4096 } )
+  - and when no duplicate error is thrown the bucket.files collection is queried for the shard key
+
 
  **/
 
@@ -32,7 +36,6 @@ load(dependencies);
 assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
 assert(db_shard, 'Must have the db_shard: var db_shard=\'host:port\' that stores the available shards.');
 assert(file_size, 'Must have the file_size: var file_size = 12345');
-assert(file_size > 0, 'A file cannot be zero in length.');
 var debug = (debug !== undefined);
 
 
@@ -42,10 +45,10 @@ var HOST_DB_KEYS = 'key'; // a capped collection
 var GiB = 1073741824;
 
 // CANDIDATE_LIMIT: the number of candidate shards to retrieve
-var CANDIDATE_LIMIT = 10;
+var CANDIDATE_LIMIT = 20;
 
 // CANDIDATE_EXPIRED: the moment the candidate should and should not be included in the find.
-var CANDIDATE_EXPIRED = 90000; // 90 seconds
+var CANDIDATE_EXPIRED = 70000; // 90 seconds
 
 
 Math.seedrandom(ObjectId().valueOf());
