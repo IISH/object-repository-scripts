@@ -59,8 +59,8 @@ function listCandidates() {
 
     var expired = new Date(new Date().getTime() - CANDIDATE_EXPIRED);
     var file_size_GiB = Math.ceil(file_size / GiB);
-    var db_shard = connect(db_shard + '/' + HOST_DB_NAME);
-    return db_shard[HOST_DB_CANDIDATE].find({active: true, usable: {$gt: file_size_GiB}, date: {$gt: expired}})
+    var db_shard_connection = connect(db_shard + '/' + HOST_DB_NAME);
+    return db_shard_connection[HOST_DB_CANDIDATE].find({active: true, usable: {$gt: file_size_GiB}, date: {$gt: expired}})
         .sort({usable: -1}).limit(CANDIDATE_LIMIT);
 }
 
@@ -90,11 +90,11 @@ function getShardKey() {
     var shardKey = (chunks.length()) ? chunks[0].files_id : candidate.minkey;
 
     // We try this for ten times just in case we have a orphan metadata record in the bucket.files collection.
-    var db_shard = connect(db_shard + '/' + HOST_DB_NAME);
+    var db_shard_connection = connect(db_shard + '/' + HOST_DB_NAME);
     for (var i = 0; i < 10; i++) {
         shardKey++;
         var unique_id = db.name + '_' + bucket + '_' + shardKey;
-        db_shard[HOST_DB_KEYS].insert({_id: unique_id});
+        db_shard_connection[HOST_DB_KEYS].insert({_id: unique_id});
         var writeResult = db.runCommand({getlasterror: 1});
         if (writeResult.err == null && db[bucket + '.files'].findOne({_id: shardKey}, {_id: 1}) == null)
             return shardKey;
