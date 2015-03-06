@@ -33,6 +33,7 @@ assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
 assert(db_shard, 'Must have the db_shard: var db_shard=\'host:port\' that stores the available shards.');
 assert(file_size, 'Must have the file_size: var file_size = 12345');
 assert(file_size > 0, 'A file cannot be zero in length.');
+var debug = (debug !== undef);
 
 
 var HOST_DB_NAME = 'shard';
@@ -73,6 +74,8 @@ function getCandidate() {
     var candidates = listCandidates(file_size);
     var length = candidates.length();
     assert(length, 'No suitable candidates found. The replica sets may all be unavailable. Or the file may be larger than the usable storage and cannot be stored.');
+    if (debug)
+        printjson(candidates);
     return candidates[Math.floor(Math.random() * length)];
 }
 
