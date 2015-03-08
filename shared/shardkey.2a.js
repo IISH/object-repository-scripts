@@ -29,9 +29,9 @@
  incremented by one ( when version is > 1 ) or chosen ad random for version 1.
  If no chunks are found, the minkey value is used and incremented by one.
 
- A final check is to see if the shardkey is unique and not used by other clients by:
- - inserting the name_bucket_shardkey in a capped collection ( db.createCollection( 'key', { capped: true, size: 4096 } )
- - and when no duplicate error is thrown the bucket.files collection is queried for the shard key
+ A final check is to see if the shardkey is unique and not used by other clients by
+ inserting a reserved document: the db[bucket.files].insert({_id:shardkey, reserved:true})
+ There should be no unique constraint error, unless the shardkey is already in use.
 
 
  **/
@@ -45,7 +45,6 @@ var _test = (db.getName() == 'test');
 
 var HOST_DB_NAME = 'shard';
 var HOST_DB_CANDIDATE = 'candidate';
-var HOST_DB_KEYS = 'key'; // a capped collection
 var HOST_DB_SEQUENCE = 'sequence'; // a collection with a single document for incremental values.
 var GiB = 1073741824;
 
@@ -55,8 +54,8 @@ var CANDIDATE_LIMIT = 20;
 // CANDIDATE_EXPIRED: the moment the candidate should and should not be included in the find.
 var CANDIDATE_EXPIRED = 70000; // 70 seconds
 
-// RETRY_SHARDKEY: the number of attempts to find a shardkey by incrementing the rejected shardkey by one.
-var RETRY_SHARDKEY = 10;
+// RETRY_shardkey: the number of attempts to find a shardkey by incrementing the rejected shardkey by one.
+var RETRY_shardkey = 10;
 
 
 Math.seedrandom(ObjectId().valueOf());
@@ -119,69 +118,55 @@ function getCandidate() {
 
 
 /**
- * getLastShardKey
+ * getLastShardkey
  *
- * Returns the files_id key with the highest value. If not found, use the host default minkey.
+ * Returns the _id key with the highest value covered by the shard. If not found, use the host default minkey.
  *
  * @param candidate The candidate host
  */
-function getLastShardKey(candidate) {
-    var remote_host = connect(candidate._id + '/' + db.getName());
-    var chunks = remote_host[bucket + '.chunks'].find({n: 0}, {files_id: 1}).sort({files_id: -1}).limit(1);
-    return (chunks.length()) ? chunks[0].files_id : candidate.minkey;
+function getLastShardkey(candidate) {
+    var files = db[bucket + '.files'].find({_id: {$gte: candidate.minkey, $lte: candidate.maxkey}}, {_id: 1}).sort({_id: -1}).limit(1);
+    return (files.length()) ? files[0]._id : candidate.minkey;
 }
 
 
 /**
- * compoundKey
- *
- * Prefix a namespace to the shardKey.
- */
-function compoundKey(shardKey) {
-    return db.getName() + '.' + bucket + '.' + shardKey;
-}
-
-
-/**
- * availableShardKey
+ * reserveShardkey
  *
  * Determine if the suggested key is available.
- * Should the key be in use, we increment the key by one and retry for RETRY_SHARDKEY times.
+ * Should the key be in use, we increment the key by one and retry for RETRY_shardkey times.
  */
-function availableShardKey(candidate_shardkey) {
-    var l = candidate_shardkey + RETRY_SHARDKEY;
+function reserveShardkey(candidate_shardkey) {
+    var l = candidate_shardkey + RETRY_shardkey;
     for (var shardkey = candidate_shardkey; shardkey < l; shardkey++) {
-        var unique_id = compoundKey(shardkey);
-        db_shard_connection[HOST_DB_KEYS].insert({_id: unique_id});
-        var writeResult = db_shard_connection.runCommand({getlasterror: 1});
-        if (writeResult.err == null && db[bucket + '.files'].findOne({_id: shardkey}, {_id: 1}) == null)
+        db[bucket + '.files'].insert({_id: shardkey, reserved: true});
+        var writeResult = db.runCommand({getlasterror: 1});
+        if (writeResult.err == null)
             return shardkey;
     }
-    throw 'Error: Unable to provide an unique shardkey for the suggested ' + candidate_shardkey;
+    throw 'Error: Unable to reserve an unique shardkey for the suggested ' + candidate_shardkey;
 }
 
 
 /**
- * printShardKey
+ * printShardkey
  *
  * Get the highest valued shard key from the bucket.
  * Once a candidate shard and key is found, we try to write the shard key into the capped keys collection to avoid a
  * race condition with other shardkey.js clients that like to write with the same key.
  */
-function printShardKey() {
+function printShardkey() {
     var candidate = getCandidate();
-    var candidate_shardkey = (candidate.version == 1) ? candidate.minkey + Math.floor(Math.random() * (candidate.maxkey - candidate.minkey - RETRY_SHARDKEY)) // Legacy
-        : getLastShardKey(candidate) + 1;
+    var candidate_shardkey = (candidate.version == 1) ? candidate.minkey + Math.floor(Math.random() * (candidate.maxkey - candidate.minkey - RETRY_shardkey)) // Legacy
+        : getLastShardkey(candidate) + 1;
 
-    var shardKey = availableShardKey(candidate_shardkey);
-    if (shardKey >= candidate.minkey && shardKey <= candidate.maxkey)
-        return shardKey;
-
-    throw 'Error: The shardkey ' + shardKey + ' cannot have a value that is lower than the minkey (' + candidate.minkey + ') or higher than the maxkey (' + candidate.maxkey + ') of the intended shard ' + candidate.setName;
+    var shardkey = reserveShardkey(candidate_shardkey);
+    assert(shardkey >= candidate.minkey && shardkey <= candidate.maxkey);
+    return shardkey;
 }
 
 
 if (_test)
     print('Ready for unit testing.');
 else
-    print(printShardKey());
+    print(printShardkey());
