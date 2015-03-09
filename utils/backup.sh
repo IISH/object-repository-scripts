@@ -9,6 +9,7 @@ cd /data/backup
 scripts=$scripts
 # ToDo: retrieve the database names from the database itself
 dbs=$dbs
+statistics=$1
 
 # Backup the config server database
 mongodump -d config
@@ -34,6 +35,13 @@ do
     mongo $db --eval "db.master.files.find({'metadata.label':{\$exists:true}},{'metadata.label':1}).forEach( \
         function(d){db.label.update({_id:d.metadata.label},{\$inc:{size:1}}, true, false)})"
 done
+
+
+
+if [ -z "$statistics" ] ; then
+    exit 0
+fi
+
 
 # Calculate storage statistics
 for db in ${dbs[*]}
