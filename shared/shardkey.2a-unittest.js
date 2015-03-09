@@ -116,8 +116,7 @@ try {
     var should_fail = reserveShardkey(shardkey);
     assert(!should_fail, 'Expected an exception for shardkey ' + shardkey + ', but got ' + should_fail);
 } catch (expected_this_error) {
-    assert(expected_this_error.startsWith('Error: '));
-    print('expected_this_error and did indeed receive it: ' + expected_this_error);
+    assert(expected_this_error == 'Unable to reserve an unique shardkey for the suggested 10', 'Not expecting this error: ' + expected_this_error);
 }
 
 
@@ -156,8 +155,7 @@ try {
     should_fail = printShardkey();
     assert(!should_fail, 'Expected an exception but got ' + should_fail);
 } catch (expected_this_error) {
-    assert(expected_this_error.startsWith('Error: '));
-    print('expected_this_error and did indeed receive it: ' + expected_this_error);
+    assert(expected_this_error == 'Unable to reserve an unique shardkey for the suggested 201', 'Not expecting this error: ' + expected_this_error);
 }
 
 

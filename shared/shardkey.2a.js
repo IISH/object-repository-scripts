@@ -1,6 +1,8 @@
 /**
  shardkey.2a.js
 
+ Usage: shardkey.2a.js --eval "var bucket='bucket name'; var db_shard = 'primary with the shard.candidate collection:port'; var file_size=NumberLong('file size in bytes'); var lib_dir='/path/to/libraries/'"
+
  Returns a shardkey for a shard.
 
  Which shardkey depends on one of the members of the replica set. The member with the highest rs.config.members[n].priority
@@ -144,7 +146,7 @@ function reserveShardkey(candidate_shardkey) {
         if (writeResult.err == null)
             return shardkey;
     }
-    throw 'Error: Unable to reserve an unique shardkey for the suggested ' + candidate_shardkey;
+    throw 'Unable to reserve an unique shardkey for the suggested ' + candidate_shardkey;
 }
 
 
