@@ -59,7 +59,7 @@ fi
         shardKey=0
     fi
     if [[ $shardKey == 0 ]]; then
-        echo "Could not retrieve a shardkey. Primaries may be unavailable."
+        echo "Could not retrieve a shardkey from shardkey.2a.js"
         exit -1
     fi
 

@@ -27,7 +27,6 @@ function setup() {
 
     // Create 50 expired candidates
     db.createCollection(bucket + '.files');
-
     var expired = new Date(new Date().getTime() - CANDIDATE_EXPIRED);
     for (var i = 1; i <= _INCREASED_CANDIDATE_LIMIT; i++) {
         var f = (i == _INCREASED_CANDIDATE_LIMIT) ? '' : i;
@@ -87,7 +86,7 @@ assert(candidate.minkey == shardkey, 'Expected shardkey to have a value of ' + c
 
 print('test 7');
 var last_key = candidate.minkey + 1;
-db[bucket + '.files'].insert({_id: last_key}); // 201
+db[bucket + '.files'].insert({_id: last_key, metadata: {pid: last_key}}); // 201
 shardkey = getLastShardkey(candidate);
 assert(shardkey > candidate.minkey);
 assert(last_key == shardkey, 'Expected shardkey to have a value of ' + last_key + ' but got ' + shardkey);
@@ -125,7 +124,7 @@ shardkey = 20;
 for (i = 0; i < RETRY_shardkey; i++) {
     expect = shardkey + 1;
     assert(!db[bucket + '.files'].findOne({_id: expect}));
-    db[bucket + '.files'].save({_id: shardkey});
+    db[bucket + '.files'].insert({_id: shardkey, metadata: {pid: shardkey}});
     available_shardkey = reserveShardkey(shardkey);
     assert(available_shardkey == expect, 'Expected the available_shardkey to be ' + expect + ', but instead got ' + available_shardkey);
     shardkey = available_shardkey + 1;
@@ -174,4 +173,7 @@ assert(unique_list_of_candidates.length == CANDIDATE_LIMIT, 'Expected to have ' 
 
 
 clean();
+
+
+print('If we got to this point, then all tests succeeded.');
 

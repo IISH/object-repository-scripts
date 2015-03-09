@@ -43,7 +43,7 @@ assert(bucket, 'Must have a bucket namespace defined: var bucket="?"');
 assert(db_shard, 'Must have the db_shard: var db_shard=\'host:port\' that stores the available shards.');
 assert(file_size, 'Must have the file_size: var file_size = 12345');
 var _test = (db.getName() == 'test');
-
+var _log = [];
 
 var HOST_DB_NAME = 'shard';
 var HOST_DB_CANDIDATE = 'candidate';
@@ -136,16 +136,21 @@ function getLastShardkey(candidate) {
  * reserveShardkey
  *
  * Determine if the suggested key is available.
- * Should the key be in use, we increment the key by one and retry for RETRY_shardkey times.
+ * Should the key be in use the writeError will indicate a E11000 duplicate key error index.
+ * If so, we increment the key by one and retry for RETRY_shardkey number of times.
  */
 function reserveShardkey(candidate_shardkey) {
     var l = candidate_shardkey + RETRY_shardkey;
     for (var shardkey = candidate_shardkey; shardkey < l; shardkey++) {
-        db[bucket + '.files'].insert({_id: shardkey, reserved: true});
+        db[bucket + '.files'].insert({_id: shardkey, metadata: {pid: shardkey}});
         var writeResult = db.runCommand({getlasterror: 1});
-        if (writeResult.err == null)
+        if (writeResult.err) {
+            _log.push({error: {shardkey: shardkey, writeResult: writeResult}});
+        }
+        else
             return shardkey;
     }
+    printjson(_log);
     throw 'Unable to reserve an unique shardkey for the suggested ' + candidate_shardkey;
 }
 
@@ -159,6 +164,7 @@ function reserveShardkey(candidate_shardkey) {
  */
 function printShardkey() {
     var candidate = getCandidate();
+    _log.push({candidate: candidate});
     var candidate_shardkey = (candidate.version == 1) ? candidate.minkey + Math.floor(Math.random() * (candidate.maxkey - candidate.minkey - RETRY_shardkey)) // Legacy
         : getLastShardkey(candidate) + 1;
 
