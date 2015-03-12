@@ -66,7 +66,7 @@ function report() {
     var candidates = db[HOST_DB_HISTORY].find({date: {$gte: _from}}).sort({date: 1});
     var usable = 0;
 
-    print('"DATE", "REPLSET","AVAIL", "USED", "USABLE"');
+    print('"DATE","AVAIL", "USED", "USABLE"');
     candidates.forEach(function (candidate) {
         usable += candidate.usable;
         print(quote(formatDate(candidate.date)) + C + quote(candidate.avail) + C + quote(candidate.used) + C + quote(candidate.usable));
