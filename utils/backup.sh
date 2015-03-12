@@ -37,6 +37,10 @@ do
 done
 
 
+# Copy the candidates into the history
+mongo $DB_SHARD/shard --quiet $scripts/utils/snapshot.js
+
+
 
 if [ -z "$statistics" ] ; then
     exit 0

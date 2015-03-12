@@ -21,10 +21,16 @@ Rem
         exit -1
     )
 
+    Rem reserve the file.
+    mongo %DB_SHARD%/shard --quiet --eval "var shardkey=%shardkey%; var file_size=NumberLong('%length%');" %scripts%\shared\reserve_storage.js
+
     Rem Upload our file.
     java -DWriteConcern=REPLICAS_SAFE -jar %orfiles% -c files -l "%l%" -m %md5% -b %bucket% -h %host% -d %db% -a %pid% -t %contentType% -s %shardKey% -M Put
-
     set rc=%errorlevel%
+
+    Rem Take our reservation
+    mongo %DB_SHARD%/shard --quiet --eval "var shardkey=%shardkey%; var file_size=NumberLong('-%length%');" %scripts%\shared\reserve_storage.js
+
     if %rc% neq 0 (
         del "%l%"
         del "%l%.md5"

@@ -53,7 +53,7 @@ else
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shardKey=0
-    shardKey=$(timeout 60 mongo $db --quiet --eval "var lib_dir='${scripts}/shared/'; var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $scripts/shared/shardkey.2a.js)
+    shardKey=$(mongo $db --quiet --eval "var lib_dir='${scripts}/shared/'; var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $scripts/shared/shardkey.2a.js)
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
     if [ -z "$is_numeric" ] ; then
         shardKey=0
@@ -66,14 +66,17 @@ fi
     # Upload our file. For masters we increase the write concern
     # REPLICAS_SAFE = Wait for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
+    mongo $DB_SHARD/shard --quiet --eval "var shardkey=$shardkey; var file_size=NumberLong('${length}');" $scripts/shared/reserve_storage.js
     writeConcern="REPLICAS_SAFE"
     java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
+    mongo $DB_SHARD/shard --quiet --eval "var shardkey=$shardkey; var file_size=NumberLong('-${length}');" $scripts/shared/reserve_storage.js
 
     if [[ $rc != 0 ]] ; then
         exit $rc
     fi
 
+# This may fail because of a corrupt content value.
 mongo $db --quiet --eval "\
     var access='$access'; \
     var content=$content; \
