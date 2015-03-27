@@ -6,7 +6,9 @@
 # Instantiate all command line parameters into key-value pairs
 # We trust the agent gave us a key-value pair list, where the key always begins with a hyphen and has a value:
 # -[keyname] [value]
-#
+# We set IFS to NULL to avoid splitting the value
+
+IFS=
 while [ "${1+isset}" ]; do
  k=${1:1}
     shift
@@ -19,6 +21,7 @@ while [ "${1+isset}" ]; do
             exit -1
         fi
 done
+unset IFS
 
 sa_path=$sa_path
 content=$content
