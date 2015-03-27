@@ -66,11 +66,11 @@ fi
     # Upload our file. For masters we increase the write concern
     # REPLICAS_SAFE = Wait for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
-    mongo $DB_SHARD/shard --quiet --eval "var shardkey=$shardkey; var file_size=NumberLong('${length}');" $scripts/shared/reserve_storage.js
+    mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('${length}');" $scripts/shared/reserve_storage.js
     writeConcern="REPLICAS_SAFE"
     java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
-    mongo $DB_SHARD/shard --quiet --eval "var shardkey=$shardkey; var file_size=NumberLong('-${length}');" $scripts/shared/reserve_storage.js
+    mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('-${length}');" $scripts/shared/reserve_storage.js
 
     if [[ $rc != 0 ]] ; then
         exit $rc

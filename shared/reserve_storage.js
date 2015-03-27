@@ -16,7 +16,7 @@ var HOST_DB_CANDIDATE = 'candidate';
 var GiB = 1073741824;
 
 
-assert(db.getName() == HOST_DB_NAME, 'Must connect to the shard database.');
+assert(db.getName() == HOST_DB_NAME, 'Must connect to the ' + HOST_DB_NAME + ' database.');
 assert(shardkey, 'Must have a shardkey: var shardkey=shardkey"');
 assert(file_size, 'File size needed: var file_size=NumberLong(\'12345\');');
 

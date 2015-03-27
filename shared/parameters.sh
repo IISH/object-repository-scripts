@@ -71,6 +71,8 @@ if [ ! -z "$location" ]; then
 		length=0
 	fi
 fi
+echo "length=$length"
+echo "location=$location"
 
 # Split the contentType [family/type] into two separate variables. Example:
 # contentType = image/jpeg => derivative:image,sourceFileExtension=jpeg
