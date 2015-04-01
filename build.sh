@@ -2,8 +2,11 @@
 #
 # hosts must resolve...
 #
-jvm=/usr/lib/jvm/java-6-sun
-cd /tmp
+
+cd /opt
+
+/opt/object-repository/agent.sh stop
+sleep 3
 
 # If the certificates are not placed in the keystore or need to be replaced, then run this script with the
 # ./build.sh cacerts
