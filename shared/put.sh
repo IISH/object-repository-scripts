@@ -18,7 +18,7 @@ label="$label"
 length=$length
 md5=$md5
 na=$na
-orfiles=$orfiles
+orfiles=$(cwp "$orfiles")
 pid="$pid"
 lid="$lid"
 resolverBaseUrl="$resolverBaseUrl"
@@ -31,6 +31,7 @@ if [ ! -f "$l" ] ; then
     echo "The file does not exist: $l"
     exit -1
 fi
+l=$(cwp "$l")
 
 if [ "$derivative" == "image" ] ; then
     # ToDo: do not use format, but parse the entire identify response to json
@@ -42,18 +43,16 @@ fi
 if [ "$derivative" == "video" ] ; then
     content=$(ffprobe -v quiet -print_format json -show_format -show_streams "$l")
 fi
-if [ "$contentType" == "text/xml" ] || [ "$contentType" == "application/xml" ] ; then
-    content=$(php $scripts/shared/identify_xmlns.php -l "$l")
-fi
 if [[ ${content:0:1} == "{" ]]; then
-    content=$(php $scripts/shared/utf8_encode.php -i "$content")
+    enc=$(cwp "$scripts/shared/utf8_encode.php")
+    content=$(php "$enc" -i "$content")
 else
     # invalid response... no json
     content="null"
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shardKey=0
-    shardKey=$(mongo $db --quiet --eval "var lib_dir='${scripts}/shared/'; var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $scripts/shared/shardkey.2a.js)
+    shardKey=$(mongo $db --quiet --eval "var lib_dir='${scripts}/shared/'; var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/shardkey.2a.js"))
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
     if [ -z "$is_numeric" ] ; then
         shardKey=0
@@ -66,11 +65,11 @@ fi
     # Upload our file. For masters we increase the write concern
     # REPLICAS_SAFE = Wait for at least 2 servers for the write operation
     echo "Shardkey: $shardKey"
-    mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('${length}');" $scripts/shared/reserve_storage.js
+    mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/reserve_storage.js")
     writeConcern="REPLICAS_SAFE"
-    java -DWriteConcern=$writeConcern -jar $orfiles -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
+    java -DWriteConcern=$writeConcern -jar "$orfiles" -c files -l "$l" -m $md5 -b $bucket -h $host -d "$db" -a "$pid" -s $shardKey -t $contentType -M Put
     rc=$?
-    mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('-${length}');" $scripts/shared/reserve_storage.js
+    mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('-${length}');" $(cwp "$scripts/shared/reserve_storage.js")
 
     if [[ $rc != 0 ]] ; then
         exit $rc
@@ -96,7 +95,7 @@ mongo $db --quiet --eval "\
     var objid='$objid'; \
     var embargo='$embargo'; \
     var embargoAccess='$embargoAccess'; \
-    " $scripts/shared/put.js
+    " $(cwp "$scripts/shared/put.js")
 
 # toDo: make sure the content type is a proper json field... so we can remove this quick fix.
 rc=$?
@@ -120,7 +119,7 @@ if [[ $rc != 0 ]] ; then
         var objid='$objid'; \
         var embargo='$embargo'; \
         var embargoAccess='$embargoAccess'; \
-        " $scripts/shared/put.js
+        " $(cwp "$scripts/shared/put.js")
     rc=$?
     if [[ $rc != 0 ]] ; then
         echo  "Failed to save metadata. Even tried twice."
@@ -134,7 +133,7 @@ fi
        var md5='$md5'; \
        var pid = '$pid'; \
        var paranoid = false ; \
-       " $scripts/shared/integrity.js
+       " $(cwp "$scripts/shared/integrity.js")
 
     rc=$?
     if [[ $rc != 0 ]] ; then
@@ -143,7 +142,7 @@ fi
 
     # Add to the statistics
     # mongo $db --quiet --eval "var pid = '$pid';var ns='$bucket';" $scripts/shared/statistics.js
-    mongo $db --quiet --eval "var pid='$pid';var ns='$bucket'" $scripts/shared/vfs.js
+    mongo $db --quiet --eval "var pid='$pid';var ns='$bucket'" $(cwp "$scripts/shared/vfs.js")
 
     remove=$remove
     if [ "$remove" == "yes" ] ; then

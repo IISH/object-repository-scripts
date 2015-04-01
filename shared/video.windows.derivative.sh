@@ -29,7 +29,7 @@ do
 	    echo "Using existing cached file on $sourceFile"
 	    break
     else
-	    l=$(cygpath --windows $sourceFile)
+	    l="$sourceFile"
 	    source $scripts/shared/get.sh
 	    if [ -f "$sourceFile" ] ; then
 	        echo "Using db file on $sourceFile"
@@ -40,10 +40,10 @@ done
 
 
 # Run the convert script to create derivative.
+windows_sourceFile="$(cygpath --windows $sourceFile)"
+windows_targetFile="$(cygpath --windows $targetFile)"
 if [ -f "$sourceFile" ]; then
 	echo "Creating derivative from $sourceFile"
-	windows_sourceFile="$(cygpath --windows $sourceFile)"
-	windows_targetFile="$(cygpath --windows $targetFile)"
 	echo "running: mvccl /file ${windows_sourceFile} /outputfile ${windows_targetFile} /preset $preset ${mvccl_opts}"
     mvccl /file "$windows_sourceFile" /outputfile "$windows_targetFile" /preset $preset "$mvccl_opts"
 else
@@ -52,8 +52,8 @@ else
 	exit 240
 fi
 
-set rc=$?
-case "$rc" in
+rc=$?
+case $rc in
     1)
         echo "The program has been compromised."
         exit 1
@@ -112,14 +112,17 @@ case "$rc" in
         exit 1
         ;;
     0)
-        echo "mvccl conversion gave an ok"
+        echo "mvccl conversion exited with an 'ok'"
+        ;;
+    *)
+        echo "Warning. Unknown exit code: ${rc}"
         ;;
 esac
 
 rm "$sourceFile"
 if [ -f "$targetFile" ]; then
 	contentType="$targetContentType"
-	l="$(cygpath --windows $targetFile)"
+	l=$targetFile
 	length=$(stat -c%s "$l")
 	md5=$(md5sum $targetFile | cut -d ' ' -f 1)
 	echo "$md5  $targetFile" > "$targetFile.md5"

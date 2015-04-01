@@ -24,7 +24,11 @@ fi
 
 if [ "$scope" = "$HOSTNAME" ] || [ "$scope" = "all" ] ; then
     if [ "$1" = "start" ] ; then
-        CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
+        if [ -z "$CYGWIN_HOME" ] ; then
+            CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
+        else
+            CMD="java -server -Dor.properties=$(cygpath --windows $OR) -jar $(cygpath --windows $agent) -id $HOSTNAME -messageQueues $(cygpath --windows $OR_HOME)/pmq-agents-enabled"
+        fi
         $CMD > $log 2>&1 &
     else
         brokerURL=$brokerURL:8161

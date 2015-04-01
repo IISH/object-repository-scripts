@@ -116,3 +116,16 @@ instruction="{instruction:{workflow:{workflow:{name:'$name',statusCode:$statusCo
     fileSet:'$fileSet', autoGeneratePIDs:'$autoGeneratePIDs', resolverBaseUrl:'$resolverBaseUrl', na:'$na', \
     contentType:'$contentType', access:'$access', action:'$action', id:'$id', plan:'$plan'}}"
 
+
+# As we may be running in cygwin, we add a special function here so scripts can run the cygpath utility.
+function cwp {
+IFS=
+    file="$1"
+    if [ -z "$CYGWIN_HOME" ] ; then
+        echo "$file"
+    else
+        echo $(cygpath --windows "$file")
+    fi
+unset IFS
+}
+
