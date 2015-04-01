@@ -7,8 +7,8 @@
     <property name="bamboo"
               value="https://bamboo.socialhistoryservices.org/browse"/>
     <property name="version" value="1.0"/>
-    <property name="mount" value=""/>
-    <property name="dest.bin" value="${mount}/usr/bin/${ant.project.name}"/>
+    <property name="mount" value="C:/cygwin64"/>
+    <property name="dest.bin" value="${mount}/bin/${ant.project.name}"/>
     <property name="dest.opt" value="${mount}/opt/${ant.project.name}"/>
     <property name="dest.conf" value="${mount}/etc/${ant.project.name}"/>
     <property name="dest.log" value="${mount}/var/log/${ant.project.name}"/>

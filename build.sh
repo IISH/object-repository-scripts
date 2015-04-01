@@ -8,14 +8,15 @@ cd /tmp
 # If the certificates are not placed in the keystore or need to be replaced, then run this script with the
 # ./build.sh cacerts
 # option
-if [ "$1" == "cacerts" ] ; then
+if [ ! -z "$1" ] ; then
 
+    keystore="$1"
     for alias in "bamboo.socialhistoryservices.org" "pid.socialhistoryservices.org"
     do
         openssl s_client -connect $alias:443 > $alias.cer
         openssl x509 -outform der -in $alias.cer -out $alias.der
-        keytool -delete -alias $alias -keystore $jvm/jre/lib/security/cacerts
-        keytool -import -alias $alias -file $alias.der -keystore $jvm/jre/lib/security/cacerts
+        keytool -delete -alias $alias -keystore $keystore
+        keytool -import -alias $alias -file $alias.der -keystore $keystore
         rm $alias.cer
         rm $alias.der
     done
