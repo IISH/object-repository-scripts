@@ -10,6 +10,8 @@
 # Pause all agents: ./agent.sh pause
 # Continue all agents: ./agent.sh continue
 
+source /etc/environment
+
 OR_HOME=$OR_HOME
 OR=$OR
 agent=$agent
