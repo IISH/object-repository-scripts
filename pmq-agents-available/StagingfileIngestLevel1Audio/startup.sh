@@ -4,6 +4,7 @@
 #
 # The convert script to create the level 1 derivative
 
+source /etc/environment
 scripts=$scripts
 source $scripts/shared/parameters.sh
 
@@ -14,7 +15,7 @@ preset="120"
 targetContentType="audio/mp3"
 derivative="audio"
 format="mp3"
-mvccl_opts=""
+mvccl_opts="/cuda"
 
 source $scripts/shared/delete.sh
 source $scripts/shared/hasdocument.sh
