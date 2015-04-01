@@ -19,7 +19,7 @@ if [ -f $f ] ; then
             echo "Calculating md5 for $f"
             group=`stat -c %g $f`
             user=`stat -c %u $f`
-            md5sum $f > $md5File
+            md5sum "$f" > $md5File
             chown $group:$user $md5File
             chmod 664 $md5File
         fi

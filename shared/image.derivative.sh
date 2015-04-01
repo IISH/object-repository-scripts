@@ -25,7 +25,7 @@ do
 	    echo "Using existing cached file on $sourceFile"
 	    break
     else
-	l=$sourceFile
+	    l=$sourceFile
 	    source $scripts/shared/get.sh
 	    if [ -f "$sourceFile" ] ; then
 	        echo "Using db file on $sourceFile"
@@ -59,8 +59,8 @@ fi
 
 if [ -f "$targetFile" ]; then
 	contentType="image/jpeg"
-	l=$targetFile
-	md5=$(md5sum $targetFile | cut -d ' ' -f 1)
+	l="$targetFile"
+	md5=$(md5sum "$targetFile" | cut -d ' ' -f 1)
 	echo "$md5  $targetFile" > "$targetFile.md5"
 	remove="yes"
 	source $scripts/shared/put.sh

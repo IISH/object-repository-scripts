@@ -56,7 +56,7 @@ do
         file="$fileSet/$filename"
         echo $file > $file
         location=/$folder/$filename
-        md5=$(md5sum $file | cut -d ' ' -f 1)
+        md5=$(md5sum "$file" | cut -d ' ' -f 1)
 	    lid="lid.$pid"
             echo "<stagingfile>" >> $instruction
             echo "<location>$location</location>" >> $instruction
