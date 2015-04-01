@@ -26,6 +26,8 @@ identifier=$identifier
 hostname=$hostname
 derivative=$derivative
 l="$l"
+lib_dir=$(cwp "${scripts}/shared/")
+
 
 if [ ! -f "$l" ] ; then
     echo "The file does not exist: $l"
@@ -52,9 +54,9 @@ else
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shardKey=0
-    shardKey=$(mongo $db --quiet --eval "var lib_dir='${scripts}/shared/'; var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/shardkey.2a.js"))
+    shardKey=$(mongo $db --quiet --eval "var lib_dir='${lib_dir}'; var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/shardkey.2a.js"))
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
-    if [ -z "$is_numeric" ] ; then
+    if [[ $? != 0 ]] | [ -z "$is_numeric" ] ; then
         shardKey=0
     fi
     if [[ $shardKey == 0 ]]; then
