@@ -55,10 +55,10 @@ fi
     shardKey=0
     shardKey=$(mongo $db --quiet --eval "var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/shardkey.2a.js"))
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
-    if [[ $? != 0 ]] || [ -z "$is_numeric" ] ; then
+    if [ "$is_numeric" != "1" ] ; then
+        echo "Invalid shardKey value: ${shardKey}"
         shardKey=0
     fi
-    echo $shardKey
     if [[ $shardKey == 0 ]]; then
         echo "Could not retrieve a shardkey from shardkey.2a.js"
         exit -1
