@@ -25,9 +25,9 @@ fi
 if [ "$scope" = "$HOSTNAME" ] || [ "$scope" = "all" ] ; then
     if [ "$1" = "start" ] ; then
         if [ -z "$CYGWIN_HOME" ] ; then
-            CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -messageQueues $OR_HOME/pmq-agents-enabled"
+            CMD="java -server -Dor.properties=$OR -jar $agent -id $HOSTNAME -bash /bin/bash -messageQueues $OR_HOME/pmq-agents-enabled"
         else
-            CMD="java -server -Dor.properties=$(cygpath --windows $OR) -jar $(cygpath --windows $agent) -id $HOSTNAME -messageQueues $(cygpath --windows $scripts)/pmq-agents-available -startup \\startup.bat"
+            CMD="java -server -Dor.properties=$(cygpath --windows $OR) -jar $(cygpath --windows $agent) -id $HOSTNAME -bash $CYGWIN_HOME\bin\bash.exe -messageQueues $(cygpath --windows $scripts)/pmq-agents-available"
         fi
         $CMD > $log 2>&1 &
     else
