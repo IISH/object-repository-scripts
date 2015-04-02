@@ -53,7 +53,7 @@ else
 fi
     # Prepare a key. We suggest a key based on the shard with the fewest documents.
     shardKey=0
-    shardKey=$(mongo $db --quiet --eval "var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/shardkey.2a.js"))
+    shardKey=$(mongo $db --quiet --eval "var bucket='${bucket}'; var db_shard='${DB_SHARD}'; var file_size=NumberLong('${length}');" $(cwp "$scripts/shared/shardkey.2a.js") | tr -d '\r\n')
     is_numeric=$(php -r "print(is_numeric('$shardKey'));")
     if [ "$is_numeric" != "1" ] ; then
         echo "Invalid shardKey value: ${shardKey}"
