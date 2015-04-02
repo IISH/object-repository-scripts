@@ -136,7 +136,6 @@ fi
        var pid = '$pid'; \
        var paranoid = false ; \
        " $(cwp "$scripts/shared/integrity.js")
-
     rc=$?
     if [[ $rc != 0 ]] ; then
         exit $rc
