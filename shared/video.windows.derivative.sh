@@ -16,7 +16,8 @@ md5=$md5
 sourceBuckets=$sourceBuckets
 bucket=$bucket
 tmp=$derivative_cache # E.g. "/cygdrive/d"
-targetFile=$tmp/$md5.$bucket
+format=$format
+targetFile="${tmp}/${md5}.${bucket}.${format}"
 preset=$preset
 mvccl_opts=$mvccl_opts
 
@@ -56,35 +57,27 @@ rc=$?
 case $rc in
     1)
         echo "The program has been compromised."
-        exit 1
         ;;
     2)
         echo "No such file or directory."
-        exit 1
         ;;
     3)
         echo "Internal error."
-        exit 1
         ;;
     4)
         echo "The preset has not been found."
-        exit 1
         ;;
     5)
         echo "I/O error."
-        exit 1
         ;;
     12)
         echo "Not enough memory."
-         exit 1
          ;;
     22)
         echo "Invalid argument."
-        exit -1
         ;;
     28)
         echo "No enough space on the hard drive."
-        exit 1
         ;;
     29)
         echo "Conversion error. Fall back on ffmpeg"
@@ -92,24 +85,19 @@ case $rc in
         rc=$?
         if [[ $rc != 0 ]] ; then
             echo "ffmpeg failover did not work either. It gave an error response."
-            rm "$targetFile"
         fi
         ;;
     30)
         echo "Invalid conversion settings."
-        exit 1
         ;;
     31)
         echo "The conversion has been interrupted by the user."
-        exit 1
         ;;
     32)
         echo "The trial period has been expired."
-        exit 1
         ;;
     33)
         echo "Copy-protected DVD."
-        exit 1
         ;;
     0)
         echo "mvccl conversion exited with an 'ok'"
@@ -120,6 +108,11 @@ case $rc in
 esac
 
 rm "$sourceFile"
+if [[ $rc != 0 ]] ; then
+    rm "$targetFile"
+    exit 1
+fi
+
 if [ -f "$targetFile" ]; then
 	contentType="$targetContentType"
 	l=$targetFile
