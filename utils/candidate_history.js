@@ -12,6 +12,7 @@
 
 assert(db.getName() == 'shard', 'Expect the database name to be "shard"');
 assert(Number(from));
+var _format = ( format === undefined ) ? 'csv' : format ;
 
 
 var HOST_DB_CANDIDATE = 'candidate';
@@ -55,26 +56,42 @@ function quote(value) {
     return '"' + value + '"';
 }
 
+function td(value) {
+    return '<td>' + value + '</td>';
+}
+
 
 /**
  * report
  *
- * Printout a CSV list
+ * Printout a list
  */
-function report() {
+function report(_format) {
     var _from = new Date(new Date().getMilliseconds() + from * DAY);
     var candidates = db[HOST_DB_HISTORY].find({date: {$gte: _from}}).sort({date: 1});
     var usable = 0;
 
-    print('"DATE","AVAIL", "USED", "USABLE"');
-    candidates.forEach(function (candidate) {
-        usable += candidate.usable;
-        print(quote(formatDate(candidate.date)) + C + quote(candidate.avail) + C + quote(candidate.used) + C + quote(candidate.usable));
-    });
+    if ( _format == 'csv') {
+        print('"DATE","AVAIL", "USED", "USABLE"');
+        candidates.forEach(function (candidate) {
+            usable += candidate.usable;
+            print(quote(formatDate(candidate.date)) + C + quote(candidate.avail) + C + quote(candidate.used) + C + quote(candidate.usable));
+        });
+    } else {
+        print('<html><body><table>');
+        print('<th><td>DATE</td><td>AVAIL</td><td>USED</td><td>USABLE</td></th>');
+        candidates.forEach(function (candidate) {
+            usable += candidate.usable;
+            print('<tr>') ;
+            print(td(formatDate(candidate.date)) + td(candidate.avail) + td(candidate.used) + td(candidate.usable));
+            print('</tr>') ;
+        });
+        print('</table></body></html>');
+    }
 
     return usable;
 }
 
 saveCandidateHistory();
-report();
+report(_format);
 
