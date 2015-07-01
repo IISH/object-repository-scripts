@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "deb http://apt.puppetlabs.com/ lucid main
-deb-src http://apt.puppetlabs.com/ lucid main">/etc/apt/sources.list.d/puppet.list
+echo "deb http://apt.puppetlabs.com/ precise main
+deb-src http://apt.puppetlabs.com/ precise main">/etc/apt/sources.list.d/puppet.list
 
 apt-key adv --recv-key --keyserver pool.sks-keyservers.net 4BD6EC30
 apt-get update
