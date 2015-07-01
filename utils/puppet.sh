@@ -5,7 +5,7 @@ deb-src http://apt.puppetlabs.com/ precise main">/etc/apt/sources.list.d/puppet.
 
 apt-key adv --recv-key --keyserver pool.sks-keyservers.net 4BD6EC30
 apt-get update
-apt-get install puppet facter
+apt-get install -y facter --install-suggests puppet-common=3.7.4-1puppetlabs1
 
 echo "[main]
 server=puppet.socialhistoryservices.org
