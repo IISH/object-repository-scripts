@@ -74,6 +74,7 @@ fi
     if [[ $rc != 0 ]] ; then
         echo "Removing the reserved key, because we had a PUT failure."
         mongo $db --quiet --eval "db.${bucket}.files.remove({'metadata.pid':${shardKey}})"
+        mongo $DB_SHARD/shard --quiet --eval "var shardkey=${shardKey}; var file_size=NumberLong('-${length}');" $(cwp "$scripts/shared/reserve_storage.js")
         exit $rc
     fi
 
