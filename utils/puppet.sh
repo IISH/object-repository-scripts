@@ -3,18 +3,27 @@
 echo "deb http://apt.puppetlabs.com/ precise main
 deb-src http://apt.puppetlabs.com/ precise main">/etc/apt/sources.list.d/puppet.list
 
-apt-key adv --recv-key --keyserver pool.sks-keyservers.net 4BD6EC30
+wget -O /tmp/pubkey.gpg http://apt.puppetlabs.com/pubkey.gpg
+gpg --import /tmp/pubkey.gpg
+gpg -a --export 4BD6EC30 | apt-key add -
 apt-get update
-apt-get install -y facter --install-suggests puppet-common=3.7.4-1puppetlabs1
+apt-get install facter puppet-common=3.8.3-1puppetlabs1
+apt-mark hold puppet-common
 
 echo "[main]
-server=puppet.socialhistoryservices.org
 environment=production
-logdir=/var/log/puppet
-vardir=/var/lib/puppet
-ssldir=/var/lib/puppet/ssl
-rundir=/var/run/puppet
 factpath=/lib/facter
+logdir=/var/log/puppet
+rundir=/var/run/puppet
+ssldir=/var/lib/puppet/ssl
+vardir=/var/lib/puppet
+
+[agent]
+allow_duplicate_certs=true
+masterport=443
+report=false
+server=puppetmaster.socialhistoryservices.org
+
 
 [master]
 # These are needed when the puppetmaster is run by passenger
@@ -24,4 +33,6 @@ ssl_client_verify_header = SSL_CLIENT_VERIFY" > /etc/puppet/puppet.conf
 
 
 puppet agent --enable
-puppet agent -t
+rm -rf /var/lib/puppet/ssl
+puppet agent -t --waitforcert 10
+puppet resource service puppet ensure=running enable=true
