@@ -9,6 +9,9 @@ function map() {
 
     // Set interval according to the ISO
     /* use a function for the exact format desired... */
+    /**
+     * @return {string}
+     */
     function ISODateString(d) {
         function pad(n) {
             return n < 10 ? '0' + n : n
@@ -97,13 +100,13 @@ function map() {
                 break;
         }
         var value = {};
-        value[ "files.count"] = 1;
-        value[ "uploadDate." + ns] = this.uploadDate;
-        value[ "files.length"] = this.length;
-        value[ "files.count." + ns] = 1;
-        value[ "files.length." + ns] = this.length;
-        value[ "access.count." + this.metadata.access] = 1;
-        value[ "contentType.count." + this.contentType] = 1;
+        value[ "files_count"] = 1;
+        value[ "uploadDate_" + ns] = this.uploadDate;
+        value[ "files_length"] = this.length;
+        value[ "files_count_" + ns] = 1;
+        value[ "files_length_" + ns] = this.length;
+        value[ "access_count_" + this.metadata.access] = 1;
+        value[ "contentType_count_" + dot_to_underscore(this.contentType)] = 1;
         emit(new ISODate(key), value);
     }
 }
@@ -114,7 +117,7 @@ function reduce(key, values) {
     values.forEach(function (value) {
         for (var k in value) {
             if (value.hasOwnProperty(k)) {
-                if (k == 'uploadDate.'+ns)
+                if (k == 'uploadDate_'+ns)
                     reducto[k] = uploadDate = ( value[k] > uploadDate ) ? value[k] : uploadDate;
                 else
                     reducto[k] = (reducto[k] === undefined) ? value[k] : reducto[k] + value[k];
@@ -128,7 +131,7 @@ function reduce(key, values) {
     var collection = "statistics.storage." + unit;
     ['master', 'level1', 'level2', 'level3'].forEach(function (ns) {
         var bucket = ns + '.files';
-        var uploadDate_key = 'uploadDate.' + ns ;
+        var uploadDate_key = 'uploadDate_' + ns ;
         var from = db.getCollection(collection).find().sort({_id:-1}).limit(1);
         if (from.length() == 0 || from[0].value[uploadDate_key] === undefined) {
             var value = {value:{}};
