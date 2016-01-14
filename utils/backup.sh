@@ -10,6 +10,9 @@ scripts=$scripts
 # ToDo: retrieve the database names from the database itself
 dbs=$dbs
 statistics=$1
+if [ -z "$statistics" ] ; then
+    statistics=0
+fi
 
 # Backup the config server database
 mongodump -d config
@@ -46,17 +49,16 @@ if [[ $usable -lt $STORAGE_MINIMUM ]] ; then
 fi
 
 
-if [ -z "$statistics" ] ; then
-    exit 0
+today=$(date +"%d")
+if [[ $today == $statistics ]]; then
+    # Calculate storage statistics
+    for db in ${dbs[*]}
+    do
+        echo "Storage statistics for $db"
+        mongo $db $scripts/shared/storage.js
+    done
 fi
 
-
-# Calculate storage statistics
-for db in ${dbs[*]}
-do
-    echo "Storage statistics for $db"
-    mongo $db $scripts/shared/storage.js
-done
 
 # Create site usage
 for db in ${dbs[*]}
