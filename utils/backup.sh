@@ -42,7 +42,7 @@ done
 
 # See if we need to send a report.
 report=/tmp/report.txt
-mongo $DB_SHARD/shard --quiet --eval "var from=-28;" $scripts/utils/candidate_history.js > $report
+mongo $DB_SHARD/shard --quiet --eval "var format='csv'; var from=-28;" $scripts/utils/candidate_history.js > $report
 usable=$(mongo $DB_SHARD/shard --quiet --eval "var usable=0; db['candidate'].find().forEach(function(c){usable+=c.usable});usable")
 if [[ $usable -lt $STORAGE_MINIMUM ]] ; then
     python $scripts/utils/sendmail.py --body "$report" --from "$OR_MAIL_FROM" --to "$OR_MAIL_TO" --subject "$OR_SUBJECT" --mail_relay "$OR_MAIL_RELAY" --mail_user "$OR_MAIL_USER" --mail_password "$OR_MAIL_PASSWORD"
