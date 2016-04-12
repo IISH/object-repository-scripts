@@ -16,12 +16,14 @@ if [ ! -z "$1" ] ; then
     keystore="$1"
     for alias in "bamboo.socialhistoryservices.org" "pid.socialhistoryservices.org"
     do
-        openssl s_client -connect $alias:443 > $alias.cer
-        openssl x509 -outform der -in $alias.cer -out $alias.pem
+        cer_file=$alias.cer
+        pem_file=$alias.pem
+        openssl s_client -connect $alias:443 > $cer_file
+        openssl x509 -outform der -in $cer_file -out $pem_file
         keytool -delete -alias $alias -keystore $keystore
-        keytool -import -alias $alias -file $alias.der -keystore $keystore
-        rm $alias.cer
-        rm $alias.der
+        keytool -import -alias $alias -file $pem_file -keystore $keystore
+        rm $cer_file
+        rm $pem_file
     done
 fi
 
