@@ -17,7 +17,7 @@ if [ ! -z "$1" ] ; then
     for alias in "bamboo.socialhistoryservices.org" "pid.socialhistoryservices.org"
     do
         openssl s_client -connect $alias:443 > $alias.cer
-        openssl x509 -outform der -in $alias.cer -out $alias.der
+        openssl x509 -outform der -in $alias.cer -out $alias.pem
         keytool -delete -alias $alias -keystore $keystore
         keytool -import -alias $alias -file $alias.der -keystore $keystore
         rm $alias.cer

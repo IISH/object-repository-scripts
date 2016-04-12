@@ -60,6 +60,7 @@ pidCheck=$(php $scripts/shared/pid.php -l $file)
 rm $file
 if [ "$action" == "delete" ] ; then
     echo "No check for pid deletion"
+    exit 0
 else
     if [ "${pidCheck}" != "${pid^^}" ] ; then
         echo "Pid not returned by webservice"

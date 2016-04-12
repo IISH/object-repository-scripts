@@ -7,7 +7,7 @@
  * the often used association with a mimetype.
  *
  * The first match in the list is returned.
- * No matches results in returning the last item in the content list
+ * No matches results in returning the constant 'application/octet-stream'
  */
 
 // l = file with extension and t = file that contains extensions and content types

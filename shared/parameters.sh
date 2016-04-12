@@ -95,10 +95,10 @@ fi
 
 # If no webservice endpoint or key was given, we supply a custom value
 if [ -z "$pidwebserviceEndpoint" ]; then
-        pidwebserviceEndpoint=$endpoint
+    pidwebserviceEndpoint=$endpoint
 fi
 if [ -z "$pidwebserviceKey" ]; then
-        pidwebserviceKey=$key
+    pidwebserviceKey=$key
 fi
 
 db="$database"_"$na"
