@@ -26,6 +26,19 @@ mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}},
 if [ -f "$l" ] ; then
     remove="yes"
     source $scripts/shared/put.sh
+
+    # Remove the derivatives.
+    for b in level3 level2 level1
+    do
+        files_id=$(mongo $db --quiet --eval "var doc=db.$b.files.findOne({'metadata.pid':'$pid'}, {_id:1});if ( doc ){print(doc._id)}")
+        if [ -z "$files_id" ] ; then
+            echo "No derivative in level ${b} found."
+        else
+            echo "Remove derivative ${b}"
+            mongo $db --quiet --eval "db.$b.files.remove({_id:$files_id})"
+            mongo $db --quiet --eval "db.$b.chunks.remove({files_id:$files_id})"
+        fi
+    done
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
     query="{'metadata.pid':'$pid'}"
