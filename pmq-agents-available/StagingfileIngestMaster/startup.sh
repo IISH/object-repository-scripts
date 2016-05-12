@@ -24,9 +24,6 @@ source $scripts/shared/delete.sh
 # If we find a file we upload it
 mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"
 if [ -f "$l" ] ; then
-    remove="yes"
-    source $scripts/shared/put.sh
-
     # Remove the derivatives.
     for b in level3 level2 level1
     do
@@ -39,6 +36,9 @@ if [ -f "$l" ] ; then
             mongo $db --quiet --eval "db.$b.chunks.remove({files_id:$files_id})"
         fi
     done
+    remove="yes"
+    source $scripts/shared/put.sh
+
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
     query="{'metadata.pid':'$pid'}"
