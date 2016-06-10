@@ -19,7 +19,8 @@
 #                        small penalty in archive size, which will help to recover archived files in the case of a
 #                        diskette failure or other data losses.
 #   -t                 Test the archive
-#   -v107374182400b    100GiB multipart package.
+#   -v10737418240b     10GiB multipart package.
+#   -w<path>           Assign work directory
 #   -x*.md5            Ignore files with a .md5 postfix.
 
 
@@ -28,6 +29,7 @@ source $scripts/shared/parameters.sh
 access=$access
 fileSet=$fileSet
 archiveID=$(basename "$fileSet")
+workdir_rar="$(dirname "$fileSet")/.work/${archiveID}/.rar"
 workdir="$(dirname "$fileSet")/.work/${archiveID}"
 archive="${workdir}/${archiveID}.rar"
 expected_archive=$(ls -t "${workdir}/$archiveID".part*.rar | tail -n 1)
@@ -120,9 +122,9 @@ function stagingfile {
 
 
 function instruction {
-    #-----------------------------------------------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------------------------------------------
     # We have a valid archive. Create the SIP.
-    #-----------------------------------------------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------------------------------------------
     file_instruction="${workdir}/instruction.xml"
     echo "<instruction
         xmlns='http://objectrepository.org/instruction/1.0/'
@@ -153,9 +155,9 @@ function instruction {
 
 
 function package {
-    #-----------------------------------------------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------------------------------------------
     # Check if previous backups of the fileset are there.
-    #-----------------------------------------------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------------------------------------------
     echo "Check if previous backups of the fileset are there: ${expected_archive}"
     echo "This check may fail."
     rar t "$expected_archive"
@@ -164,9 +166,9 @@ function package {
         echo "Found a valid archive: ${expected_archive}"
     else
         echo "No valid archive found. This is not an error, just a warning."
-        #-------------------------------------------------------------------------------------------------------------------
+        #---------------------------------------------------------------------------------------------------------------
         # Remove stale working directory.
-        #-------------------------------------------------------------------------------------------------------------------
+        #---------------------------------------------------------------------------------------------------------------
         if [ -d "$workdir" ]
         then
             echo "Found working directory. Deleting: ${workdir}"
@@ -175,25 +177,27 @@ function package {
         mkdir -p "$workdir"
 
 
-        #-------------------------------------------------------------------------------------------------------------------
+        #---------------------------------------------------------------------------------------------------------------
         # Create a multipart archive. Exclude the .md5 files placed there by the system.
-        #-------------------------------------------------------------------------------------------------------------------
-        rar a -ep1 -k -m0 -ola -r -rr5% -t -v10485760b -x*.md5 "$archive" "$fileSet"
+        #---------------------------------------------------------------------------------------------------------------
+        mkdir "$workdir_rar"
+        rar a -ep1 -k -m0 -ola -r -rr5% -t -v10737418240b -w"$workdir_rar" -x*.md5 "$archive" "$fileSet"
         rc=$?
+        rm -rf "$workdir_rar"
         if [[ $rc != 0 ]] ; then
             echo "rar 'a' command on ${archive} ${fileSet} returned an error ${rc}"
             rm -rf "$workdir"
             exit $rc
         fi
 
-        #-------------------------------------------------------------------------------------------------------------------
+        #---------------------------------------------------------------------------------------------------------------
         # If we only have one part, Then rename the file accordingly. This way we always have a sequence number.
-        #-------------------------------------------------------------------------------------------------------------------
-        non_sequential_archive="${workdir}/${archiveID}.rar"
-        if [ -f "$non_sequential_archive" ]
+        #---------------------------------------------------------------------------------------------------------------
+        if [ -f "$archive" ]
         then
-            echo "Moving ${non_sequential_archive} to ${expected_archive}"
-            mv "$non_sequential_archive" "$expected_archive"
+            expected_archive="$archive.part01.rar"
+            echo "Moving ${archive} to ${expected_archive}"
+            mv "$archive" "$expected_archive"
         fi
     fi
 }
