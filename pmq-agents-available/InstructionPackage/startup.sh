@@ -36,6 +36,7 @@ expected_archive=$(ls -t "${workdir}/$archiveID".part*.rar | tail -n 1)
 na=$na
 label=$label
 notificationEMail=$notificationEMail
+objid=$objid
 
 
 if [ -z "$na" ]
@@ -62,6 +63,12 @@ else
 fi
 
 
+if [ -z "$objid" ]
+then
+    objid="${na}/${archiveID}"
+fi
+
+
 #-----------------------------------------------------------------------------------------------------------------------
 # We have a valid archive. SHOULD we find a manifest.xml file here, then we will declare it as a master.
 #-----------------------------------------------------------------------------------------------------------------------
@@ -74,11 +81,11 @@ function manifest {
         exit 1
     fi
 
-    location="${archiveID}/manifest.xml"
+    location="/${archiveID}/manifest.xml"
     l="${file}.md5"
     md5sum "$file" > "$l"
     md5=$(cat "$l" | cut -d ' ' -f 1)
-    pid="${na}/${archiveID}"
+    pid="${objid}"
 
     echo "
     <stagingfile>
@@ -104,11 +111,11 @@ function stagingfile {
         exit 1
     fi
 
-    location="${archiveID}/${filename}"
+    location="/${archiveID}/${filename}"
     l="${file}.md5"
     md5sum "$file" > "$l"
     md5=$(cat "$l" | cut -d ' ' -f 1)
-    pid="${na}/${archiveID}.${seq}"
+    pid="${objid}.${seq}"
 
     echo "
     <stagingfile>
@@ -134,7 +141,7 @@ function instruction {
         action='add'
         notificationEMail='$notificationEMail'
         plan='StagingfileIngestMaster,StagingfileBindPIDs'
-        objid='$archiveID'
+        objid='$objid'
         >" > $file_instruction
 
     for file in "$workdir/"*.rar
