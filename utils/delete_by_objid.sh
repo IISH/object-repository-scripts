@@ -21,7 +21,7 @@ then
 fi
 
 
-buckets="master level1 level2 level3"
+buckets="master"
 
 
 echo "db: ${db}"
@@ -30,8 +30,8 @@ echo "buckets: ${buckets}"
 
 
 query="{'metadata.objid':'${objid}'}"
-found_one=$(mongo $db --eval "db.master.files.findOne(${query})")
-if [ -z "$found_one" ]
+found_one=$(mongo $db --quiet --eval "db.master.files.findOne(${query})")
+if [ "$found_one" == "null" ]
 then
     echo "No files found with ${query}"
     exit 2
@@ -41,8 +41,8 @@ fi
 echo "The number of files that will be deleted are:"
 for bucket in $buckets
 do
-    count=$(mongo $db --eval "db.${bucket}.files.count(${query})")
-    echo "${db}.${bucket}: ${count}"
+    count=$(mongo $db --quiet --eval "db.${bucket}.files.count(${query})")
+    echo "db.${bucket}.files.count(${query})=${count}"
 done
 
 
@@ -57,25 +57,24 @@ then
     tmp_dir="/tmp/pids.${objid}"
     mkdir -p "$tmp_dir"
     file="${tmp_dir}/pids.txt"
-    mongo $db --eval "db.master.files.find(${query},{'metadata.pid':1}).forEach(function(){print(d.metadata.pid)})">$file
-    for pid in pids
+    mongo $db --quiet --eval "db.master.files.find(${query},{'metadata.pid':1}).forEach(function(d){print(d.metadata.pid)})">$file
+    while read pid
     do
         query="{'metadata.pid':'${pid}'}"
-        for bucket in buckets
+        for bucket in $buckets
         do
-            _id=$(mongo $db --eval "db.${bucket}.files.findOne({'${pid}'},{_id:1})")
-            if [ -z "$_id" ]
+            _id=$(mongo $db --quiet --eval "var doc=db.${bucket}.files.findOne(${query},{_id:1}); if (doc) print(doc._id); else print('null');")
+            echo "Deleting ${db}.${bucket}.${_id} from ${bucket}.files and ${bucket}.chunks"
+            if [ "$_id" == "null" ]
             then
-                echo "Error: no _id found for ${pid}"
-                exit 3
+                echo "Warning: no _id found for ${query}"
             else
-                echo "Deleting ${db}.${bucket}.${_id} from ${bucket}.files and ${bucket}.chunks"
-                mongo $db --eval "db.${bucket}.files.remove({_id:${_id})"
-                mongo $db --eval "db.${bucket}.chunks.remove({files_id:${_id})"
+                mongo ${db} --quiet --eval "db.${bucket}.files.remove({_id:${_id}})"
+                mongo ${db} --quiet --eval "db.${bucket}.chunks.remove({files_id:${_id}})"
             fi
         done
     done < $file
 else
-    echo "Aborted because you types ${proceed}"
+    echo "Aborted because you typed ${proceed}"
     exit 4
 fi
