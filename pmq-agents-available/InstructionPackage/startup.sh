@@ -137,6 +137,7 @@ function instruction {
         xmlns='http://objectrepository.org/instruction/1.0/'
         access='$access'
         autoIngestValidInstruction='true'
+        deleteCompletedInstruction='true'
         label='$label'
         action='add'
         notificationEMail='$notificationEMail'
