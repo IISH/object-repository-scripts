@@ -5,15 +5,7 @@
 # Remove all files with the given objid
 
 
-db="$1"
-if [ -z "$db" ]
-then
-    echo "db not set"
-    exit 1
-fi
-
-
-objid="$2"
+objid="$1"
 if [ -z "$objid" ]
 then
     echo "objid not set"
@@ -24,6 +16,7 @@ fi
 buckets="master"
 na=${objid:0:5}
 id=${objid:6}
+db="or_${na}"
 echo "db: ${db}"
 echo "objid: ${objid}"
 echo "na: ${na}"

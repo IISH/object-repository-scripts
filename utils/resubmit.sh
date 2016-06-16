@@ -17,7 +17,7 @@ then
     exit 2
 fi
 
-$scripts/utils/delete_by_objid.sh "$na" "$objid"
+source $scripts/utils/delete_by_objid.sh "$na" "$objid"
 
 d="/mnt/sa/10622/23445/$1"
 if [ -d "$d" ] ; then
