@@ -22,11 +22,20 @@ fi
 
 
 buckets="master"
-
-
+na=${objid:0:5}
+id=${objid:6}
 echo "db: ${db}"
 echo "objid: ${objid}"
+echo "na: ${na}"
+echo "id: ${id}"
 echo "buckets: ${buckets}"
+
+
+if [ ! "$objid" == "${na}/${id}" ]
+then
+    echo "The expected na and id are not correctly derived from the objid."
+    exit 2
+fi
 
 
 query="{'metadata.objid':'${objid}'}"
@@ -34,7 +43,7 @@ found_one=$(mongo $db --quiet --eval "db.master.files.findOne(${query})")
 if [ "$found_one" == "null" ]
 then
     echo "No files found with ${query}"
-    exit 2
+    exit 3
 fi
 
 
@@ -69,8 +78,11 @@ then
             then
                 echo "Warning: no _id found for ${query}"
             else
+                # Remove from the datastore
                 mongo ${db} --quiet --eval "db.${bucket}.files.remove({_id:${_id}})"
                 mongo ${db} --quiet --eval "db.${bucket}.chunks.remove({files_id:${_id}})"
+                # Remove from the vfs
+                mongo --quiet --eval "db.vfs.remove({'_id': { \$regex: /${na}\/${bucket}\/${id}/}})"
             fi
         done
     done < $file
