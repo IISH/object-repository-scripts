@@ -24,10 +24,6 @@ fi
 $scripts/utils/delete_by_objid.sh "$objid"
 
 fileset="/mnt/sa/10622/23445/${id}"
-backup="/mnt/sa/10622/23445/.${id}"
-# remove the old instruction
 query="{fileSet:'${fileset}'}"
 mongo sa --quiet --eval "db.instruction.remove($query)"
 mongo sa --quiet --eval "db.stagingfile.remove($query)"
-
-mv "$fileset" "$backup"
