@@ -12,7 +12,7 @@
 # $ rar a              Create and add files to archive.
 #   -ep1               Exclude base directory from names.
 #   -k                 Lock the archive.
-#   -m3                Default compression.
+#   -m0                Store files. So no compression.
 #   -ola               Store symbolic links absolute path.
 #   -r                 Recurse
 #   -rr5%              Optionally, redundant information (recovery record) may be added to an archive, incurring a
@@ -188,7 +188,7 @@ function package {
         # Create a multipart archive. Exclude the .md5 files placed there by the system.
         #---------------------------------------------------------------------------------------------------------------
         mkdir "$workdir_rar"
-        rar a -ep1 -k -m3 -ola -r -rr5% -t -v10737418240b -w"$workdir_rar" -x*.md5 "$archive" "$fileSet"
+        rar a -ep1 -k -m0 -ola -r -rr5% -t -v10737418240b -w"$workdir_rar" -x*.md5 "$archive" "$fileSet"
         rc=$?
         rm -rf "$workdir_rar"
         if [[ $rc != 0 ]] ; then
