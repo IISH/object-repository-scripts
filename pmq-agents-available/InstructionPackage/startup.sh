@@ -93,6 +93,7 @@ function manifest {
         <md5>${md5}</md5>
         <pid>${pid}</pid>
         <seq>0</seq>
+        <contentType>text/xml</contentType>
     </stagingfile>
     "
 }
@@ -123,6 +124,7 @@ function stagingfile {
       <md5>${md5}</md5>
       <pid>${pid}</pid>
       <seq>${seq}</seq>
+      <contentType>application/x-rar-compressed</contentType>
     </stagingfile>
     "
 }
