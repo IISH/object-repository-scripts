@@ -19,7 +19,7 @@
 #                        small penalty in archive size, which will help to recover archived files in the case of a
 #                        diskette failure or other data losses.
 #   -t                 Test the archive
-#   -v10737418240b     10GiB multipart package.
+#   -v2147483647b      2 GiB multipart package.
 #   -w<path>           Assign work directory
 #   -x*.md5            Ignore files with a .md5 postfix.
 
@@ -191,7 +191,7 @@ function package {
         # Create a multipart archive. Exclude the .md5 files placed there by the system.
         #---------------------------------------------------------------------------------------------------------------
         mkdir "$workdir_rar"
-        rar a -ep1 -k -m0 -ola -r -rr5% -t -v10737418240b -w"$workdir_rar" -x*.md5 "$archive" "$fileSet"
+        rar a -ep1 -k -m0 -ola -r -rr5% -t -v2147483647b -w"$workdir_rar" -x*.md5 "$archive" "$fileSet"
         rc=$?
         rm -rf "$workdir_rar"
         if [[ $rc != 0 ]] ; then
