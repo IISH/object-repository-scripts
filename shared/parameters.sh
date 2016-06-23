@@ -97,9 +97,24 @@ fi
 if [ -z "$pidwebserviceEndpoint" ]; then
     pidwebserviceEndpoint=$endpoint
 fi
+
+
 if [ -z "$pidwebserviceKey" ]; then
     pidwebserviceKey=$key
 fi
+
+
+if [ -z "$autoIngestValidInstruction" ]
+then
+    autoIngestValidInstruction="false"
+fi
+
+
+if [ -z "$deleteCompletedInstruction" ]
+then
+    deleteCompletedInstruction="false"
+fi
+
 
 db="$database"_"$na"
 

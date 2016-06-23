@@ -27,6 +27,7 @@
 scripts=$scripts
 source $scripts/shared/parameters.sh
 access=$access
+deleteCompletedInstruction=$deleteCompletedInstruction
 fileSet=$fileSet
 archiveID=$(basename "$fileSet")
 workdir_rar="$(dirname "$fileSet")/.work/${archiveID}/.rar"
@@ -139,9 +140,9 @@ function instruction {
         xmlns='http://objectrepository.org/instruction/1.0/'
         access='$access'
         autoIngestValidInstruction='true'
-        deleteCompletedInstruction='true'
+        deleteCompletedInstruction='$deleteCompletedInstruction'
         label='$label'
-        action='add'
+        action='upsert'
         notificationEMail='$notificationEMail'
         plan='StagingfileIngestMaster,StagingfileBindPIDs'
         objid='$objid'
