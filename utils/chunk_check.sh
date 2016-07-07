@@ -1,8 +1,15 @@
 #!/bin/bash
 
-db=$1
-ns=$2
-_id=$3
+host=$1
+db=$2
+ns=$3
+_id=$4
 
-file=chunk.check.$db.$ns.txt
-mongo $db --eval "var ns='$ns'; var _id='$_id'" /usr/bin/object-repository/scripts/utils/chunk_check.js > $file
+echo "host=${host}"
+echo "db=${db}"
+echo "ns=${ns}"
+echo "_id=${_id}"
+
+file="${host}.${db}.${ns}.${_id}"
+mongo $db --quiet --eval "var ns='$ns'; var _id='$_id'; var host='$host';" $scripts/utils/chunk_check.js > $file
+python $scripts/chunk_check.py -f $file > $file.check
