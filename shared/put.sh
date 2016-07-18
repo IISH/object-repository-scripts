@@ -136,23 +136,55 @@ if [[ $rc != 0 ]] ; then
     fi
 fi
 
-    # With the fs... this check is really not necessary then using REPLICAS_SAFE
-    mongo $db --quiet --eval "\
-       var ns='$bucket'; \
-       var md5='$md5'; \
-       var pid = '$pid'; \
-       var paranoid = false ; \
-       " $(cwp "$scripts/shared/integrity.js")
-    rc=$?
-    if [[ $rc != 0 ]] ; then
-        exit $rc
+    # Now download the file again and see if the checksum is as we expect it to be.
+    # We do this only for the master.
+    validate_file="$validate_file"
+    if [ "$validate_file" == "yes" ]
+    then
+        archiveID=$(basename "$fileSet")
+        workdir="$(dirname "$fileSet")/.work/${archiveID}"
+        if [ ! -d "$workdir" ]
+        then
+            mkdir -p "$workdir"
+        fi
+        md5_check_file="${workdir}/${md5}.bin"
+        java -jar "$orfiles" -M Get -l "$md5_check_file" -host "$host" -d "$db" -b master -a "$pid" -m ""
+        md5_check=$(md5sum "$md5_check_file" | cut -d ' ' -f 1)
+        rm "$file_md5_check"
+        if [ "$md5" == "$md5_check" ]
+        then
+            echo "md5 checksum ok"
+        else
+            echo "md5 mismatch then comparing the file with a checkout version."
+            exit 1
+        fi
     fi
+
+
+    # Remove the derivatives.
+    remove_derivatives="$remove_derivatives"
+    if [ "$remove_derivatives" == "yes" ]
+    then
+        for b in level3 level2 level1
+        do
+            files_id=$(mongo $db --quiet --eval "var doc=db.$b.files.findOne({'metadata.pid':'$pid'}, {_id:1});if ( doc ){print(doc._id)}")
+            if [ -z "$files_id" ] ; then
+                echo "No derivative in level ${b} found."
+            else
+                echo "Remove derivative ${b}"
+                mongo $db --quiet --eval "db.$b.files.remove({_id:$files_id})"
+                mongo $db --quiet --eval "db.$b.chunks.remove({files_id:$files_id})"
+            fi
+        done
+    fi
+
+
 
     # Add to the statistics
     # mongo $db --quiet --eval "var pid = '$pid';var ns='$bucket';" $scripts/shared/statistics.js
     mongo $db --quiet --eval "var pid='$pid';var ns='$bucket'" $(cwp "$scripts/shared/vfs.js")
 
-    remove=$remove
+    remove="$remove"
     if [ "$remove" == "yes" ] ; then
         rm "$l"
         rm "$l.md5"

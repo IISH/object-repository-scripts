@@ -15,7 +15,7 @@ def parse_csv(file):
 
     print('EXPECTED MD5 | ACTUAL MD5 | MATCH')
     csv.field_size_limit(524288)
-    count=0
+    n=0
     with open(file, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for _items in reader:
@@ -23,8 +23,8 @@ def parse_csv(file):
             data =_items[1]
             actual_md5 = hashlib.md5(binascii.unhexlify(data)).hexdigest()
             compare = int(expected_md5, 16) == int(actual_md5, 16)
-            print(str(count) + ' ' + expected_md5 + ' ' + actual_md5 + ' ' + str(compare))
-            count+=1
+            print(str(n) + ' ' + expected_md5 + ' ' + actual_md5 + ' ' + str(compare))
+            n+=1
 
 def usage():
     print('Usage: chunk_check.py -f [source file]')

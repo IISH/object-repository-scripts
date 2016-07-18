@@ -1,21 +1,9 @@
 #!/bin/bash
+#
+# For each host start the chunk procedure
 
-for db in $dbs
-do
-    for ns in level3 level2 level1 master
-    do
-            echo "Validation on $db.$ns"
-            file=chunk.check.$db.$ns.sh
-            mongo $db --eval "db.$ns.files.find({},{_id:1}).forEach(function(d){print('./chunk.check.sh $db $ns '+d._id)})" > $file
-            chmod 744 $file
-    done
-done
+replicaset=$1
+host=mongo or-mongodb-$replicaset-2.objectrepository.org
+db=or_10622
 
-for db in $dbs
-do
-    for ns in level3 level2 level1 master
-    do
-            source $file
-    done
-done
-
+mongo $host:27018/$db --eval "var lower=db.master.chunks.find({},{files_id:1}).sort({files_id:1}).limit(1); print(lower[0].files_id)"
