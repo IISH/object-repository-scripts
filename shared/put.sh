@@ -150,12 +150,13 @@ fi
         md5_check_file="${workdir}/${md5}.bin"
         java -jar "$orfiles" -M Get -l "$md5_check_file" -host "$host" -d "$db" -b master -a "$pid" -m ""
         md5_check=$(md5sum "$md5_check_file" | cut -d ' ' -f 1)
-        rm "$file_md5_check"
         if [ "$md5" == "$md5_check" ]
         then
             echo "md5 checksum ok"
+            rm "$md5_check_file"
         else
             echo "md5 mismatch then comparing the file with a checkout version."
+            echo "Expect ${md5} but got ${md5_check}  ${md5_check_file}"
             exit 1
         fi
     fi

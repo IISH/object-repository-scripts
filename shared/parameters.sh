@@ -115,6 +115,10 @@ then
     deleteCompletedInstruction="false"
 fi
 
+# Normalize the md5 to ensure it is 32 characters in length.
+md5="00000000000000000000000000000000${md5}"
+md5=${md5:(-32)}
+
 
 db="$database"_"$na"
 
