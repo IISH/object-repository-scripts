@@ -13,11 +13,14 @@ then
     exit 1
 else
     # clear the vfs
-    mongo "$db" --eval "db.vfs.remove()"
+    mongo "$db" --eval "db.vfs.drop()"
+    sleep 10
+    mongo "$db" --eval "db.vfs.createIndex({'f.o':1})"
+    mongo "$db" --eval "db.vfs.createIndex({'f.p':1})"
 fi
 
 
-for c in master
+for bucket in master
 do
     # Create a list of PID values
     file_pids = "/tmp/${db}.${bucket}.pids.txt"
