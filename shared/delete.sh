@@ -32,6 +32,12 @@ if [ "$action" == "delete" ] ; then
         exit -1
     fi
 
+    # Remove from the vfs
+    if [ "$add_vfs" == "yes" ]
+    then
+        mongo "$db" --quiet --eval "var pid='$pid';var ns='$bucket'; var del=true;" $(cwp "$scripts/shared/vfs.js")
+    fi
+
     echo "Document $pid removed"
     exit 0
 fi

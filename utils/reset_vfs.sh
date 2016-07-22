@@ -12,23 +12,24 @@ then
     echo "Need a database"
     exit 1
 else
-    # clear the vfs
+    echo "clear the vfs"
     mongo "$db" --eval "db.vfs.drop()"
-    sleep 10
-    mongo "$db" --eval "db.vfs.createIndex({'f.o':1})"
-    mongo "$db" --eval "db.vfs.createIndex({'f.p':1})"
 fi
 
 
 for bucket in master
 do
-    # Create a list of PID values
-    file_pids = "/tmp/${db}.${bucket}.pids.txt"
-    mongo "$db" --quiet --eval "db.${bucket}.files.find({},{_id:0, 'metadata.pid':1})" > "$file_pids"
-
+    file_pids="/tmp/${db}.${bucket}.pids.txt"
+    echo "Create a list of PID values: ${file_pids}"
+    mongo "$db" --quiet --eval "db.${bucket}.files.find({},{_id:0, 'metadata.pid':1}).forEach(function(d){print(d.metadata.pid)})" > "$file_pids"
     # Now, for each PID set the vfs
-    for read pid
+    while read pid
     do
-        mongo "$db" --quiet --eval "var pid='$pid';var ns='$bucket'" $(cwp "$scripts/shared/vfs.js")
+        echo "Set vfs document for ${pid}"
+        mongo "$db" --quiet --eval "var pid='$pid';var ns='$bucket'" "$scripts/shared/vfs.js"
     done < "$file_pids"
 done
+
+
+mongo "$db" --eval "db.vfs.createIndex({'f.o':1})"
+mongo "$db" --eval "db.vfs.createIndex({'f.p':1})"

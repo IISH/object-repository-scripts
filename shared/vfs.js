@@ -25,6 +25,7 @@ assert(ns, "Need a namespace\\bucket.");
 var log = ( log === undefined ) ? null : log;
 var pid = ( pid === undefined ) ? null : pid;
 var date = ( date === undefined ) ? null : date;
+var del = ( del === undefined ) ? false : del;
 var environment = ( environment === undefined ) ? 'production' : 'test' ;
 
 print('Create vfs for ' + db.getName() + '.' + ns);
@@ -61,13 +62,22 @@ db.getCollection(ns + '.files').find(
                 var child = parent;
                 parent = parent.substring(0, i);
                 var n = child.substring(i + 1);
-                if (log) print('Set parent ' + parent + ' and child ' + n);
+                if (log) {
+                    if (del)
+                        print('Unset from parent ' + parent + ' child ' + n);
+                    else
+                        print('Set parent ' + parent + ' and child ' + n);
+                }
 
                 // file
                 if (child == l) {
                     var _f = {n: d.filename, p: d.metadata.pid, l: d.length, t: d.uploadDate.getTime(), a: d.metadata.access};
-                    if (d.metadata.objid) _f.o = d.metadata.objid;
-                    db.vfs.update({_id: child}, {$addToSet: {f: _f}}, true, false);
+                    if (d.metadata.objid)
+                        _f.o = d.metadata.objid;
+                    if (del)
+                        db.vfs.update({_id: child}, {$pull: {f: _f}}, true, false);
+                    else
+                        db.vfs.update({_id: child}, {$addToSet: {f: _f}}, true, false);
                     if ( environment == 'production' ) assert(db.runCommand({getlasterror: 1, w: '2'}).err == null, "Could not update vfs.");
                 }
 
