@@ -21,14 +21,16 @@ action=$action
 
 source $scripts/shared/delete.sh
 
+
+remove="yes"
+remove_derivatives="yes"
+validate_file="yes"
+add_vfs="yes"
+
 # If we find a file we upload it
 mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"
 if [ -f "$l" ] ; then
-    remove="yes"
-    remove_derivatives="yes"
-    validate_file="yes"
     source $scripts/shared/put.sh
-
 else
     echo "No location '$l' found... updating metadata for the $db.$bucket collection"
     query="{'metadata.pid':'$pid'}"
@@ -80,6 +82,12 @@ else
     fi
     echo "The expected updated elements cannot be found with the query $query"
     exit 245
+
+    # Add to the vfs
+    if [ "$add_vfs" == "yes" ]
+    then
+        mongo "$db" --quiet --eval "var pid='$pid';var ns='$bucket'" $(cwp "$scripts/shared/vfs.js")
+    fi
 fi
 
 exit $?
