@@ -102,7 +102,30 @@ if [ ! "file_with_identifiers" ]
 then
     rm "$file_with_identifiers"
 fi
-mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).forEach(function(d){print(d.files_id)})" > "$file_with_identifiers"
+
+# This can take to long:
+# mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).forEach(function(d){print(d.files_id)})" > "$file_with_identifiers"
+maxKey=$(mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:-1})[0].files_id")
+rc=$?
+if [[ $rc == 0 ]]
+then
+    echo "maxKey: ${maxKey}"
+else
+    echo "Unable to get the maxKey with identifiers (${rc}): ${file_with_identifiers}"
+    exit 1
+fi
+
+minKey=$(mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:1})[0].files_id")
+rc=$?
+if [[ $rc == 0 ]]
+then
+    echo "minKey: ${minKey}"
+else
+    echo "Unable to get the minKey with identifiers (${rc}): ${file_with_identifiers}"
+    exit 1
+fi
+
+mongo "${bucket_files_host}/${db}" --quiet --eval "db.${bucket}.files.find({\$and:[{_id:{\$gte:${minKey}}},{_id:{\$lte:${maxKey}}},md5:{\$exists:true}]},{_id:1}).sort({_id:1}).forEach(function(d){print(d._id)})" > "$file_with_identifiers"
 rc=$?
 if [[ $rc != 0 ]]
 then
@@ -143,7 +166,7 @@ do
     md5_part3="${md5_expected:16:8}"
     md5_part4="${md5_expected:24:8}"
     path="${target}/${md5_part1}/${md5_part2}/${md5_part3}/${md5_part4}"
-    if [ -d "$path" ]
+    if [ ! -d "$path" ]
     then
         mkdir -p "$path"
     fi
