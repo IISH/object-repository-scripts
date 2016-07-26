@@ -4,87 +4,158 @@
 #
 # Backup a replica set by exporting filestreams plus their metadata.
 #
-# Gridfs stores files in two collections# [bucket].files and [bucket].chunks
-# Given a normalized md5 string of 32 characters, then a file and its metadata is exported as:
-# /[replica set]/[db]/[first 8 md5 of the file]/[second 8 md5 chars]/[third 8]/[md5].bin
-# /[replica set]/[db]/[first 8 md5 of the file]/[second 8 md5 chars]/[third 8]/[md5].json
+# Gridfs stores files in two collections# [BUCKET].files and [BUCKET].chunks
+# A file and its metadata is exported as:
+# /[TARGET FOLDER]/[ID PARTS]/[ID].bin
+# /[TARGET FOLDER]/[ID PARTS]/[ID].json
 #
-# Usage# backup_replicaset.sh [metadata host] [primary host] [db] [bucket] [target]
+# Usage
+# backup_replicaset.sh [metadata host] [primary host] [DB] [BUCKET] [TARGET] [optional KEEP_PREVIOUS_FILES=yes|no]
 # E.g. ./backup_replicaset.sh or_10622 master /some/device/mountpoint
+#
+# The procedure will log the ID of the file and success or reason of failure.
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Gather and validate the arguments.
 #-----------------------------------------------------------------------------------------------------------------------
-bucket_files_host=$1
-if [ -z "$bucket_files_host" ]
+BUCKET_FILES_HOST=$1
+if [ -z "$BUCKET_FILES_HOST" ]
 then
     echo "Must have a host name of the replica set that contains the files collection."
     exit 1
 fi
 
-bucket_chunks_host=$2
-if [ -z "$bucket_chunks_host" ]
+BUCKET_CHUNKS_HOST=$2
+if [ -z "$BUCKET_CHUNKS_HOST" ]
 then
     echo "Must have a host name of the replica set that contains the chunks collection."
     exit 1
 fi
 
-db=$3
-if [ -z "$db" ]
+DB=$3
+if [ -z "$DB" ]
 then
     echo "Must have a database name"
     exit 1
 fi
 
-bucket=$4
-if [ -z "$bucket" ]
+BUCKET=$4
+if [ -z "$BUCKET" ]
 then
     echo "Must have a collection name for the metadata and chunks collection"
     exit 1
 fi
 
-count_bucket_files=$(mongo "${bucket_files_host}/${db}" --quiet --eval "db.${bucket}.files.count()")
+count_bucket_files=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "DB.${BUCKET}.files.count()")
 rc=$?
-if [[ $rc != 0 ]]
+if [[ ${rc} != 0 ]]
 then
     echo "Error trying to count the number of documents."
     exit 1
 fi
-if [[ $count_bucket_files == 0 ]]
+if [[ ${count_bucket_files} == 0 ]]
 then
-    echo "No collection ${bucket}.files found on ${bucket_files_host}/${db}"
+    echo "No collection ${BUCKET}.files found on ${BUCKET_FILES_HOST}/${DB}"
     exit 1
 else
-    echo "Found ${count_bucket_files} metadata documents on ${bucket_files_host}/${db}"
+    echo "Found ${count_bucket_files} metadata documents on ${BUCKET_FILES_HOST}/${DB}"
 fi
 
-count_bucket_chunks=$(mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.count()")
+count_bucket_chunks=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval "DB.${BUCKET}.chunks.count()")
 rc=$?
-if [[ $rc != 0 ]]
+if [[ ${rc} != 0 ]]
 then
     echo "Error trying to count the number of documents."
     exit 1
 fi
-if [[ $count_bucket_chunks == 0 ]]
+if [[ ${count_bucket_chunks} == 0 ]]
 then
-    echo "No collection ${bucket}.chunks found on ${bucket_chunks_host}/${db}"
+    echo "No collection ${BUCKET}.chunks found on ${BUCKET_CHUNKS_HOST}/${DB}"
     exit 1
 else
-    echo "Found ${count_bucket_chunks} chunk documents on ${bucket_chunks_host}/${db}"
+    echo "Found ${count_bucket_chunks} chunk documents on ${BUCKET_CHUNKS_HOST}/${DB}"
 fi
 
-target=$5
-if [ -z "$target" ]
+TARGET=$5
+if [ -z "$TARGET" ]
 then
-    echo "Must have a target folder"
+    echo "Must have a TARGET folder"
     exit 1
 fi
-if [ ! -d "$target" ]
+if [ ! -d "$TARGET" ]
 then
-    echo "Directory not found ${target}"
+    echo "Directory not found ${TARGET}"
     exit 1
 fi
+
+
+KEEP_PREVIOUS_FILES="6"
+if [ -z "$KEEP_PREVIOUS_FILES" ]
+then
+    KEEP_PREVIOUS_FILES="yes"
+fi
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Calculate the md5 from a file.
+#-----------------------------------------------------------------------------------------------------------------------
+function md5_from_file {
+    file="$1"
+    md5=$(md5sum "$file" | cut -d ' ' -f 1)
+    echo -n $(normalize_md5_hash ${md5})
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Normalize an md5 hash into 32 characters by filling up the left side with trailing zeros.
+#-----------------------------------------------------------------------------------------------------------------------
+function normalize_md5_hash {
+    md5="00000000000000000000000000000000${1}"
+    md5=${md5:(-32)}
+    echo -n "$md5"
+}
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Normalize an md5 hash into 32 characters by filling up the left side with trailing zeros.
+#-----------------------------------------------------------------------------------------------------------------------
+function save_metadata {
+
+    id="$1"
+    file_metadata="$2"
+    if [ -f "$file_metadata" ]
+    then
+        rm "$file_metadata"
+    fi
+    mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "printjson(db.${BUCKET}.files.findOne({_id:${id}}));" > "$file_metadata"
+}
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Create a path based on a 12 zero leader divided into three parts.
+#-----------------------------------------------------------------------------------------------------------------------
+function build_path {
+
+    id="$1"
+
+    case "${id:0:1}" in
+        "-")
+            alias_id="${id:1}"
+            file_part_0="-"
+        ;;
+        *)
+            alias_id="$id"
+            file_part_0=""
+        ;;
+    esac
+    file_fill="000000000000${alias_id}"
+    file_part_1="${file_fill:(-12):4}"
+    file_part_2="${file_fill:(-8):4}"
+    file_part_3="${file_fill:(-4):4}"
+    path="${TARGET}/${file_part_0}${file_part_1}/${file_part_2}/${file_part_3}"
+    echo -n "$path"
+}
+
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -97,17 +168,16 @@ wget -O "$ORFILES" --no-check-certificate "https://bamboo.socialhistoryservices.
 #-----------------------------------------------------------------------------------------------------------------------
 # Get a list of all identifiers on the replica set.
 #-----------------------------------------------------------------------------------------------------------------------
-file_with_identifiers="/opt/_id.${db}.${bucket}.txt"
+file_with_identifiers="/opt/_id.${DB}.${BUCKET}.txt"
 if [ ! "file_with_identifiers" ]
 then
     rm "$file_with_identifiers"
 fi
 
-# This can take to long:
-# mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).forEach(function(d){print(d.files_id)})" > "$file_with_identifiers"
-maxKey=$(mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:-1})[0].files_id")
+maxKey=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval \
+    "db.${BUCKET}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:-1})[0].files_id")
 rc=$?
-if [[ $rc == 0 ]]
+if [[ ${rc} == 0 ]]
 then
     echo "maxKey: ${maxKey}"
 else
@@ -115,9 +185,10 @@ else
     exit 1
 fi
 
-minKey=$(mongo "${bucket_chunks_host}/${db}" --quiet --eval "db.${bucket}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:1})[0].files_id")
+minKey=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval \
+    "db.${BUCKET}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:1})[0].files_id")
 rc=$?
-if [[ $rc == 0 ]]
+if [[ ${rc} == 0 ]]
 then
     echo "minKey: ${minKey}"
 else
@@ -125,21 +196,22 @@ else
     exit 1
 fi
 
-mongo "${bucket_files_host}/${db}" --quiet --eval "db.${bucket}.files.find({\$and:[{_id:{\$gte:${minKey}}},{_id:{\$lte:${maxKey}}},md5:{\$exists:true}]},{_id:1}).sort({_id:1}).forEach(function(d){print(d._id)})" > "$file_with_identifiers"
+mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval \
+    "db.${BUCKET}.files.find({\$and:[{_id:{\$gte:${minKey}}},{_id:{\$lte:${maxKey}}},md5:{\$exists:true}]},{_id:1}).sort({_id:1}).forEach(function(d){print(d._id)})" > "$file_with_identifiers"
 rc=$?
-if [[ $rc != 0 ]]
+if [[ ${rc} != 0 ]]
 then
     echo "Unable to get a file with identifiers: ${file_with_identifiers}"
     exit 1
 fi
 count=$(cat "$file_with_identifiers" | wc -l)
-if [[ $count == 0 ]]
+if [[ ${count} == 0 ]]
 then
     echo "No identifiers found."
     exit 1
 fi
 
-if [[ $count_bucket_files != $count ]]
+if [[ ${count_bucket_files} != ${count} ]]
 then
     echo "Warning... ${count} documents stored, but ${count_bucket_files} expected."
 fi
@@ -150,61 +222,73 @@ fi
 #-----------------------------------------------------------------------------------------------------------------------
 while read id
 do
-    echo "Checking out ${id}"
-    md5_expected=$(mongo "${bucket_files_host}/${db}" --quiet --eval "var doc=db.${bucket}.files.findOne();assert(doc);assert(doc.md5);print(doc.md5)")
+    echo -n "Checking out ${id}... "
+    md5_expected=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "var doc=db.${BUCKET}.files.findOne({_id:${id});assert(doc);assert(doc.md5);print(doc.md5)")
     rc=$?
-    if [[ $rc != 0 ]]
+    if [[ ${rc} == 0 ]]
     then
-        echo "Error ${rc} with ${id}"
+        md5_expected=$(normalize_md5_hash "$md5_expected")
+    else
+        echo "ERROR ${rc} with ${id} when retrieving the expected md5 from the files collection ${BUCKET_FILES_HOST}."
         continue
     fi
 
-    md5_expected="00000000000000000000000000000000${md5_expected}"
-    md5_expected=${md5_expected:(-32)}
-    md5_part1="${md5_expected:0:8}"
-    md5_part2="${md5_expected:8:8}"
-    md5_part3="${md5_expected:16:8}"
-    md5_part4="${md5_expected:24:8}"
-    path="${target}/${md5_part1}/${md5_part2}/${md5_part3}/${md5_part4}"
+    path=$(build_path "$id")
     if [ ! -d "$path" ]
     then
         mkdir -p "$path"
     fi
-    file_binary="${path}/${id}.bin"
-    if [ -f "$file_binary" ]
-    then
-        rm "$file_binary"
-    fi
-    java -jar "$ORFILES" -M Get -l "$file_binary" -h "$bucket_files_host" -d "$db" -b "$bucket" -s "$id" -a "some_pid" -m "some_md5"
-    rc=$?
-    if [[ $rc != 0 ]]
-    then
-        echo "Error ${rc} with ${id}"
-        continue
-    fi
-
-    md5_actual=$(md5sum "$file_binary" | cut -d ' ' -f 1)
-    md5_actual="00000000000000000000000000000000${md5_actual}"
-    md5_actual=${md5_actual:(-32)}
-    if [ "$md5_expected" == "$md5_actual" ]
-    then
-        echo "md5 checksum ok ${md5_actual}"
-    else
-        echo "md5 mismatch then comparing the file with a checkout version."
-        echo "Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
-    fi
 
     file_metadata="${path}/${id}.json"
-    if [ -f "$file_metadata" ]
+    file_binary="${path}/${id}.bin"
+
+    # if the file already exist, we check if the md5 still holds true. Otherwise we remove it.
+    # There is a risk here... what is the file was corrupted in the database after it was downloaded?
+    # Hence the flag: ignore_previous_files
+    if [ -f "$file_binary" ]
     then
-        rm "$file_metadata"
+        if [ "$KEEP_PREVIOUS_FILES" == "yes" ]
+        then
+            md5_actual=$(md5_from_file "$file_binary")
+            if [ "$md5_expected" != "$md5_actual" ]
+            then
+                rm "${file_binary}"
+            fi
+        else
+            rm "${file_binary}"
+        fi
     fi
-    mongo "${bucket_files_host}/${db}" --quiet --eval "printjson(db.${bucket}.files.findOne());" > "$file_metadata"
-    rc=$?
-    if [[ $rc != 0 ]]
+
+
+    # Download the file.
+    if [ ! -f "$file_binary" ]
     then
-        echo "Error ${rc} saving ${file_metadata}"
+        java -jar "$ORFILES" -M Get -l "$file_binary" -h "$BUCKET_FILES_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
+        rc=$?
+        if [[ ${rc} != 0 ]]
+        then
+            echo "ERROR ${rc} when downloading file with ${id}"
+            continue
+        fi
+        md5_actual=$(md5_from_file "$file_binary")
+        if [ "$md5_expected" != "$md5_actual" ]
+        then
+            echo "ERROR: md5 mismatch then comparing the file with a checkout version. \
+                Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
+            continue
+        fi
+    fi
+
+
+    save_metadata "$id" "$file_metadata"
+    rc=$?
+    if [[ ${rc} != 0 ]]
+    then
+        echo "ERROR ${rc} saving the file's ${file_metadata}"
         continue
     fi
+
+    # If we got here then the binary and it's metadata is saved to disk.
+    echo "OK"
 
 done < "$file_with_identifiers"
