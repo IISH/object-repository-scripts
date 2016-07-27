@@ -10,7 +10,7 @@
 # /[TARGET FOLDER]/[ID PARTS]/[ID].json
 #
 # Usage
-# backup_replicaset.sh [metadata host] [primary host] [DB] [BUCKET] [TARGET] [optional KEEP_PREVIOUS_FILES=yes|no]
+# backup_replicaset.sh "metadata host" "primary host" "DB" "BUCKET" "TARGET" "[MOUNT HOST]:/[folder]" "optional KEEP_PREVIOUS_FILES=yes|no"
 # E.g. ./backup_replicaset.sh or_10622 master /some/device/mountpoint
 #
 # The procedure will log the ID of the file and success or reason of failure.
@@ -47,11 +47,11 @@ then
     exit 1
 fi
 
-count_bucket_files=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "DB.${BUCKET}.files.count()")
+count_bucket_files=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "db.${BUCKET}.files.count()")
 rc=$?
 if [[ ${rc} != 0 ]]
 then
-    echo "Error trying to count the number of documents."
+    echo "Error trying to count the number of documents from ${count_bucket_files}."
     exit 1
 fi
 if [[ ${count_bucket_files} == 0 ]]
@@ -62,11 +62,11 @@ else
     echo "Found ${count_bucket_files} metadata documents on ${BUCKET_FILES_HOST}/${DB}"
 fi
 
-count_bucket_chunks=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval "DB.${BUCKET}.chunks.count()")
+count_bucket_chunks=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval "db.${BUCKET}.chunks.count()")
 rc=$?
 if [[ ${rc} != 0 ]]
 then
-    echo "Error trying to count the number of documents."
+    echo "Error trying to count the number of documents from ${count_bucket_chunks}."
     exit 1
 fi
 if [[ ${count_bucket_chunks} == 0 ]]
@@ -90,7 +90,24 @@ then
 fi
 
 
-KEEP_PREVIOUS_FILES="6"
+mount_host="$6"
+if [ -z "$mount_host" ]
+then
+    echo "Must have a mount host."
+    exit 1
+fi
+umount "$TARGET"
+sleep 10
+mount -t nfs "$mount_host" "$TARGET"
+rc=$?
+if [[ ${rc} != 0 ]]
+then
+    echo "Error ${rc} when mounting: ${mount_host}"
+    exit 1
+fi
+
+
+KEEP_PREVIOUS_FILES="$7"
 if [ -z "$KEEP_PREVIOUS_FILES" ]
 then
     KEEP_PREVIOUS_FILES="yes"
@@ -174,16 +191,6 @@ then
     rm "$file_with_identifiers"
 fi
 
-maxKey=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval \
-    "db.${BUCKET}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:-1})[0].files_id")
-rc=$?
-if [[ ${rc} == 0 ]]
-then
-    echo "maxKey: ${maxKey}"
-else
-    echo "Unable to get the maxKey with identifiers (${rc}): ${file_with_identifiers}"
-    exit 1
-fi
 
 minKey=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval \
     "db.${BUCKET}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:1})[0].files_id")
@@ -196,12 +203,25 @@ else
     exit 1
 fi
 
+
+maxKey=$(mongo "${BUCKET_CHUNKS_HOST}/${DB}" --quiet --eval \
+    "db.${BUCKET}.chunks.find({files_id:{\$ne:0},n:0},{_id:0, files_id:1}).limit(1).sort({files_id:-1})[0].files_id")
+rc=$?
+if [[ ${rc} == 0 ]]
+then
+    echo "maxKey: ${maxKey}"
+else
+    echo "Unable to get the maxKey with identifiers (${rc}): ${file_with_identifiers}"
+    exit 1
+fi
+
+
 mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval \
-    "db.${BUCKET}.files.find({\$and:[{_id:{\$gte:${minKey}}},{_id:{\$lte:${maxKey}}},md5:{\$exists:true}]},{_id:1}).sort({_id:1}).forEach(function(d){print(d._id)})" > "$file_with_identifiers"
+    "db.${BUCKET}.files.find({\$and:[{_id:{\$gte:${minKey}}},{_id:{\$lte:${maxKey}}},{md5:{\$exists:true}}]},{_id:1}).sort({_id:1}).forEach(function(d){print(d._id)})" > "$file_with_identifiers"
 rc=$?
 if [[ ${rc} != 0 ]]
 then
-    echo "Unable to get a file with identifiers: ${file_with_identifiers}"
+    echo "Error ${rc}. Unable to get a file with identifiers: ${file_with_identifiers}"
     exit 1
 fi
 count=$(cat "$file_with_identifiers" | wc -l)
@@ -220,10 +240,11 @@ fi
 #-----------------------------------------------------------------------------------------------------------------------
 # Extract all files.
 #-----------------------------------------------------------------------------------------------------------------------
+echo "Begin"
 while read id
 do
     echo -n "Checking out ${id}... "
-    md5_expected=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "var doc=db.${BUCKET}.files.findOne({_id:${id});assert(doc);assert(doc.md5);print(doc.md5)")
+    md5_expected=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "var doc=db.${BUCKET}.files.findOne({_id:${id}});assert(doc);assert(doc.md5);print(doc.md5)")
     rc=$?
     if [[ ${rc} == 0 ]]
     then
@@ -263,7 +284,7 @@ do
     # Download the file.
     if [ ! -f "$file_binary" ]
     then
-        java -jar "$ORFILES" -M Get -l "$file_binary" -h "$BUCKET_FILES_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
+        java -jar "$ORFILES" -M Replica -l "$file_binary" -h "$BUCKET_FILES_HOST" -r "$BUCKET_CHUNKS_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
         rc=$?
         if [[ ${rc} != 0 ]]
         then
@@ -273,8 +294,7 @@ do
         md5_actual=$(md5_from_file "$file_binary")
         if [ "$md5_expected" != "$md5_actual" ]
         then
-            echo "ERROR: md5 mismatch then comparing the file with a checkout version. \
-                Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
+            echo "ERROR: md5 mismatch then comparing file ${id}. Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
             continue
         fi
     fi
@@ -292,3 +312,4 @@ do
     echo "OK"
 
 done < "$file_with_identifiers"
+echo "End"
