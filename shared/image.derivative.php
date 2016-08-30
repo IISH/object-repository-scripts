@@ -1,5 +1,5 @@
 <?php
-set_time_limit(60); //GIVE THE SCRIPT A LIMIT OF 60 SECONDS TO RUN
+set_time_limit(180); //GIVE THE SCRIPT A LIMIT OF 180 SECONDS TO RUN
 #ini_set("memory_limit", "2048M"); //SET THE MEMORY LIMIT TO 2Mb
 
 
@@ -155,28 +155,28 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
     //FORCED VALUES USED FOR GENERATING THUMBS
     if (isset($derivativeTypes[$derivativeType]['forceWidth'])) {
 
-        $commmand = "convert -limit memory 1024 \"" . $input . "\" ";
-        $commmand .= "-thumbnail " . $derivativeTypes[$derivativeType]['forceWidth'] . "x ";
+        $command = "convert -limit memory 1024 \"" . $input . "\" ";
+        $command .= "-thumbnail " . $derivativeTypes[$derivativeType]['forceWidth'] . "x ";
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
-            $commmand .= "-quality " . $derivativeTypes[$derivativeType]['quality'] . " ";
+            $command .= "-quality " . $derivativeTypes[$derivativeType]['quality'] . " ";
         }
 
-        $commmand .= "-density 72 -strip ";
-        $commmand .= "\"" . $output . "." . $derivativeTypes[$derivativeType]['extension'] . "\" ";
+        $command .= "-density 72 -strip ";
+        $command .= "\"" . $output . "." . $derivativeTypes[$derivativeType]['extension'] . "\" ";
 
     } else {
 
-        $commmand = "convert -limit memory 1024 \"" . $input . "\" ";
-        $commmand .= "-compress " . $derivativeTypes[$derivativeType]['encode'] . " ";
+        $command = "convert -limit memory 1024 \"" . $input . "\" ";
+        $command .= "-compress " . $derivativeTypes[$derivativeType]['encode'] . " ";
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
-            $commmand .= "-quality " . $derivativeTypes[$derivativeType]['quality'] . " ";
+            $command .= "-quality " . $derivativeTypes[$derivativeType]['quality'] . " ";
         }
 
-        $commmand .= "-resample " . $targetDPIs . " ";
-        $commmand .= "-density " . $targetDPIs . " ";
-        $commmand .= "\"" . $output . "." . $derivativeTypes[$derivativeType]['extension'] . "\" ";
+        $command .= "-resample " . $targetDPIs . " ";
+        $command .= "-density " . $targetDPIs . " ";
+        $command .= "\"" . $output . "." . $derivativeTypes[$derivativeType]['extension'] . "\" ";
 
     }
 
@@ -188,7 +188,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
         unset($commandReturn_var);
     }
 
-    exec($commmand, $commandOutput, $commandReturn_var);
+    exec($command, $commandOutput, $commandReturn_var);
 
     if (!file_exists($output . "." . $derivativeTypes[$derivativeType]['extension'])) {
         echo "ERROR: OUTPUT FILE WAS NOT CREATED\n";

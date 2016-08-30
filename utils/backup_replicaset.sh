@@ -90,23 +90,6 @@ then
 fi
 
 
-mount_host="$6"
-if [ -z "$mount_host" ]
-then
-    echo "Must have a mount host."
-    exit 1
-fi
-umount "$TARGET"
-sleep 10
-mount -t nfs "$mount_host" "$TARGET"
-rc=$?
-if [[ ${rc} != 0 ]]
-then
-    echo "Error ${rc} when mounting: ${mount_host}"
-    exit 1
-fi
-
-
 KEEP_PREVIOUS_FILES="$7"
 if [ -z "$KEEP_PREVIOUS_FILES" ]
 then
@@ -186,7 +169,7 @@ wget -O "$ORFILES" --no-check-certificate "https://bamboo.socialhistoryservices.
 # Get a list of all identifiers on the replica set.
 #-----------------------------------------------------------------------------------------------------------------------
 file_with_identifiers="/opt/_id.${DB}.${BUCKET}.txt"
-if [ ! "file_with_identifiers" ]
+if [ -f "file_with_identifiers" ]
 then
     rm "$file_with_identifiers"
 fi
@@ -243,16 +226,20 @@ fi
 echo "Begin"
 while read id
 do
-    echo -n "Checking out ${id}... "
-    md5_expected=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "var doc=db.${BUCKET}.files.findOne({_id:${id}});assert(doc);assert(doc.md5);print(doc.md5)")
-    rc=$?
-    if [[ ${rc} == 0 ]]
-    then
-        md5_expected=$(normalize_md5_hash "$md5_expected")
-    else
-        echo "ERROR ${rc} with ${id} when retrieving the expected md5 from the files collection ${BUCKET_FILES_HOST}."
-        continue
-    fi
+    rc=1
+    while [[ ${rc} == 1 ]]
+    do
+        echo -n "Checking out ${id}... "
+        md5_expected=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "var doc=db.${BUCKET}.files.findOne({_id:${id}});assert(doc);assert(doc.md5);print(doc.md5)")
+        rc=$?
+        if [[ ${rc} == 0 ]]
+        then
+            md5_expected=$(normalize_md5_hash "$md5_expected")
+        else
+            echo "WARNING ${rc} with ${id} when retrieving the expected md5 from the files collection ${BUCKET_FILES_HOST}. Pausing for 300 seconds."
+            sleep 300
+        fi
+    done
 
     path=$(build_path "$id")
     if [ ! -d "$path" ]
