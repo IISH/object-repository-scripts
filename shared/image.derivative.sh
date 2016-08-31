@@ -42,7 +42,7 @@ if [ -f "$sourceFile" ]; then
 	rc=$?
     if [[ $rc == 0 ]] ; then
         echo "Running conversion: ${cmd}"
-        $cmd
+        eval "$cmd"
     else
         echo "Error: ${cmd}"
     fi
