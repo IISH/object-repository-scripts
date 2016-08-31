@@ -2,6 +2,8 @@
 
 // Returns the appropriate conversion command given the input file and desired derivative format.
 
+ini_set("memory_limit", "2048M"); //SET THE MEMORY LIMIT TO 2GiB
+
 //DEFINE DIFERENT DERIVATIVE TYPES
 $derivativeTypes = array();
 
@@ -184,8 +186,8 @@ function generateDerivative($input, $output, $derivativeType)
 
 
 //GET COMMAND LINE OPTIONS
-//i=input file; o=output file; l=derivative level; d=database; b=bucket; p=pid; s=mongo shellscript
-$options = getopt("i:o:l:d:b:p:s:");
+//i=input file; b=derivative level; o=output file
+$options = getopt("i:b:o:");
 
 
 //CHECK COMMAND LINE OPTIONS
@@ -200,8 +202,8 @@ if (isset($options['i'])) {
     exit(1);
 }
 
-if (isset($options['l'])) {
-    if (!isset($derivativeTypes[$options['l']])) {
+if (isset($options['b'])) {
+    if (!isset($derivativeTypes[$options['b']])) {
         echo("\nUNKNOWN DERIVATIVE TYPE\n");
         exit(1);
     }
@@ -210,11 +212,11 @@ if (isset($options['l'])) {
     exit(1);
 }
 
-if (!isset($options['b'])) {
-    echo("Bucket is not set");
+if (!isset($options['o'])) {
+    echo("Output file is not set");
     exit(1);
 }
 
-// i = inputfile; o = outputfile; l=derivative level
-generateDerivative($options['i'], $options['o'], $options['l']);
+// i = inputfile; o = outputfile; b=derivative level
+generateDerivative($options['i'], $options['b'], $options['o']);
 ?>
