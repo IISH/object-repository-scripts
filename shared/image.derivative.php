@@ -1,7 +1,6 @@
 <?php
-set_time_limit(180); //GIVE THE SCRIPT A LIMIT OF 180 SECONDS TO RUN
-#ini_set("memory_limit", "2048M"); //SET THE MEMORY LIMIT TO 2Mb
 
+// Returns the appropriate conversion command given the input file and desired derivative format.
 
 //DEFINE DIFERENT DERIVATIVE TYPES
 $derivativeTypes = array();
@@ -69,7 +68,7 @@ $derivativeTypes['level3']['quality'] = 25;
 $derivativeTypes['level3']['forceWidth'] = 200; //PX
 
 
-function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid, $script)
+function generateDerivative($input, $output, $derivativeType)
 {
     global $derivativeTypes;
 
@@ -79,7 +78,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
         $im = new Imagick($input);
     } catch (Exception $e) {
         echo "ERROR: " . $e->getMessage() . "\n";
-        exit();
+        exit(1);
     }
 
     $original['dpis'] = $im->getImageResolution();
@@ -180,33 +179,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
 
     }
 
-    if (isset($commandOutput)) {
-        unset($commandOutput);
-    }
-
-    if (isset($commandReturn_var)) {
-        unset($commandReturn_var);
-    }
-
-    exec($command, $commandOutput, $commandReturn_var);
-
-    if (!file_exists($output . "." . $derivativeTypes[$derivativeType]['extension'])) {
-        echo "ERROR: OUTPUT FILE WAS NOT CREATED\n";
-        echo "COMMAND OUTPUT: " . print_r( $commandOutput ) . "\n";
-        echo "COMMAND RETURN VAR: " . $commandReturn_var . "\n";
-        //exit();
-    } else {
-        echo "OK!\n";
-
-        if (count($commandOutput) > 0) {
-            echo "WARNING: " . $commandOutput . "\n";
-        }
-
-        if ($commandReturn_var != 0) {
-            echo "WARNING: " . $commandReturn_var . "\n";
-        }
-    }
-
+    print($command);
 }
 
 
@@ -219,36 +192,29 @@ $options = getopt("i:o:l:d:b:p:s:");
 
 if (isset($options['i'])) {
     if (!file_exists($options['i'])) {
-        exit("\nORIGINAL FILE NOT FOUND\n");
+        echo("\nORIGINAL FILE NOT FOUND\n");
+        exit(1);
     }
 } else {
-    exit("\nORIGINAL FILE NOT DEFINED\n");
+    echo("\nORIGINAL FILE NOT DEFINED\n");
+    exit(1);
 }
 
 if (isset($options['l'])) {
     if (!isset($derivativeTypes[$options['l']])) {
-        exit("\nUNKNOWN DERIVATIVE TYPE\n");
+        echo("\nUNKNOWN DERIVATIVE TYPE\n");
+        exit(1);
     }
 } else {
-    exit("\nDERIVATIVE TYPE NOT DEFINED\n");
-}
-
-if (!isset($options['d'])) {
-    exit("Database is not set");
+    echo("\nDERIVATIVE TYPE NOT DEFINED\n");
+    exit(1);
 }
 
 if (!isset($options['b'])) {
-    exit("Bucket is not set");
+    echo("Bucket is not set");
+    exit(1);
 }
 
-if (!isset($options['p'])) {
-    exit("PID is not set");
-}
-
-if (!isset($options['s'])) {
-    exit("Shell script is not set");
-}
-
-// i = inputfile; o = outputfile; l=derivative level; d=database; b=bucket; p=pid; s=script
-generateDerivative($options['i'], $options['o'], $options['l'], $options['d'], $options['b'], $options['p'], $options['s']);
+// i = inputfile; o = outputfile; l=derivative level
+generateDerivative($options['i'], $options['o'], $options['l']);
 ?>

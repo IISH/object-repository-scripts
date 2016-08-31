@@ -38,7 +38,13 @@ done
 # Run the convert script to create derivative.
 if [ -f "$sourceFile" ]; then
 	echo "Creating derivative from $sourceFile"
-	php $scripts/shared/image.derivative.php -i $sourceFile -l $bucket -b $sourceBucket -d $db -p $pid -s $scripts/shared/content.js -o $targetFile
+	$convert=$($scripts/shared/image.derivative.php -i "$sourceFile" -l "$bucket" -o "$targetFile")
+	rc=$?
+    if [[ $rc == 0 ]] ; then
+        $convert
+    else
+        echo "$convert"
+    fi
 else
 	echo "Could not find a master or higher level derivative to produce a $bucket file"
 	echo "We need at least a master to produce a derivative."
