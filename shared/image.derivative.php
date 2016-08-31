@@ -70,7 +70,7 @@ $derivativeTypes['level3']['quality'] = 25;
 $derivativeTypes['level3']['forceWidth'] = 200; //PX
 
 
-function generateDerivative($input, $output, $derivativeType)
+function generateDerivative($input, $derivativeType, $output)
 {
     global $derivativeTypes;
 
