@@ -38,11 +38,11 @@ done
 # Run the convert script to create derivative.
 if [ -f "$sourceFile" ]; then
 	echo "Creating ${bucket} derivative from ${sourceFile}"
-	$cmd=$(/usr/bin/php $scripts/shared/image.derivative.php -i "$sourceFile" -b "$bucket" -o "$targetFile")
+	cmd=$(/usr/bin/php "${scripts}/shared/image.derivative.php" -i "$sourceFile" -b "$bucket" -o "$targetFile")
 	rc=$?
     if [[ $rc == 0 ]] ; then
         echo "Running conversion: ${cmd}"
-        $convert
+        $cmd
     else
         echo "Error: ${cmd}"
     fi
