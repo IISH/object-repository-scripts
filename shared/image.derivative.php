@@ -192,7 +192,7 @@ function generateDerivative($input, $output, $derivativeType, $db, $bucket, $pid
 
     if (!file_exists($output . "." . $derivativeTypes[$derivativeType]['extension'])) {
         echo "ERROR: OUTPUT FILE WAS NOT CREATED\n";
-        echo "COMMAND OUTPUT: " . $commandOutput . "\n";
+        echo "COMMAND OUTPUT: " . print_r( $commandOutput ) . "\n";
         echo "COMMAND RETURN VAR: " . $commandReturn_var . "\n";
         //exit();
     } else {
