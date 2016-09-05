@@ -80,11 +80,16 @@ case $rc in
         echo "No enough space on the hard drive."
         ;;
     29)
-        echo "Conversion error. Fall back on ffmpeg"
-        ffmpeg -i "$windows_sourceFile" -vcodec libx264 -preset slower -crf 23 "$windows_targetFile"
+        echo "Conversion error. Fall back on ffmpeg."
+        ffmpeg -i "$windows_sourceFile" -vcodec libx264 -preset slower -crf 23 -y "$windows_targetFile"
         rc=$?
         if [[ $rc != 0 ]] ; then
-            echo "ffmpeg failover did not work either. It gave an error response."
+		    echo "Conversion error ${rc} from ffmpeg. Second attempt with audio channel reduction."
+		    ffmpeg -i "$windows_sourceFile" -ac 2 -vcodec libx264 -preset slower -crf 23 -y "$windows_targetFile"
+	    fi
+        rc=$?
+        if [[ $rc != 0 ]] ; then
+            echo "ffmpeg failover did not work either. It gave an error response ${rc}."
         fi
         ;;
     30)

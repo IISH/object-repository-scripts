@@ -343,7 +343,8 @@
 .mp2,audio/mpeg
 .mpa,audio/mpeg
 .mpga,audio/mpeg
-.mp3,audio/mpeg3
+.mp3,audio/mpeg
+.mpeg3,audio/mpeg
 .la,audio/nspaudio
 .lma,audio/nspaudio
 .s3m,audio/s3m
