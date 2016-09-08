@@ -1,9 +1,24 @@
 #!/bin/bash
-#
-# For each host start the chunk procedure
 
+
+scripts="$scripts"
 replicaset=$1
-host=mongo or-mongodb-$replicaset-2.objectrepository.org
-db=or_10622
+db=$2
+bucket=$3
+_id=$4
+target="or-mongodb-${replicaset}.${db}.${bucket}.${_id}"
+echo "HOST N EXPECTED ACTUAL MATCH" >  "$target"
 
-mongo $host:27018/$db --eval "var lower=db.master.chunks.find({},{files_id:1}).sort({files_id:1}).limit(1); print(lower[0].files_id)"
+
+for replica in 02 00 01
+do
+    echo "Retrieve the chunks"
+    host="or-mongodb-${replicaset}-${replica}:27018"
+    file="${host}.${db}.${bucket}.${_id}"
+    "${scripts}/utils/chunk_check.sh" "$host" "$db" "$bucket" "$_id" > "$file"
+
+    f="${file}.check"
+    echo "Calculating md5 per chunk to ${f}"
+    python "${scripts}/utils/chunk_check.py" -f "$file" > "$f"
+    paste "$target" "$f" | column -s ',' -t >> "$target"
+done

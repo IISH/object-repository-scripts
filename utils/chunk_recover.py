@@ -11,19 +11,21 @@ import hashlib
 import sys
 
 
+
+
+
 def parse_csv(file):
 
+    print('N,RECOVER')
     csv.field_size_limit(524288)
     n=0
     with open(file, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for _items in reader:
-            expected_md5 =_items[0]
-            data =_items[1]
-            actual_md5 = hashlib.md5(binascii.unhexlify(data)).hexdigest()
-            compare = int(expected_md5, 16) == int(actual_md5, 16)
-            print(str(n) + ',' + expected_md5 + ',' + actual_md5 + ',' + str(compare))
-            n+=1
+            n, expected, actual, match = [item for item in _items]
+            if not match:
+                lookup()
+
 
 def usage():
     print('Usage: chunk_check.py -f [source file]')
@@ -33,8 +35,8 @@ def main(argv):
     sourcefile = None
 
     try:
-        opts, args = getopt.getopt(argv, 'f:h',
-                                   ['file=', 'help'])
+        opts, args = getopt.getopt(argv, 'p:s:d:h',
+                                   ['primary=', 'secondary=', 'delay=', 'help'])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -42,7 +44,7 @@ def main(argv):
         if opt in ('-h', '--help'):
             usage()
             sys.exit()
-        elif opt in ('-f', '--file'):
+        elif opt in ('-p', '--primary'):
             sourcefile = arg
 
     assert sourcefile
