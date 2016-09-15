@@ -4,35 +4,43 @@
 #
 # Recalculate the md5 hash
 
-import binascii
 import csv
 import getopt
-import hashlib
 import sys
 
 
+def parse_csv(primary, secondary, delay):
+    p_dict = load(primary, False)
+    s_p_dict = load(secondary)
+    d_p_dict = load(delay)
+
+    for n in p_dict:
+        if n in s_p_dict:
+            print(n + ',' + s_p_dict[n])
+        elif n in d_p_dict:
+            print(n + ',' + d_p_dict[n])
 
 
-
-def parse_csv(file):
-
-    print('N,RECOVER')
-    csv.field_size_limit(524288)
-    n=0
+def load(file, accept=True):
+    d = dict()
     with open(file, 'rb') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        reader = csv.reader(csvfile, delimiter=',')
         for _items in reader:
-            n, expected, actual, match = [item for item in _items]
-            if not match:
-                lookup()
+            host, _id, n, files_id, expected, actual, match = [item for item in _items]
+            if match == accept:
+                d[n] = host
+    return d
+
+def str2bool(v):
+    return v.lower() in ('yes', 'true', 't', '1')
 
 
 def usage():
-    print('Usage: chunk_check.py -f [source file]')
+    print('Usage: chunk_recover.py -p [primart file] -s [secondary file] -d [delay file]')
 
 
 def main(argv):
-    sourcefile = None
+    primary = secondary = delay = None
 
     try:
         opts, args = getopt.getopt(argv, 'p:s:d:h',
@@ -45,10 +53,20 @@ def main(argv):
             usage()
             sys.exit()
         elif opt in ('-p', '--primary'):
-            sourcefile = arg
+            primary = arg
+        elif opt in ('-s', '--secondary'):
+            secondary = arg
+        elif opt in ('-d', '--delay'):
+            delay = arg
+        else:
+            print 'Unknown argument: ' + opt
+            usage()
+            sys.exit(1)
 
-    assert sourcefile
-    parse_csv(sourcefile)
+    assert primary
+    assert secondary
+    assert delay
+    parse_csv(primary, secondary, delay)
 
 
 if __name__ == '__main__':

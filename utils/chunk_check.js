@@ -26,7 +26,7 @@ server.getMongo().setSlaveOk();
 var chunksCollection = server.getCollection(bucket + '.chunks');
 var nc = Math.ceil(doc.length / doc.chunkSize);
 for (var n = 0; n < nc; n++) {
-    var chunk = chunksCollection.findOne({files_id: files_id, n: n}, {_id: 0, md5:1, data:1});
+    var chunk = chunksCollection.findOne({files_id: files_id, n: n});
     assert(chunk, 'No chunk found: {files_id: ' + files_id + ',n: ' + n + '}');
-    print('"' + host + '","' + chunk.md5 + '","' + chunk.data.hex() + '"');
+    print('"' + host + '","' + chunk._id.valueOf() + '","' + n + '","' + files_id + '","' + chunk.md5 + '","' + chunk.data.hex() + '"');
 }

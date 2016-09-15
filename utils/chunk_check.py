@@ -14,17 +14,18 @@ import sys
 def parse_csv(file):
 
     csv.field_size_limit(524288)
-    n=0
     with open(file, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for _items in reader:
             host = _items[0]
-            expected_md5 = _items[1]
-            data = _items[2]
+            _id = _items[1]
+            n = _items[2]
+            files_id = _items[3]
+            expected_md5 = _items[4]
+            data = _items[5]
             actual_md5 = hashlib.md5(binascii.unhexlify(data)).hexdigest()
             compare = int(expected_md5, 16) == int(actual_md5, 16)
-            print(str(n) + ',' + expected_md5 + ',' + actual_md5 + ',' + str(compare))
-            n+=1
+            print(host + ',' + _id + ',' + n + ',' + files_id + ',' + expected_md5 + ',' + actual_md5 + ',' + str(compare))
 
 def usage():
     print('Usage: chunk_check.py -f [source file]')
