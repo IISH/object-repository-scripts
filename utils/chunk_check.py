@@ -18,8 +18,9 @@ def parse_csv(file):
     with open(file, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for _items in reader:
-            expected_md5 =_items[0]
-            data =_items[1]
+            host = _items[0]
+            expected_md5 = _items[1]
+            data = _items[2]
             actual_md5 = hashlib.md5(binascii.unhexlify(data)).hexdigest()
             compare = int(expected_md5, 16) == int(actual_md5, 16)
             print(str(n) + ',' + expected_md5 + ',' + actual_md5 + ',' + str(compare))
