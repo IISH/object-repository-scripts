@@ -16,9 +16,11 @@ def parse_csv(primary, secondary, delay):
 
     for n in p_dict:
         if n in s_p_dict:
-            print(n + ',' + s_p_dict[n])
+            print('True,' + n + ',' + s_p_dict[n])
         elif n in d_p_dict:
-            print(n + ',' + d_p_dict[n])
+            print('True,' + n + ',' + d_p_dict[n])
+        else:
+            print('False,' + n + ',' + p_dict[n])
 
 
 def load(file, accept=True):
@@ -27,7 +29,7 @@ def load(file, accept=True):
         reader = csv.reader(csvfile, delimiter=',')
         for _items in reader:
             host, _id, n, files_id, expected, actual, match = [item for item in _items]
-            if match == accept:
+            if str2bool(match) == accept:
                 d[n] = host
     return d
 
