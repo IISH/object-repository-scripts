@@ -2,7 +2,11 @@
 
 
 FILE_WITH_ERRORS="$1"
-rm "$FILE_WITH_ERRORS"
+if [ ! -f "$FILE_WITH_ERRORS" ]
+then
+    echo "$FILE_WITH_ERRORS"
+    exit 1
+fi
 
 while read line
 do read replicaset_number id <<< "$line"

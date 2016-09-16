@@ -23,7 +23,6 @@ function export {
 function chunk {
     r="$1"
     file="$2"
-    echo "Retrieve the chunks"
     host="or-mongodb-${REPLICASET}-${r}.objectrepository.org:27018"
     tmp="file.csv"
     "${scripts}/utils/chunk_check.sh" "$host" "$DB" "$BUCKET" "$_ID" > "$tmp"
@@ -33,7 +32,7 @@ function chunk {
 
 
 function recover {
-    "${scripts}/utils/chunk_recover.py" --primary primary.csv --secondary secondary.csv --delay delay.csv
+    python "${scripts}/utils/chunk_recover.py" --primary primary.csv --secondary secondary.csv --delay delay.csv
 }
 
 
