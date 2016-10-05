@@ -206,7 +206,7 @@ function package {
         #---------------------------------------------------------------------------------------------------------------
         if [ -f "$archive" ]
         then
-            expected_archive="$archive.part01.rar"
+            expected_archive="${archive}.part1.rar"
             echo "Moving ${archive} to ${expected_archive}"
             mv "$archive" "$expected_archive"
         fi
