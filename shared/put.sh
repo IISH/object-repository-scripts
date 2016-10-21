@@ -28,6 +28,33 @@ derivative=$derivative
 l="$l"
 
 
+#-----------------------------------------------------------------------------------------------------------------------
+# Create a path based on a 12 zero leader divided into three parts.
+#-----------------------------------------------------------------------------------------------------------------------
+function build_path {
+
+    id="$1"
+    TARGET="/data"
+
+    case "${id:0:1}" in
+        "-")
+            alias_id="${id:1}"
+            file_part_0="-"
+        ;;
+        *)
+            alias_id="$id"
+            file_part_0=""
+        ;;
+    esac
+    file_fill="000000000000${alias_id}"
+    file_part_1="${file_fill:(-12):4}"
+    file_part_2="${file_fill:(-8):4}"
+    file_part_3="${file_fill:(-4):4}"
+    path="${TARGET}/${file_part_0}${file_part_1}/${file_part_2}/${file_part_3}"
+    echo -n "$path"
+}
+
+
 if [ ! -f "$l" ] ; then
     echo "The file does not exist: $l"
     exit -1
@@ -169,32 +196,6 @@ then
     fi
 fi
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Create a path based on a 12 zero leader divided into three parts.
-#-----------------------------------------------------------------------------------------------------------------------
-function build_path {
-
-    id="$1"
-    TARGET="/data"
-
-    case "${id:0:1}" in
-        "-")
-            alias_id="${id:1}"
-            file_part_0="-"
-        ;;
-        *)
-            alias_id="$id"
-            file_part_0=""
-        ;;
-    esac
-    file_fill="000000000000${alias_id}"
-    file_part_1="${file_fill:(-12):4}"
-    file_part_2="${file_fill:(-8):4}"
-    file_part_3="${file_fill:(-4):4}"
-    path="${TARGET}/${file_part_0}${file_part_1}/${file_part_2}/${file_part_3}"
-    echo -n "$path"
-}
-
 
 # Add to the backup?
 if [ "$add_backup" == "yes" ]
@@ -225,7 +226,7 @@ then
             exit $rc
         fi
     fi
-    rsync -av "$file_metadata" "${BACKUP_SERVER}:${path}/${shardKey}.json"
+    rsync -avR "$file_metadata" "${BACKUP_SERVER}:${path}/${shardKey}.json"
     rc=$?
     rm "$file_metadata"
     if [[ $rc != 0 ]]
