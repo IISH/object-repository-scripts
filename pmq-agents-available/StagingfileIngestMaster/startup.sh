@@ -22,10 +22,11 @@ action=$action
 source $scripts/shared/delete.sh
 
 
+add_backup="yes"
+add_vfs="yes"
 remove="yes"
 remove_derivatives="yes"
 validate_file="yes"
-add_vfs="yes"
 
 # If we find a file we upload it
 mongo $db --quiet --eval "db.label.update( {'_id' : '$label'}, {\$inc:{size:1}}, true, false)"

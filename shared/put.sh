@@ -169,6 +169,69 @@ then
     fi
 fi
 
+#-----------------------------------------------------------------------------------------------------------------------
+# Create a path based on a 12 zero leader divided into three parts.
+#-----------------------------------------------------------------------------------------------------------------------
+function build_path {
+
+    id="$1"
+    TARGET="/data"
+
+    case "${id:0:1}" in
+        "-")
+            alias_id="${id:1}"
+            file_part_0="-"
+        ;;
+        *)
+            alias_id="$id"
+            file_part_0=""
+        ;;
+    esac
+    file_fill="000000000000${alias_id}"
+    file_part_1="${file_fill:(-12):4}"
+    file_part_2="${file_fill:(-8):4}"
+    file_part_3="${file_fill:(-4):4}"
+    path="${TARGET}/${file_part_0}${file_part_1}/${file_part_2}/${file_part_3}"
+    echo -n "$path"
+}
+
+
+# Add to the backup?
+if [ "$add_backup" == "yes" ]
+then
+    if [ -z "$BACKUP_SERVER" ]
+    then
+        echo "Error: no backup server set but add_backup=yes"
+        exit 1
+    fi
+
+    file_metadata="/tmp/${shardKey}.json"
+    mongo "$db" --quiet --eval "printjson(db.${bucket}.files.findOne({_id:${shardKey}}));" > "$file_metadata"
+    rc=$?
+    if [[ $rc != 0 ]]
+    then
+        echo  "Failed to save metadata to ${file_metadata}"
+        exit $rc
+    fi
+
+    path=$(build_path "$shardKey")
+    rsync -av "$l" "${BACKUP_SERVER}:${path}/${shardKey}.bin"
+    rc=$?
+    if [[ $rc != 0 ]]
+    then
+        echo  "Failed to save binary ${l} to ${BACKUP_SERVER}"
+        exit $rc
+    fi
+    rsync -av "$file_metadata" "${BACKUP_SERVER}:${path}/${shardKey}.json"
+    rc=$?
+    rm "$file_metadata"
+    if [[ $rc != 0 ]]
+    then
+        echo  "Failed to save metadata ${file_metadata} to ${BACKUP_SERVER}"
+        exit $rc
+    fi
+fi
+
 
 # Remove the derivatives.
 remove_derivatives="$remove_derivatives"
