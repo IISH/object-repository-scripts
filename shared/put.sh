@@ -215,12 +215,15 @@ then
     fi
 
     path=$(build_path "$shardKey")
-    rsync -av "$l" "${BACKUP_SERVER}:${path}/${shardKey}.bin"
-    rc=$?
-    if [[ $rc != 0 ]]
+    if [ -f "$l" ]
     then
-        echo  "Failed to save binary ${l} to ${BACKUP_SERVER}"
-        exit $rc
+        rsync -avR "$l" "${BACKUP_SERVER}:${path}/${shardKey}.bin"
+        rc=$?
+        if [[ $rc != 0 ]]
+        then
+            echo  "Failed to save binary ${l} to ${BACKUP_SERVER}"
+            exit $rc
+        fi
     fi
     rsync -av "$file_metadata" "${BACKUP_SERVER}:${path}/${shardKey}.json"
     rc=$?
