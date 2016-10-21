@@ -218,7 +218,7 @@ then
     path=$(build_path "$shardKey")
     if [ -f "$l" ]
     then
-        rsync -avR "$l" "${BACKUP_SERVER}:${path}/${shardKey}.bin"
+        rsync -av "$l" "${BACKUP_SERVER}:${path}/${shardKey}.bin"
         rc=$?
         if [[ $rc != 0 ]]
         then
@@ -226,7 +226,7 @@ then
             exit $rc
         fi
     fi
-    rsync -avR "$file_metadata" "${BACKUP_SERVER}:${path}/${shardKey}.json"
+    rsync -av "$file_metadata" "${BACKUP_SERVER}:${path}/${shardKey}.json"
     rc=$?
     rm "$file_metadata"
     if [[ $rc != 0 ]]
