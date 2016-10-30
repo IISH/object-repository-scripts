@@ -204,11 +204,12 @@ function package {
         #---------------------------------------------------------------------------------------------------------------
         # If we only have one part, Then rename the file accordingly. This way we always have a sequence number.
         #---------------------------------------------------------------------------------------------------------------
-        if [ -f "$archive" ]
+        single_tar="${archive}.rar"
+        if [ -f "$single_tar" ]
         then
             expected_archive="${archive}.part1.rar"
-            echo "Moving ${archive} to ${expected_archive}"
-            mv "$archive" "$expected_archive"
+            echo "Moving ${single_tar} to ${expected_archive}"
+            mv "$single_tar" "$expected_archive"
         fi
     fi
 }
