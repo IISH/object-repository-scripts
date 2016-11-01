@@ -2,7 +2,7 @@
 #
 # /shared/backup_replicaset.sh
 #
-# Backup a replica set by exporting filestreams plus their metadata.
+# Backup a replica set by exporting filestreams: binary plus metadata.
 #
 # Gridfs stores files in two collections# [BUCKET].files and [BUCKET].chunks
 # A file and its metadata is exported as:
@@ -10,7 +10,7 @@
 # /[TARGET FOLDER]/[ID PARTS]/[ID].json
 #
 # Usage
-# backup_replicaset.sh "metadata host" "primary host" "DB" "BUCKET" "TARGET" "[MOUNT HOST]:/[folder]" "optional KEEP_PREVIOUS_FILES=yes|no"
+# backup_replicaset.sh "metadata host" "primary host" "DB" "BUCKET" "TARGET" "[user]@[HOST]:[folder]"
 # E.g. ./backup_replicaset.sh or_10622 master /some/device/mountpoint
 #
 # The procedure will log the ID of the file and success or reason of failure.
@@ -89,19 +89,11 @@ then
     exit 1
 fi
 
-
 REMOTE_HOST=$6
 if [ -z "$REMOTE_HOST" ]
 then
     echo "Must have a REMOTE_HOST, e.g. [user]@[ip]:[folder]"
     exit 1
-fi
-
-
-KEEP_PREVIOUS_FILES="$7"
-if [ -z "$KEEP_PREVIOUS_FILES" ]
-then
-    KEEP_PREVIOUS_FILES="yes"
 fi
 
 
@@ -263,36 +255,24 @@ do
     # Hence the flag: ignore_previous_files
     if [ -f "$file_binary" ]
     then
-        if [ "$KEEP_PREVIOUS_FILES" == "yes" ]
-        then
-            md5_actual=$(md5_from_file "$file_binary")
-            if [ "$md5_expected" != "$md5_actual" ]
-            then
-                rm "${file_binary}"
-            fi
-        else
-            rm "${file_binary}"
-        fi
+        rm "$file_binary"
     fi
 
 
     # Download the file.
     ok=0
-    if [ ! -f "$file_binary" ]
+    java -jar "$ORFILES" -M Replica -l "$file_binary" -h "$BUCKET_FILES_HOST" -r "$BUCKET_CHUNKS_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
+    ok=$?
+    if [[ ${ok} == 0 ]]
     then
-        java -jar "$ORFILES" -M Replica -l "$file_binary" -h "$BUCKET_FILES_HOST" -r "$BUCKET_CHUNKS_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
-        ok=$?
-        if [[ ${ok} == 0 ]]
+        md5_actual=$(md5_from_file "$file_binary")
+        if [ "$md5_expected" != "$md5_actual" ]
         then
-            md5_actual=$(md5_from_file "$file_binary")
-            if [ "$md5_expected" != "$md5_actual" ]
-            then
-                ok=1
-                echo "md5 mismatch then comparing file ${id}. Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
-            fi
-        else
-            echo "${ok} when downloading file with ${id}"
+            ok=1
+            echo "md5 mismatch then comparing file ${id}. Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
         fi
+    else
+        echo "${ok} when downloading file with ${id}"
     fi
 
 
