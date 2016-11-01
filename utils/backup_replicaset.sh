@@ -90,6 +90,14 @@ then
 fi
 
 
+REMOTE_HOST=$6
+if [ -z "$REMOTE_HOST" ]
+then
+    echo "Must have a REMOTE_HOST, e.g. [user]@[ip]:[folder]"
+    exit 1
+fi
+
+
 KEEP_PREVIOUS_FILES="$7"
 if [ -z "$KEEP_PREVIOUS_FILES" ]
 then
@@ -269,34 +277,47 @@ do
 
 
     # Download the file.
+    ok=0
     if [ ! -f "$file_binary" ]
     then
         java -jar "$ORFILES" -M Replica -l "$file_binary" -h "$BUCKET_FILES_HOST" -r "$BUCKET_CHUNKS_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
-        rc=$?
-        if [[ ${rc} != 0 ]]
+        ok=$?
+        if [[ ${ok} == 0 ]]
         then
-            echo "ERROR ${rc} when downloading file with ${id}"
-            continue
-        fi
-        md5_actual=$(md5_from_file "$file_binary")
-        if [ "$md5_expected" != "$md5_actual" ]
-        then
-            echo "ERROR: md5 mismatch then comparing file ${id}. Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
-            continue
+            md5_actual=$(md5_from_file "$file_binary")
+            if [ "$md5_expected" != "$md5_actual" ]
+            then
+                ok=1
+                echo "md5 mismatch then comparing file ${id}. Expect ${md5_expected} but got ${md5_actual}  ${file_binary}"
+            fi
+        else
+            echo "${ok} when downloading file with ${id}"
         fi
     fi
 
 
     save_metadata "$id" "$file_metadata"
-    rc=$?
-    if [[ ${rc} != 0 ]]
+    ok=$?
+    if [[ ${ok} != 0 ]]
     then
-        echo "ERROR ${rc} saving the file's ${file_metadata}"
-        continue
+        echo "${ok} saving the file's ${file_metadata}"
     fi
 
-    # If we got here then the binary and it's metadata is saved to disk.
-    echo "OK"
+    # If we got here with an ok=0 then the binary and it's metadata is saved to disk.
+    if [[ ${ok} == 0 ]]
+    then
+        rsync -av "${TARGET}/" "$REMOTE_HOST"
+        ok=$?
+        if [[ ${ok} == 0 ]]
+        then
+            echo "OK"
+        else
+            echo "${ok} when performing rsync ${TARGET} ${REMOTE_HOST}"
+            echo "ERROR"
+        fi
+    fi
+
+    rm -rf "$path"
 
 done < "$file_with_identifiers"
 echo "End"
