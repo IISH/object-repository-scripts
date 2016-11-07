@@ -13,6 +13,8 @@
 # backup_replicaset.sh "metadata host" "primary host" "DB" "BUCKET" "TARGET" "[user]@[HOST]:[folder]"
 # E.g. ./backup_replicaset.sh or_10622 master /some/device/mountpoint
 #
+# WARNING: the target parameter is a folder that will be removed. Do not point it to persistent storage folders.
+#
 # The procedure will log the ID of the file and success or reason of failure.
 
 
@@ -47,6 +49,25 @@ then
     exit 1
 fi
 
+TARGET=$5
+if [ -z "$TARGET" ]
+then
+    echo "Must have a TARGET folder"
+    exit 1
+fi
+if [ -d "$TARGET" ]
+then
+    rm -rf "$TARGET"
+fi
+mkdir -p "$TARGET"
+
+REMOTE_HOST=$6
+if [ -z "$REMOTE_HOST" ]
+then
+    echo "Must have a REMOTE_HOST, e.g. [user]@[ip]:[folder]"
+    exit 1
+fi
+
 count_bucket_files=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "db.${BUCKET}.files.count()")
 rc=$?
 if [[ ${rc} != 0 ]]
@@ -77,24 +98,7 @@ else
     echo "Found ${count_bucket_chunks} chunk documents on ${BUCKET_CHUNKS_HOST}/${DB}"
 fi
 
-TARGET=$5
-if [ -z "$TARGET" ]
-then
-    echo "Must have a TARGET folder"
-    exit 1
-fi
-if [ ! -d "$TARGET" ]
-then
-    echo "Directory not found ${TARGET}"
-    exit 1
-fi
 
-REMOTE_HOST=$6
-if [ -z "$REMOTE_HOST" ]
-then
-    echo "Must have a REMOTE_HOST, e.g. [user]@[ip]:[folder]"
-    exit 1
-fi
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -214,11 +218,6 @@ then
     exit 1
 fi
 
-if [[ ${count_bucket_files} != ${count} ]]
-then
-    echo "Warning... ${count} documents stored, but ${count_bucket_files} expected."
-fi
-
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Extract all files.
@@ -226,17 +225,17 @@ fi
 echo "Begin"
 while read id
 do
-    rc=1
-    while [[ ${rc} == 1 ]]
+    ok=1
+    while [[ ${ok} != 0 ]]
     do
         echo -n "Checking out ${id}... "
         md5_expected=$(mongo "${BUCKET_FILES_HOST}/${DB}" --quiet --eval "var doc=db.${BUCKET}.files.findOne({_id:${id}});assert(doc);assert(doc.md5);print(doc.md5)")
-        rc=$?
-        if [[ ${rc} == 0 ]]
+        ok=$?
+        if [[ ${ok} == 0 ]]
         then
             md5_expected=$(normalize_md5_hash "$md5_expected")
         else
-            echo "WARNING ${rc} with ${id} when retrieving the expected md5 from the files collection ${BUCKET_FILES_HOST}. Pausing for 300 seconds."
+            echo "WARNING ${ok} with ${id} when retrieving the expected md5 from the files collection ${BUCKET_FILES_HOST}. Pausing for 300 seconds."
             sleep 300
         fi
     done
@@ -250,18 +249,9 @@ do
     file_metadata="${path}/${id}.json"
     file_binary="${path}/${id}.bin"
 
-    # if the file already exist, we check if the md5 still holds true. Otherwise we remove it.
-    # There is a risk here... what is the file was corrupted in the database after it was downloaded?
-    # Hence the flag: ignore_previous_files
-    if [ -f "$file_binary" ]
-    then
-        rm "$file_binary"
-    fi
-
 
     # Download the file.
-    ok=0
-    java -jar "$ORFILES" -M Replica -l "$file_binary" -h "$BUCKET_FILES_HOST" -r "$BUCKET_CHUNKS_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
+    java -Xmx1024M -jar "$ORFILES" -M Replica -l "$file_binary" -h "$BUCKET_FILES_HOST" -r "$BUCKET_CHUNKS_HOST" -d "$DB" -b "$BUCKET" -s "$id" -a "some_pid" -m "some_md5"
     ok=$?
     if [[ ${ok} == 0 ]]
     then
@@ -286,18 +276,19 @@ do
     # If we got here with an ok=0 then the binary and it's metadata is saved to disk.
     if [[ ${ok} == 0 ]]
     then
-        rsync -av "${TARGET}/" "$REMOTE_HOST"
+        rsync -av --size-only "${TARGET}/" "$REMOTE_HOST"
         ok=$?
         if [[ ${ok} == 0 ]]
         then
             echo "OK"
         else
-            echo "${ok} when performing rsync ${TARGET} ${REMOTE_HOST}"
+            echo "${ok} when performing rsync ${TARGET}/ ${REMOTE_HOST}"
             echo "ERROR"
         fi
     fi
 
-    rm -rf "$path"
+    rm -rf "$TARGET"
+    mkdir -p "$TARGET"
 
 done < "$file_with_identifiers"
 echo "End"

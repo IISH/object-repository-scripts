@@ -218,6 +218,7 @@ then
     path=$(build_path "$shardKey")
     if [ -f "$l" ]
     then
+        ssh "$BACKUP_SERVER" "mkdir -p ${path}"
         rsync -av "$l" "${BACKUP_SERVER}:${path}/${shardKey}.bin"
         rc=$?
         if [[ $rc != 0 ]]
