@@ -32,6 +32,7 @@ then
 fi
 
 
+query="{'metadata.objid':'${objid}'}"
 echo "The number of files that will be deleted are:"
 for bucket in $buckets
 do
@@ -53,6 +54,7 @@ then
         tmp_dir="/tmp/pids.${objid}"
         mkdir -p "$tmp_dir"
         file="${tmp_dir}/pids.txt"
+        rm "$file"
         mongo $db --quiet --eval "db.${bucket}.files.find(${query},{'_id':1}).forEach(function(d){print(d._id)})">$file
         while read _id
         do
@@ -61,7 +63,7 @@ then
             mongo ${db} --quiet --eval "db.${bucket}.files.remove({_id:${_id}})"
             mongo ${db} --quiet --eval "db.${bucket}.chunks.remove({files_id:${_id}})"
             # Remove from the vfs
-            mongo --quiet --eval "db.vfs.remove({'_id': { \$regex: /${na}\/${bucket}\/${id}/}})"
+            mongo --quiet --eval "db.vfs.remove({_id: { \$regex: /${na}\/${bucket}\/${id}/}})"
         done < $file
     done
 else
