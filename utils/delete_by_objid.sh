@@ -13,7 +13,8 @@ then
 fi
 
 
-buckets="master"
+
+buckets="master level1 level2 level3"
 na=${objid:0:5}
 id=${objid:6}
 db="or_${na}"
@@ -28,15 +29,6 @@ if [ ! "$objid" == "${na}/${id}" ]
 then
     echo "The expected na and id are not correctly derived from the objid."
     exit 2
-fi
-
-
-query="{'metadata.objid':'${objid}'}"
-found_one=$(mongo $db --quiet --eval "db.master.files.findOne(${query})")
-if [ "$found_one" == "null" ]
-then
-    echo "No files found with ${query}"
-    exit 3
 fi
 
 
@@ -56,29 +48,22 @@ proceed="${proceed,,}"
 
 if [ "$proceed" == "yes" ]
 then
-    tmp_dir="/tmp/pids.${objid}"
-    mkdir -p "$tmp_dir"
-    file="${tmp_dir}/pids.txt"
-    mongo $db --quiet --eval "db.master.files.find(${query},{'metadata.pid':1}).forEach(function(d){print(d.metadata.pid)})">$file
-    while read pid
+    for bucket in $buckets
     do
-        query="{'metadata.pid':'${pid}'}"
-        for bucket in $buckets
+        tmp_dir="/tmp/pids.${objid}"
+        mkdir -p "$tmp_dir"
+        file="${tmp_dir}/pids.txt"
+        mongo $db --quiet --eval "db.${bucket}.files.find(${query},{'_id':1}).forEach(function(d){print(d._id)})">$file
+        while read _id
         do
-            _id=$(mongo $db --quiet --eval "var doc=db.${bucket}.files.findOne(${query},{_id:1}); if (doc) print(doc._id); else print('null');")
             echo "Deleting ${db}.${bucket}.${_id} from ${bucket}.files and ${bucket}.chunks"
-            if [ "$_id" == "null" ]
-            then
-                echo "Warning: no _id found for ${query}"
-            else
-                # Remove from the datastore
-                mongo ${db} --quiet --eval "db.${bucket}.files.remove({_id:${_id}})"
-                mongo ${db} --quiet --eval "db.${bucket}.chunks.remove({files_id:${_id}})"
-                # Remove from the vfs
-                mongo --quiet --eval "db.vfs.remove({'_id': { \$regex: /${na}\/${bucket}\/${id}/}})"
-            fi
-        done
-    done < $file
+            # Remove from the datastore
+            mongo ${db} --quiet --eval "db.${bucket}.files.remove({_id:${_id}})"
+            mongo ${db} --quiet --eval "db.${bucket}.chunks.remove({files_id:${_id}})"
+            # Remove from the vfs
+            mongo --quiet --eval "db.vfs.remove({'_id': { \$regex: /${na}\/${bucket}\/${id}/}})"
+        done < $file
+    done
 else
     echo "Aborted because you typed ${proceed}"
     exit 4
