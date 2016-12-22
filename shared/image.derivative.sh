@@ -68,6 +68,7 @@ fi
 if [ -f "$targetFile" ]; then
 	contentType="image/jpeg"
 	l="$targetFile"
+	length=$(stat -c%s "$l")
 	md5=$(md5sum "$targetFile" | cut -d ' ' -f 1)
 	echo "$md5  $targetFile" > "$targetFile.md5"
 	remove="yes"
