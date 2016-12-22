@@ -67,7 +67,7 @@ $derivativeTypes['level2']['quality'] = 35;
 $derivativeTypes['level3']['encode'] = 'JPEG';
 $derivativeTypes['level3']['extension'] = 'jpg';
 $derivativeTypes['level3']['quality'] = 25;
-$derivativeTypes['level3']['forceWidth'] = 200; //PX
+$derivativeTypes['level3']['forceWidth'] = 450; //PX
 
 
 function generateDerivative($input, $derivativeType, $output)
