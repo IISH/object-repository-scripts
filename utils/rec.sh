@@ -7,6 +7,7 @@ echo "<instruction \
     xmlns='http://objectrepository.org/instruction/1.0/' \
     autoIngestValidInstruction='true' \
     action='upsert' \
+    contentType='image/tiff' \
     plan='StagingfileIngestLevel3' \
     replaceExistingDerivatives='true'>"
 while read pid
