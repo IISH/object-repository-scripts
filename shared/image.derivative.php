@@ -15,7 +15,7 @@ $derivativeTypes = array();
 
 // 'maxWidth' AND 'maxHeight' OVERRIDE 'targetDPI' RULES BUT DOES THE RESIZE BASED ON DPIS - PXS VALUES WILL NOT PRECISE (BECAUSE OF THE FLOOR ON DPIS) BUT ALWAYS LOWER THEN THE DEFINED 'maxWidth' AND 'maxHeight'
 
-// 'forceWidth' OVERRIDE ALL OTHER RESIZE OPTIONS AND SHOULD ONLY BE USED FOR GENERANTING THUMBS D3 - RESIZE IS NOT BASED ON DPIS (DPIS ARE DEFAULTED TO 72)
+// 'forceLength' OVERRIDE ALL OTHER RESIZE OPTIONS AND SHOULD ONLY BE USED FOR GENERANTING THUMBS D3 - RESIZE IS NOT BASED ON DPIS (DPIS ARE DEFAULTED TO 72)
 
 
 //D1
@@ -67,7 +67,7 @@ $derivativeTypes['level2']['quality'] = 35;
 $derivativeTypes['level3']['encode'] = 'JPEG';
 $derivativeTypes['level3']['extension'] = 'jpg';
 $derivativeTypes['level3']['quality'] = 25;
-$derivativeTypes['level3']['forceWidth'] = 450; //PX
+$derivativeTypes['level3']['forceLength'] = 450; //PX
 
 
 function generateDerivative($input, $derivativeType, $output)
@@ -154,10 +154,12 @@ function generateDerivative($input, $derivativeType, $output)
 
 
     //FORCED VALUES USED FOR GENERATING THUMBS
-    if (isset($derivativeTypes[$derivativeType]['forceWidth'])) {
+    if (isset($derivativeTypes[$derivativeType]['forceLength'])) {
+
+        $rs = ($dpisx > $dpisy) ? $derivativeTypes[$derivativeType]['forceLength'] . 'x' : 'x' . $derivativeTypes[$derivativeType]['forceLength'];
 
         $command = " /usr/bin/convert -limit memory 1024 \"" . $input . "\" ";
-        $command .= "-thumbnail " . $derivativeTypes[$derivativeType]['forceWidth'] . "x ";
+        $command .= '-thumbnail ' . $rs . ' ';
 
         if (isset($derivativeTypes[$derivativeType]['quality'])) {
             $command .= "-quality " . $derivativeTypes[$derivativeType]['quality'] . " ";
