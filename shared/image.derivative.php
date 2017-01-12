@@ -156,7 +156,7 @@ function generateDerivative($input, $derivativeType, $output)
     //FORCED VALUES USED FOR GENERATING THUMBS
     if (isset($derivativeTypes[$derivativeType]['forceLength'])) {
 
-        $rs = ($dpisx > $dpisy) ? $derivativeTypes[$derivativeType]['forceLength'] . 'x' : 'x' . $derivativeTypes[$derivativeType]['forceLength'];
+        $rs = ($targetWidth > $targetHeight) ? $derivativeTypes[$derivativeType]['forceLength'] . 'x' : 'x' . $derivativeTypes[$derivativeType]['forceLength'];
 
         $command = " /usr/bin/convert -limit memory 1024 \"" . $input . "\" ";
         $command .= '-thumbnail ' . $rs . ' ';
