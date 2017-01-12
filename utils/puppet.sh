@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo "deb http://apt.puppetlabs.com/ precise main
-deb-src http://apt.puppetlabs.com/ precise main">/etc/apt/sources.list.d/puppet.list
+echo "deb http://apt.puppetlabs.com/ trusty main
+deb-src http://apt.puppetlabs.com/ trusty main">/etc/apt/sources.list.d/puppet.list
 
 wget -O /tmp/pubkey.gpg http://apt.puppetlabs.com/pubkey.gpg
 gpg --import /tmp/pubkey.gpg
-gpg -a --export 4BD6EC30 | apt-key add -
+gpg -a --export EF8D349F | apt-key add -
 apt-get update
 apt-get install facter puppet-common=3.8.3-1puppetlabs1
 apt-mark hold puppet-common
