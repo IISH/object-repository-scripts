@@ -6,13 +6,13 @@
 sa_path=$sa_path
 scripts=$scripts
 db=$db
+id=$id
 pid=$pid
-md5=$md5
 sourceBuckets=$sourceBuckets
 sourceFileExtension=$sourceFileExtension
 bucket=$bucket
 tmp=$derivative_cache
-targetFile=$tmp/$md5.$bucket
+targetFile=$tmp/$id.$bucket
 
 for sourceBucket in ${sourceBuckets[*]}
 do
@@ -20,7 +20,7 @@ do
     if [ ! "$sourceBucket" == "master" ]; then
         sourceFileExtension="jpeg"
     fi
-    sourceFile=$tmp/$md5.$sourceBucket.$sourceFileExtension
+    sourceFile=$tmp/$id.$sourceBucket.$sourceFileExtension
     echo "sourceFile=$sourceFile"
     if [ -f "$sourceFile" ]; then
 	    echo "Using existing cached file on $sourceFile"
@@ -48,7 +48,7 @@ if [ -f "$sourceFile" ]; then
     fi
 else
 	echo "Could not find a master or higher level derivative to produce a $bucket file"
-	echo "We need at least a master to produce a derivative."
+	echo "We need at least a ${bucket} to produce a derivative."
 	exit 240
 fi
 
@@ -58,7 +58,7 @@ mpf=$targetFile-0.jpg
 targetFile="$targetFile.jpg"
 if [ -f $mpf ] ; then
     mv -f $mpf $targetFile
-    rm $tmp/$md5.$bucket-*
+    rm $tmp/$id.$bucket-*
 fi
 
 if [ -f "$sourceFile" ]; then
