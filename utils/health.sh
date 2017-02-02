@@ -21,7 +21,12 @@ function main() {
     echo "<html>"
     echo "<body>"
     echo "<h1>${NOW}</h1>"
-    echo "<table>"
+    echo "<ul>"
+    echo "<li>1 = PRIMARY</il>"
+    echo "<li>2 = SECONDARY</il>"
+    echo "<li>3 = UNKNOWN</il>"
+    echo "</ul>"
+    echo "<table border='1'>"
     echo "<th>host</th><th>status</th>"
 
 
@@ -52,9 +57,9 @@ function main() {
 
             if [[ $state == $OK ]]
             then
-                echo "<tr><td>${host}</td><td>OK</td></tr>"
+                echo "<tr><td>${host}</td><td style='color: green'>${EXPECTED_STATE}</td></tr>"
             else
-                echo "<tr><td>${host}</td><td style=\"color: red\">BAD: expect ${EXPECTED_STATE} but got ${state}</td></tr>"
+                echo "<tr><td>${host}</td><td style='color: red'>${EXPECTED_STATE} but got ${state}</td></tr>"
             fi
         done
     done
