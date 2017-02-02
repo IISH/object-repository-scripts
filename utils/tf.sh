@@ -3,6 +3,9 @@
 # Check the health and expected state of the node. See if we can write to the disk.
 
 
+NOW=`date`
+DIR="/opt/health"
+mkdir -p $DIR
 
 OK=0
 WARNING=1
@@ -15,6 +18,9 @@ SECONDARY=2
 
 function main() {
 
+    echo "<html>"
+    echo "<body>"
+    echo "<h1>${NOW}</h1>"
     echo "<table>"
     echo "<th>host</th><th>status</th>"
 
@@ -55,6 +61,8 @@ function main() {
 
 
     echo "</table>"
+    echo "</body>"
+    echo "</html>"
 }
 
 
