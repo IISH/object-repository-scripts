@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mongo $1 --quiet --eval "db.level3.files.find({'metadata.pid':{\$regex:'^10622\/30051'}},{_id:0,'metadata.pid':1,'metadata.access':1}).forEach(function(d){print(d.metadata.pid+' '+d.metadata.access)})" > barcodes.txt
+#mongo $1 --quiet --eval "db.level3.files.find({'metadata.pid':{\$regex:'^10622\/30051'},'metadata.lastUploadDate':{\$lt:ISODate('2017-01-15')}},{_id:0,'metadata.pid':1,'metadata.access':1}).forEach(function(d){print(d.metadata.pid+' '+d.metadata.access)})" > barcodes.txt
 
 echo "<instruction \
     label='barcode grotere lengte x breedte' \
@@ -12,7 +12,7 @@ echo "<instruction \
     replaceExistingDerivatives='true'>"
 while read line
 do
-    pid access
+    read pid access <<< $line
     echo "<stagingfile><pid>${pid}</pid></stagingfile>"
 done < $1
 echo "</instruction>"

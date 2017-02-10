@@ -15,17 +15,70 @@ UNKNOWN=3
 PRIMARY=1
 SECONDARY=2
 
+function state() {
+    arg=$1
+    case $arg in
+        $PRIMARY)
+            echo "Primary"
+         ;;
+         $SECONDARY)
+             echo "Secondary"
+         ;;
+         *)
+             echo "Unknown"
+         ;;
+     esac
+}
+
+function status() {
+    arg=$1
+    case $arg in
+         $CRITICAL)
+             echo "critical"
+         ;;
+         $OK)
+            echo "ok"
+         ;;
+         $WARNING)
+            echo "warning"
+         ;;
+         *)
+             echo "unknown"
+         ;;
+     esac
+}
+
+function style() {
+    arg=$1
+    case $arg in
+         $CRITICAL)
+             echo "critical"
+         ;;
+         $OK)
+            echo "ok"
+         ;;
+         $WARNING)
+            echo "warning"
+         ;;
+         *)
+             echo "unknown"
+         ;;
+     esac
+}
 
 function main() {
 
     echo "<html>"
+    echo "<head>"
+    echo "<style type='text/css'>"
+    echo ".critical {background-color: white; color: red;}"
+    echo ".ok {background-color: white; color: green;}"
+    echo ".unknown {background-color: white; color: red;}"
+    echo ".warning {background-color: white; color: red;}"
+    echo "</style>"
+    echo "</head>"
     echo "<body>"
     echo "<h1>${NOW}</h1>"
-    echo "<ul>"
-    echo "<li>1 = PRIMARY</il>"
-    echo "<li>2 = SECONDARY</il>"
-    echo "<li>3 = UNKNOWN</il>"
-    echo "</ul>"
     echo "<table border='1'>"
     echo "<th>host</th><th>status</th>"
 
@@ -55,11 +108,16 @@ function main() {
                 state=$UNKNOWN
             fi
 
+            label_status=$(state $state)
+            label_expected_state=$(state $EXPECTED_STATE)
+            style=$(style $state)
+
             if [[ $state == $OK ]]
             then
-                echo "<tr><td>${host}</td><td style='color: green'>${EXPECTED_STATE}</td></tr>"
+                echo "<tr><td>${host}</td><td class='${style}'>${label_expected_state}</td></tr>"
             else
-                echo "<tr><td>${host}</td><td style='color: red'>${EXPECTED_STATE} but got ${state}</td></tr>"
+
+                echo "<tr><td>${host}</td><td class='${style}'>expected ${label_expected_state} but got ${label_status}</td></tr>"
             fi
         done
     done
