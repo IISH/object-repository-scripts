@@ -184,6 +184,7 @@ function generateDerivative($input, $derivativeType, $output)
     }
 
     print($command);
+    exit(0);
 }
 
 
@@ -221,4 +222,5 @@ if (!isset($options['o'])) {
 
 // i = inputfile; o = outputfile; b=derivative level
 generateDerivative($options['i'], $options['b'], $options['o']);
+exit(1);
 ?>
