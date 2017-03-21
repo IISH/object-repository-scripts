@@ -66,7 +66,7 @@ fi
 i="${fileSet}/instruction.xml"
 if [ -f "$i" ]
 then
-    echo "Odd: ${i} found. This is not what we expect. Exiting..."
+    echo "Odd: ${i} found. This is not what we expect. There may already be a package waiting here."
     exit 1
 fi
 
