@@ -63,6 +63,13 @@ else
     fi
 fi
 
+i="${fileSet}/instruction.xml"
+if [ -f "$i" ]
+then
+    echo "Odd: ${i} found. This is not what we expect. Exiting..."
+    exit 1
+fi
+
 
 if [ -z "$objid" ]
 then
