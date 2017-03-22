@@ -66,7 +66,7 @@ fi
 i="${fileSet}/instruction.xml"
 if [ -f "$i" ]
 then
-    echo "Odd: ${i} found. This is not what we expect. There may already be a package waiting here."
+    echo "Odd: ${i} found. This is not what we expect. There may already be a package waiting in here."
     exit 1
 fi
 
@@ -240,14 +240,22 @@ function move_dir {
         echo "Expected a working directory ${workdir} to replace the fileSet ${fileSet}, but it is not there."
         exit 1
     fi
-
 }
 
+#-----------------------------------------------------------------------------------------------------------------------
+# As we made a move we can kill the instructino
+#-----------------------------------------------------------------------------------------------------------------------
+function remove_instruction {
+    mongo sa --quiet --eval "db.getCollection('stagingfile').remove({fileSet:'$fileSet'})"
+    mongo sa --quiet --eval "db.getCollection('instruction').remove({fileSet:'$fileSet'})"
+    sleep 1m
+}
 
 function main {
     package
     instruction
     move_dir
+    remove_instruction
 }
 
 
