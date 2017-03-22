@@ -45,6 +45,7 @@ if [ -f "$sourceFile" ]; then
         eval "$cmd"
     else
         echo "Error: ${cmd}"
+        eval "$cmd"
     fi
 else
 	echo "Could not find a master or higher level derivative to produce a $bucket file"
@@ -57,6 +58,7 @@ fi
 mpf=$targetFile-0.jpg
 targetFile="$targetFile.jpg"
 if [ -f $mpf ] ; then
+    echo "Move ${mpf} ${targetFile}"
     mv -f $mpf $targetFile
     rm $tmp/$id.$bucket-*
 fi
