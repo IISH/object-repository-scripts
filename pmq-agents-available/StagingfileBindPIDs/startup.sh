@@ -19,6 +19,12 @@ lid=$lid
 pidwebserviceKey=$pidwebserviceKey
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 
+# Hack
+if [ $na == "12012" ]
+then
+    na="20.500.${na}"
+fi
+
 
 if [ "$action" == "delete" ] ; then
     soapenv="<?xml version='1.0' encoding='UTF-8'?>  \
