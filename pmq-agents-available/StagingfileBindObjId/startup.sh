@@ -20,6 +20,12 @@ pidwebserviceEndpoint=$pidwebserviceEndpoint
 objid=$objid
 pdfLevel=$pdfLevel
 
+# Hack
+if [ $na == "12012" ]
+then
+    na="20.500.${na}"
+fi
+
 if [ -z "$objid" ] ; then
     echo "No objid.... exiting"
     exit 245
