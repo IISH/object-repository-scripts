@@ -19,12 +19,6 @@ lid=$lid
 pidwebserviceKey=$pidwebserviceKey
 pidwebserviceEndpoint=$pidwebserviceEndpoint
 
-# Hack
-if [ $na == "12012" ]
-then
-    na="20.500.${na}"
-fi
-
 
 if [ "$action" == "delete" ] ; then
     soapenv="<?xml version='1.0' encoding='UTF-8'?>  \
@@ -59,7 +53,7 @@ fi
 
 file=/tmp/$identifier.log
 wget -O $file --header="Content-Type: text/xml" \
-    --header="Authorization: oauth $pidwebserviceKey" --post-data "$soapenv" \
+    --header="Authorization: bearer $pidwebserviceKey" --post-data "$soapenv" \
     --no-check-certificate $pidwebserviceEndpoint
 
 pidCheck=$(php $scripts/shared/pid.php -l $file)

@@ -20,11 +20,6 @@ pidwebserviceEndpoint=$pidwebserviceEndpoint
 objid=$objid
 pdfLevel=$pdfLevel
 
-# Hack
-if [ $na == "12012" ]
-then
-    na="20.500.${na}"
-fi
 
 if [ -z "$objid" ] ; then
     echo "No objid.... exiting"
@@ -66,7 +61,7 @@ fi
 
 file=/tmp/$identifier.log
 wget -O $file --header="Content-Type: text/xml" \
-    --header="Authorization: oauth $pidwebserviceKey" --post-data "$soapenv" \
+    --header="Authorization: bearer $pidwebserviceKey" --post-data "$soapenv" \
     --no-check-certificate $pidwebserviceEndpoint
 
 if [ "$action" == "delete" ] ; then
